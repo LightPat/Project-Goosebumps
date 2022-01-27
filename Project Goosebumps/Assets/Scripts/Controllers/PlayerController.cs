@@ -3,7 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class PlayerController : MonoBehaviour
+[RequireComponent(typeof(PlayerInput))]
+public class PlayerController : Controller
 {
     /* Most of the variables are associated with a specific method,
      * so I declare variables above the methods they are
@@ -14,7 +15,6 @@ public class PlayerController : MonoBehaviour
     [Header("Input Settings")]
     public float sensitivity = 15f;
 
-    private Rigidbody rb;
     private GameObject firstPersonCamera;
 
     void Start()
@@ -144,10 +144,37 @@ public class PlayerController : MonoBehaviour
         }
     }
 
+    [Header("Crouch Settings")]
+    public float crouchSpeed = 2f;
+    public float crouchHeight = 1.5f;
+    void OnCrouch(InputValue value)
+    {
+        // Half the collider's height
+        // GetComponent<Collider>().bounds.size.y/2
+
+        if (value.isPressed)
+        {
+            // If crouch is pressed, shrink the player and change the speed
+            transform.localScale -= new Vector3(0, crouchHeight, 0);
+            currentSpeed = crouchSpeed;
+        }
+        else
+        {
+            // If crouch is released, grow the player and revert the speed change
+            transform.localScale -= new Vector3(0, -crouchHeight, 0);
+            currentSpeed = walkingSpeed;
+        }
+    }
+
     [Header("Interact Settings")]
     public float reach = 2f;
     void OnInteract()
     {
-        Debug.Log("Interacting");
+        RaycastHit hit;
+        // Raycast gameObject that we are looking at if it is in the range of our reach
+        bool bHit = Physics.Raycast(firstPersonCamera.transform.position, firstPersonCamera.transform.forward, out hit, reach);
+
+        // TODO Add logic to handle adding items to inventory system
+        Debug.Log(hit.collider + "TODO Add logic to handle adding items to inventory system");
     }
 }
