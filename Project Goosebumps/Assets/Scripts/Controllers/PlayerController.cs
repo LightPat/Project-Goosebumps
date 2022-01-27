@@ -2,8 +2,10 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using InventorySystem;
 
 [RequireComponent(typeof(PlayerInput))]
+[RequireComponent(typeof(Inventory))]
 public class PlayerController : Controller
 {
     /* Most of the variables are associated with a specific method,
@@ -15,11 +17,14 @@ public class PlayerController : Controller
     [Header("Input Settings")]
     public float sensitivity = 15f;
 
+    private Inventory inventory;
     private GameObject firstPersonCamera;
 
     void Start()
     {
-        rb = GetComponent<Rigidbody>();
+        // Call parent start method
+        base.Start();
+        inventory = GetComponent<Inventory>();
         firstPersonCamera = transform.Find("First Person Camera").gameObject;
     }
 
@@ -174,7 +179,18 @@ public class PlayerController : Controller
         // Raycast gameObject that we are looking at if it is in the range of our reach
         bool bHit = Physics.Raycast(firstPersonCamera.transform.position, firstPersonCamera.transform.forward, out hit, reach);
 
-        // TODO Add logic to handle adding items to inventory system
-        Debug.Log(hit.collider + "TODO Add logic to handle adding items to inventory system");
+        // Have to check bHit in order to prevent a null reference exception when checking tags
+        if (bHit)
+        {
+            if (hit.collider.tag == "InventoryItem")
+            {
+                inventory.addItem(hit.collider.gameObject);
+            }
+            else if (hit.collider.tag == "Interactable")
+            {
+                // TODO
+                Debug.Log("Haven't implemented interactable logic yet in PlayerController.cs");
+            }
+        }
     }
 }

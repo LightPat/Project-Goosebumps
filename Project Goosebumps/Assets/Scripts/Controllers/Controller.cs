@@ -6,4 +6,9 @@ using UnityEngine;
 public class Controller : MonoBehaviour
 {
     protected Rigidbody rb;
+
+    protected void Start()
+    {
+        rb = GetComponent<Rigidbody>();
+    }
 }

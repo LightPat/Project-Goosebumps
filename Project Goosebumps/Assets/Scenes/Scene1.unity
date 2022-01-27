@@ -297,6 +297,7 @@ GameObject:
   - component: {fileID: 565275741}
   - component: {fileID: 565275740}
   - component: {fileID: 565275742}
+  - component: {fileID: 565275743}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -464,6 +465,19 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHealth: 100
+--- !u!114 &565275743
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 565275734}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ac4a38169504c464ea8642bde5c16983, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxCapacity: 0
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
@@ -706,6 +720,10 @@ PrefabInstance:
     - target: {fileID: 919132149155446097, guid: 38da4e18974632240bc2d7ee480ceee4, type: 3}
       propertyPath: m_Name
       value: Scar L
+      objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 38da4e18974632240bc2d7ee480ceee4, type: 3}
+      propertyPath: m_TagString
+      value: InventoryItem
       objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 38da4e18974632240bc2d7ee480ceee4, type: 3}
