@@ -5,8 +5,8 @@ using UnityEngine.InputSystem;
 
 public class PlayerController : MonoBehaviour
 {
-    /* Most of the private variables are associated with a method,
-     * so I declare private variables above the methods they are
+    /* Most of the variables are associated with a specific method,
+     * so I declare variables above the methods they are
      * associated with, instead of all of them at the top.
      * This prevents clutter at the top of the script and makes it
      * more readable. */
@@ -14,13 +14,8 @@ public class PlayerController : MonoBehaviour
     [Header("Input Settings")]
     public float sensitivity = 15f;
 
-    [Header("Developer Options")]
-    public float walkingSpeed = 5f;
-    public float verticalLookBound = 90f;
-
     private Rigidbody rb;
     private GameObject firstPersonCamera;
-    private float currentSpeed;
 
     void Start()
     {
@@ -86,10 +81,19 @@ public class PlayerController : MonoBehaviour
         // Updating player position from WASD input
         newPosition = transform.position + rb.rotation * new Vector3(moveInput.x, 0, moveInput.y) * currentSpeed * Time.fixedDeltaTime;
         rb.MovePosition(newPosition);
+
+        // Falling Gravity velocity increase
+        if (rb.velocity.y < 0)
+        {
+            rb.AddForce(new Vector3(0, (fallingGravityScale * -1), 0), ForceMode.VelocityChange);
+        }
     }
 
+    [Header("Move Settings")]
+    public float walkingSpeed = 5f;
     private Vector3 newPosition;
     private Vector2 moveInput;
+    private float currentSpeed;
     void OnMove(InputValue value)
     {
         if (value.Get() == null) { currentSpeed = 0f; }
@@ -98,11 +102,52 @@ public class PlayerController : MonoBehaviour
         moveInput = value.Get<Vector2>();
     }
 
+    [Header("Look Settings")]
+    public float verticalLookBound = 90f;
     private Quaternion newRotation;
     private Vector3 lookEulers;
     private Vector2 lookInput;
     void OnLook(InputValue value)
     {
         lookInput = value.Get<Vector2>();
+    }
+
+    [Header("Jump Settings")]
+    public float jumpHeight = 3f;
+    public float fallingGravityScale = 0.5f;
+    void OnJump()
+    {
+        // TODO this isn't really an elegant solution, if you stand on the edge of something it doesn't realize that you are still grouded
+        // If you check for velocity = 0 then you can double jump since the apex of your jump's velocity is 0
+        // Check if the player is touching a gameObject under them
+        // May need to change 1.5f to be a different number if you switch the asset of the player model
+        bool isGrounded()
+        {
+            RaycastHit hit;
+            // Raycast any gameObject that is beneath the box collider
+            bool bHit = Physics.Raycast(transform.position, transform.up * -1, out hit, 1.5f);
+
+            return bHit;
+
+            // Sweep test or capsule collide later maybe as ideas to fix this
+            //bHit = rb.SweepTest(-transform.up, out hit, 1.5f);
+
+            //Debug.Log(hit.collider);
+            //return bHit;
+        }
+
+        // Jump logic
+        if (isGrounded())
+        {
+            float jumpForce = Mathf.Sqrt(jumpHeight * -2 * Physics.gravity.y);
+            rb.AddForce(new Vector3(0, jumpForce, 0), ForceMode.VelocityChange);
+        }
+    }
+
+    [Header("Interact Settings")]
+    public float reach = 2f;
+    void OnInteract()
+    {
+        Debug.Log("Interacting");
     }
 }
