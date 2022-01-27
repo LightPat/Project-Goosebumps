@@ -296,6 +296,7 @@ GameObject:
   - component: {fileID: 565275739}
   - component: {fileID: 565275741}
   - component: {fileID: 565275740}
+  - component: {fileID: 565275742}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -413,6 +414,8 @@ MonoBehaviour:
   verticalLookBound: 90
   jumpHeight: 3
   fallingGravityScale: 0.5
+  crouchSpeed: 2
+  crouchHeight: 1.5
   reach: 2
 --- !u!114 &565275741
 MonoBehaviour:
@@ -448,6 +451,19 @@ MonoBehaviour:
   m_DefaultActionMap: First Person
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 222921922}
+--- !u!114 &565275742
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 565275734}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: aa9b14cdd71a431458ef9519b89afcbf, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxHealth: 100
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
