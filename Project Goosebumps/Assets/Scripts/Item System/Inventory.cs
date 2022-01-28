@@ -13,15 +13,24 @@ namespace ItemSystem
 
         void OnPrimaryWeapon()
         {
-            if (loadout[0].activeInHierarchy) { loadout[0].SetActive(false); return; }
+            // If there is no weapon in the primary loadout slot, return
+            if (loadout[0] == null) { return; }
 
-            loadout[0].SetActive(true);
+            // If the gun is equipped and active, disable it, otherwise enable it
+            if (loadout[0].activeInHierarchy)
+            {
+                loadout[0].SetActive(false);
+            }
+            else
+            {
+                loadout[0].SetActive(true);
+            }
         }
 
         public void addItem(GameObject g)
         {
             ResetTransform(g);
-            g.transform.SetParent(transform.Find("Equipped Weapon Spawn Point"), false);
+            g.transform.SetParent(transform.Find("Vertical Rotate").Find("Equipped Weapon Spawn Point"), false);
             g.GetComponent<Rigidbody>().isKinematic = true;
             g.SetActive(false);
             loadout[0] = g;

@@ -20,12 +20,13 @@ public class PlayerController : Controller
     private Inventory inventory;
     private GameObject firstPersonCamera;
 
-    void Start()
+    new void Start()
     {
         // Call parent start method
         base.Start();
         inventory = GetComponent<Inventory>();
-        firstPersonCamera = transform.Find("First Person Camera").gameObject;
+        firstPersonCamera = transform.Find("Vertical Rotate").Find("First Person Camera").gameObject;
+        currentSpeed = walkingSpeed;
 
         Cursor.lockState = CursorLockMode.Locked;
     }
@@ -78,12 +79,8 @@ public class PlayerController : Controller
         // Rotate player horizontally
         Quaternion newRotation = Quaternion.Euler(0, lookEulers.x, 0);
         transform.rotation = newRotation;
-
-        // Rotate all the children of the player vertically and horizontally
-        foreach (Transform t in transform)
-        {
-            t.rotation = Quaternion.Euler(-lookEulers.y, lookEulers.x, 0);
-        }
+        // Rotate vertical rotation object vertically and horizontally
+        transform.Find("Vertical Rotate").rotation = Quaternion.Euler(-lookEulers.y, lookEulers.x, 0);
     }
 
     void FixedUpdate()
@@ -106,9 +103,6 @@ public class PlayerController : Controller
     private float currentSpeed;
     void OnMove(InputValue value)
     {
-        if (value.Get() == null) { currentSpeed = 0f; }
-
-        currentSpeed = walkingSpeed;
         moveInput = value.Get<Vector2>();
     }
 
@@ -165,13 +159,13 @@ public class PlayerController : Controller
         if (value.isPressed)
         {
             // If crouch is pressed, shrink the player and change the speed
-            transform.localScale -= new Vector3(0, crouchHeight, 0);
+            transform.Find("Model").localScale -= new Vector3(0, crouchHeight, 0);
             currentSpeed = crouchSpeed;
         }
         else
         {
             // If crouch is released, grow the player and revert the speed change
-            transform.localScale -= new Vector3(0, -crouchHeight, 0);
+            transform.Find("Model").localScale += new Vector3(0, crouchHeight, 0);
             currentSpeed = walkingSpeed;
         }
     }
