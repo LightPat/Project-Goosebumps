@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using InventorySystem;
+using ItemSystem;
 
 [RequireComponent(typeof(PlayerInput))]
 [RequireComponent(typeof(Inventory))]
@@ -26,6 +26,8 @@ public class PlayerController : Controller
         base.Start();
         inventory = GetComponent<Inventory>();
         firstPersonCamera = transform.Find("First Person Camera").gameObject;
+
+        Cursor.lockState = CursorLockMode.Locked;
     }
 
     void Update()
@@ -73,16 +75,19 @@ public class PlayerController : Controller
             lookEulers.y += lookInput.y;
         }
 
-        // Rotate the camera vertically, but not the player
-        firstPersonCamera.transform.rotation = Quaternion.Euler(-lookEulers.y, lookEulers.x, 0);
+        // Rotate player horizontally
+        Quaternion newRotation = Quaternion.Euler(0, lookEulers.x, 0);
+        transform.rotation = newRotation;
+
+        // Rotate all the children of the player vertically and horizontally
+        foreach (Transform t in transform)
+        {
+            t.rotation = Quaternion.Euler(-lookEulers.y, lookEulers.x, 0);
+        }
     }
 
     void FixedUpdate()
     {
-        // Rotation with mouse look
-        Quaternion newRotation = Quaternion.Euler(0, lookEulers.x, 0);
-        rb.MoveRotation(newRotation);
-
         // Updating player position from WASD input
         newPosition = transform.position + rb.rotation * new Vector3(moveInput.x, 0, moveInput.y) * currentSpeed * Time.fixedDeltaTime;
         rb.MovePosition(newPosition);
@@ -172,7 +177,7 @@ public class PlayerController : Controller
     }
 
     [Header("Interact Settings")]
-    public float reach = 2f;
+    public float reach = 4f;
     void OnInteract()
     {
         RaycastHit hit;

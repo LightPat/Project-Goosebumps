@@ -1,8 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
-namespace InventorySystem
+namespace ItemSystem
 {
     public class Inventory : MonoBehaviour
     {
@@ -10,18 +11,26 @@ namespace InventorySystem
 
         private GameObject[] loadout = new GameObject[3];
 
+        void OnPrimaryWeapon()
+        {
+            if (loadout[0].activeInHierarchy) { loadout[0].SetActive(false); return; }
+
+            loadout[0].SetActive(true);
+        }
+
         public void addItem(GameObject g)
         {
             ResetTransform(g);
-            g.transform.SetParent(transform, false);
+            g.transform.SetParent(transform.Find("Equipped Weapon Spawn Point"), false);
+            g.GetComponent<Rigidbody>().isKinematic = true;
             g.SetActive(false);
+            loadout[0] = g;
         }
 
-        private static void ResetTransform(GameObject g)
+        private void ResetTransform(GameObject g)
         {
             g.transform.localPosition = Vector3.zero;
             g.transform.localRotation = Quaternion.identity;
-            g.transform.localScale = Vector3.one;
         }
     }
 }
