@@ -76,24 +76,43 @@ public class PlayerController : Controller
             lookEulers.y += lookInput.y;
         }
 
+        
         // Rotate player horizontally
         Quaternion newRotation = Quaternion.Euler(0, lookEulers.x, 0);
         transform.rotation = newRotation;
         // Rotate vertical rotation object vertically and horizontally
         transform.Find("Vertical Rotate").rotation = Quaternion.Euler(-lookEulers.y, lookEulers.x, 0);
+
+        // Updating player position from WASD input
+        newPosition = transform.position + rb.rotation * new Vector3(moveInput.x, 0, moveInput.y) * currentSpeed * Time.deltaTime;
+        transform.position = newPosition;
     }
 
     void FixedUpdate()
     {
-        // Updating player position from WASD input
-        newPosition = transform.position + rb.rotation * new Vector3(moveInput.x, 0, moveInput.y) * currentSpeed * Time.fixedDeltaTime;
-        rb.MovePosition(newPosition);
-
         // Falling Gravity velocity increase
         if (rb.velocity.y < 0)
         {
             rb.AddForce(new Vector3(0, (fallingGravityScale * -1), 0), ForceMode.VelocityChange);
         }
+
+    }
+
+    [Header("Is Grounded")]
+    public float checkDistance = 2f;
+    bool isGrounded()
+    {
+        RaycastHit hit;
+        // Raycast any gameObject that is beneath the collider
+        bool bHit = Physics.Raycast(transform.position, transform.up * -1, out hit, checkDistance);
+
+        return bHit;
+
+        // Sweep test or capsule collide later maybe as ideas to fix this
+        //bHit = rb.SweepTest(-transform.up, out hit, 1.5f);
+
+        //Debug.Log(hit.collider);
+        //return bHit;
     }
 
     [Header("Move Settings")]
@@ -115,7 +134,7 @@ public class PlayerController : Controller
     {
         lookInput = value.Get<Vector2>();
     }
-
+    
     [Header("Jump Settings")]
     public float jumpHeight = 3f;
     public float fallingGravityScale = 0.5f;
@@ -125,20 +144,7 @@ public class PlayerController : Controller
         // If you check for velocity = 0 then you can double jump since the apex of your jump's velocity is 0
         // Check if the player is touching a gameObject under them
         // May need to change 1.5f to be a different number if you switch the asset of the player model
-        bool isGrounded()
-        {
-            RaycastHit hit;
-            // Raycast any gameObject that is beneath the box collider
-            bool bHit = Physics.Raycast(transform.position, transform.up * -1, out hit, 1.5f);
-
-            return bHit;
-
-            // Sweep test or capsule collide later maybe as ideas to fix this
-            //bHit = rb.SweepTest(-transform.up, out hit, 1.5f);
-
-            //Debug.Log(hit.collider);
-            //return bHit;
-        }
+        
 
         // Jump logic
         if (isGrounded())
