@@ -6,7 +6,8 @@ Story-Driven Fantasy First Person Sandbox with cool swords, guns, and magic
 ## Assets
 Currently used assets:<br/>
 [Scar L 3D Model](https://www.cgtrader.com/free-3d-models/military/gun/scar-l-01574b59-91cf-4a67-902c-fe52300fff9d)<br/>
-[Katana 3D Model](https://www.cgtrader.com/free-3d-models/military/melee/touken-ranbu-mikazuki-munechika-sword)
+[Katana 3D Model](https://www.cgtrader.com/free-3d-models/military/melee/touken-ranbu-mikazuki-munechika-sword)<br/>
+[Player 3D Model](https://www.cgtrader.com/free-3d-models/character/sci-fi/sci-fi-free-robot-bh-2)<br/>
 
 ## Code Write Up/Plan
 ### Players/Enemies

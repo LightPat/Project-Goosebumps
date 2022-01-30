@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using TMPro;
 
 namespace ItemSystem
@@ -11,20 +12,19 @@ namespace ItemSystem
 
         private GameObject[] loadout = new GameObject[3];
 
-        void OnPrimaryWeapon()
+        void OnSlot1()
         {
-            // If there is no weapon in the primary loadout slot, return
-            if (loadout[0] == null) { return; }
+            QueryLoadout(0);
+        }
 
-            // If the gun is equipped and active, disable it, otherwise enable it
-            if (loadout[0].activeInHierarchy)
-            {
-                loadout[0].SetActive(false);
-            }
-            else
-            {
-                loadout[0].SetActive(true);
-            }
+        void OnSlot2()
+        {
+            QueryLoadout(1);
+        }
+
+        void OnSlot3()
+        {
+            QueryLoadout(2);
         }
 
         public void addItem(GameObject g)
@@ -33,13 +33,44 @@ namespace ItemSystem
             g.transform.SetParent(transform.Find("Vertical Rotate").Find("Equipped Weapon Spawn Point"), false);
             g.GetComponent<Rigidbody>().isKinematic = true;
             g.SetActive(false);
-            loadout[0] = g;
+
+            for (int i = 0; i < loadout.Length; i++)
+            {
+                if (loadout[i] == null)
+                {
+                    loadout[i] = g;
+                    break;
+                }
+            }
         }
 
         private void ResetTransform(GameObject g)
         {
             g.transform.localPosition = Vector3.zero;
             g.transform.localRotation = Quaternion.identity;
+        }
+
+        private void QueryLoadout(int index)
+        {
+            // If there is no weapon in the loadout slot, return
+            if (loadout[index] == null) { return; }
+
+            // If there is a weapon active, disable it
+            foreach (GameObject g in loadout)
+            {
+                if (g != null)
+                {
+                    if (g.activeInHierarchy)
+                    {
+                        g.SetActive(false);
+                        // If this weapon is the same slot as we asked for, end so that we don't set active true again
+                        if (g == loadout[index]) { return; }
+                    }
+                }
+            }
+
+            // At this point, there is no active equipped item, so we can set the queried weapon to active
+            loadout[index].SetActive(true);
         }
     }
 }
