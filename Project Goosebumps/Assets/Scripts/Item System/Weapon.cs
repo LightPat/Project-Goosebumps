@@ -12,7 +12,7 @@ namespace ItemSystem
         public bool fullAuto = true;
 
         [HideInInspector]
-        public bool allowAttack;
+        protected bool allowAttack = true;
 
         protected GameObject firstPersonCamera;
 

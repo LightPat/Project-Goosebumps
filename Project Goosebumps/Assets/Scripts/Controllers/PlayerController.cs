@@ -90,8 +90,9 @@ public class PlayerController : Controller
         {
             if (attackHeld)
             {
-                if (w.GetComponent<Weapon>().fullAuto & w.GetComponent<Weapon>().allowAttack)
+                if (w.GetComponent<Weapon>().fullAuto)
                 {
+                    //Debug.Log("REached");
                     w.GetComponent<Weapon>().attack();
                 }
             }
@@ -217,9 +218,14 @@ public class PlayerController : Controller
     {
         GameObject equippedWeapon = inventory.getEquippedWeapon();
 
+        // Fire if the weapon isn't full auto
+        // Full auto firing is handled in update()
         if (equippedWeapon != null)
         {
-            equippedWeapon.GetComponent<Weapon>().attack();
+            if (!equippedWeapon.GetComponent<Weapon>().fullAuto)
+            {
+                equippedWeapon.GetComponent<Weapon>().attack();
+            }
         }
 
         if (value.isPressed)
