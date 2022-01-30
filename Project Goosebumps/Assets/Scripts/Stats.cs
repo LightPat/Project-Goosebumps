@@ -13,6 +13,16 @@ public class Stats : MonoBehaviour
         HP = maxHealth;
     }
 
+    public void takeDamage(int damage)
+    {
+        HP -= damage;
+
+        if (HP <= 0)
+        {
+            gameObject.SetActive(false);
+        }
+    }
+
     public int getHealth()
     {
         return HP;

@@ -76,12 +76,26 @@ public class PlayerController : Controller
             lookEulers.y += lookInput.y;
         }
 
-        
         // Rotate player horizontally
         Quaternion newRotation = Quaternion.Euler(0, lookEulers.x, 0);
         transform.rotation = newRotation;
         // Rotate vertical rotation object vertically and horizontally
         transform.Find("Vertical Rotate").rotation = Quaternion.Euler(-lookEulers.y, lookEulers.x, 0);
+
+        //GameObject equippedWeapon = inventory.getEquippedWeapon();
+
+        // Full auto firing
+        GameObject w = inventory.getEquippedWeapon();
+        if (w != null)
+        {
+            if (attackHeld)
+            {
+                if (w.GetComponent<Weapon>().fullAuto & w.GetComponent<Weapon>().allowAttack)
+                {
+                    w.GetComponent<Weapon>().attack();
+                }
+            }
+        }
     }
 
     void FixedUpdate()
@@ -195,6 +209,26 @@ public class PlayerController : Controller
                 // TODO
                 Debug.Log("Haven't implemented interactable logic yet in PlayerController.cs");
             }
+        }
+    }
+
+    private bool attackHeld;
+    void OnAttack(InputValue value)
+    {
+        GameObject equippedWeapon = inventory.getEquippedWeapon();
+
+        if (equippedWeapon != null)
+        {
+            equippedWeapon.GetComponent<Weapon>().attack();
+        }
+
+        if (value.isPressed)
+        {
+            attackHeld = true;
+        }
+        else
+        {
+            attackHeld = false;
         }
     }
 }

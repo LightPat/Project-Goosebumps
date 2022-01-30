@@ -34,6 +34,13 @@ namespace ItemSystem
             g.GetComponent<Rigidbody>().isKinematic = true;
             g.SetActive(false);
 
+            if (g.GetComponent<Weapon>())
+            {
+                g.GetComponent<Weapon>().updateCamera();
+            }
+
+            // Append gameobject to end of loadout
+            // TODO move this functionality to a GUI
             for (int i = 0; i < loadout.Length; i++)
             {
                 if (loadout[i] == null)
@@ -42,6 +49,22 @@ namespace ItemSystem
                     break;
                 }
             }
+        }
+
+        public GameObject getEquippedWeapon()
+        {
+            foreach (GameObject g in loadout)
+            {
+                if (g != null)
+                {
+                    if (g.activeInHierarchy)
+                    {
+                        return g;
+                    }
+                }
+            }
+
+            return null;
         }
 
         private void ResetTransform(GameObject g)

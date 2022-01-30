@@ -13,12 +13,10 @@ namespace ItemSystem
 
         [HideInInspector]
         public bool allowAttack;
-        [HideInInspector]
-        public bool equipped;
 
         protected GameObject firstPersonCamera;
 
-        public abstract void Attack();
+        public abstract void attack();
 
         public void updateCamera()
         {
