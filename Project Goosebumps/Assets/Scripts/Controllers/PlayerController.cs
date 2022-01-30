@@ -82,20 +82,19 @@ public class PlayerController : Controller
         transform.rotation = newRotation;
         // Rotate vertical rotation object vertically and horizontally
         transform.Find("Vertical Rotate").rotation = Quaternion.Euler(-lookEulers.y, lookEulers.x, 0);
-
-        // Updating player position from WASD input
-        newPosition = transform.position + rb.rotation * new Vector3(moveInput.x, 0, moveInput.y) * currentSpeed * Time.deltaTime;
-        transform.position = newPosition;
     }
 
     void FixedUpdate()
     {
+        // Updating player position from WASD input
+        newPosition = transform.position + rb.rotation * new Vector3(moveInput.x, 0, moveInput.y) * currentSpeed * Time.fixedDeltaTime;
+        rb.MovePosition(newPosition);
+
         // Falling Gravity velocity increase
         if (rb.velocity.y < 0)
         {
             rb.AddForce(new Vector3(0, (fallingGravityScale * -1), 0), ForceMode.VelocityChange);
         }
-
     }
 
     [Header("Is Grounded")]
