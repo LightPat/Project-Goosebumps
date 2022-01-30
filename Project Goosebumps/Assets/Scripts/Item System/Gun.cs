@@ -29,6 +29,8 @@ namespace ItemSystem
                 RaycastHit hit;
                 bool bHit = Physics.Raycast(firstPersonCamera.transform.position, firstPersonCamera.transform.forward, out hit);
 
+                Debug.Log(hit.collider);
+
                 // Apply force to object if it has a rigidbody, if it is a player, destroy it
                 if (bHit)
                 {
@@ -60,8 +62,7 @@ namespace ItemSystem
             // Seconds between swings
             float seconds = 1 / sps;
 
-            // Bullet tracer
-            gunshotSound.Play();
+            //gunshotSound.Play();
 
             // Update Bullet line
             lineRenderer.enabled = true;
