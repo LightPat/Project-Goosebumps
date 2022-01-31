@@ -8,6 +8,7 @@ namespace ItemSystem
 {
     public class Inventory : MonoBehaviour
     {
+        public GameObject HUDCanvas;
         public int maxCapacity;
 
         private GameObject[] loadout = new GameObject[3];
@@ -46,6 +47,7 @@ namespace ItemSystem
                 if (loadout[i] == null)
                 {
                     loadout[i] = g;
+                    HUDCanvas.transform.Find("Slot " + (i + 1).ToString()).gameObject.GetComponent<TextMeshProUGUI>().SetText(g.name);
                     break;
                 }
             }
@@ -53,6 +55,7 @@ namespace ItemSystem
 
         public GameObject getEquippedWeapon()
         {
+            // Loops through the loadout, if any weapons are active in the scene, return that, otherwise return null
             foreach (GameObject g in loadout)
             {
                 if (g != null)
@@ -67,6 +70,19 @@ namespace ItemSystem
             return null;
         }
 
+        private int getEquippedWeaponIndex()
+        {
+            for (int i = 0; i < loadout.Length; i++)
+            {
+                if (loadout[i] != null)
+                {
+                    if (loadout[i].activeInHierarchy) { return i; }
+                }
+            }
+
+            return -1;
+        }
+
         private void ResetTransform(GameObject g)
         {
             g.transform.localPosition = Vector3.zero;
@@ -75,6 +91,8 @@ namespace ItemSystem
 
         private void QueryLoadout(int index)
         {
+            int i = getEquippedWeaponIndex();
+
             // If there is no weapon in the loadout slot, return
             if (loadout[index] == null) { return; }
 
@@ -85,6 +103,7 @@ namespace ItemSystem
                 {
                     if (g.activeInHierarchy)
                     {
+                        HUDCanvas.transform.Find("Slot " + (i+1).ToString()).gameObject.GetComponent<TextMeshProUGUI>().fontStyle = FontStyles.Normal;
                         g.SetActive(false);
                         // If this weapon is the same slot as we asked for, end so that we don't set active true again
                         if (g == loadout[index]) { return; }
@@ -93,6 +112,8 @@ namespace ItemSystem
             }
 
             // At this point, there is no active equipped item, so we can set the queried weapon to active
+            Debug.Log(HUDCanvas.transform.Find("Slot " + (index+1).ToString()));
+            HUDCanvas.transform.Find("Slot " + (index+1).ToString()).gameObject.GetComponent<TextMeshProUGUI>().fontStyle = FontStyles.Bold;
             loadout[index].SetActive(true);
         }
     }
