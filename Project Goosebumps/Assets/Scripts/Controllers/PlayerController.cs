@@ -82,6 +82,8 @@ public class PlayerController : Controller
         // Rotate vertical rotation object vertically and horizontally
         transform.Find("Vertical Rotate").rotation = Quaternion.Euler(-lookEulers.y, lookEulers.x, 0);
 
+        //GameObject equippedWeapon = inventory.getEquippedWeapon();
+
         // Full auto firing
         GameObject w = inventory.getEquippedWeapon();
         if (w != null)
@@ -168,7 +170,7 @@ public class PlayerController : Controller
 
     [Header("Crouch Settings")]
     public float crouchSpeed = 2f;
-    public float crouchHeight = 0.5f;
+    public float crouchHeight = 1.5f;
     void OnCrouch(InputValue value)
     {
         // Half the collider's height
