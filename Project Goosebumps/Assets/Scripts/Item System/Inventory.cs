@@ -103,7 +103,7 @@ namespace ItemSystem
                 {
                     if (g.activeInHierarchy)
                     {
-                        HUDCanvas.transform.Find("Slot " + (i+1).ToString()).gameObject.GetComponent<TextMeshProUGUI>().fontStyle = FontStyles.Normal;
+                        HUDCanvas.transform.Find("Slot " + (i + 1).ToString()).gameObject.GetComponent<TextMeshProUGUI>().fontStyle = FontStyles.Normal;
                         g.SetActive(false);
                         // If this weapon is the same slot as we asked for, end so that we don't set active true again
                         if (g == loadout[index]) { return; }

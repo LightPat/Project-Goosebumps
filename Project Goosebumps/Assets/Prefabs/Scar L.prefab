@@ -2503,9 +2503,10 @@ MonoBehaviour:
   baseDamage: 20
   headshotMultiplier: 2
   fullAuto: 1
-  allowAttack: 0
+  bullet: {fileID: 4302310589480882471, guid: f5e83bbe13da96349b47a654bde2ba72, type: 3}
   thrust: 0
   rateOfFire: 500
+  hitScan: 1
 --- !u!120 &2367928216034409629
 LineRenderer:
   m_ObjectHideFlags: 0
