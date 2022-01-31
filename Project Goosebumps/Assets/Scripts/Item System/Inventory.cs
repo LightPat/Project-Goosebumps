@@ -112,7 +112,6 @@ namespace ItemSystem
             }
 
             // At this point, there is no active equipped item, so we can set the queried weapon to active
-            Debug.Log(HUDCanvas.transform.Find("Slot " + (index+1).ToString()));
             HUDCanvas.transform.Find("Slot " + (index+1).ToString()).gameObject.GetComponent<TextMeshProUGUI>().fontStyle = FontStyles.Bold;
             loadout[index].SetActive(true);
         }
