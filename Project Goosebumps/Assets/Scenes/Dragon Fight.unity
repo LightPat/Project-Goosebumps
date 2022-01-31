@@ -428,7 +428,7 @@ GameObject:
   - component: {fileID: 358361730}
   - component: {fileID: 358361729}
   m_Layer: 0
-  m_Name: Wall
+  m_Name: Slope
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -503,13 +503,13 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 358361728}
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.43, z: 0.556}
-  m_LocalScale: {x: 3.3630102, y: 2.8248, z: 0.1}
+  m_LocalRotation: {x: -0, y: -0, z: -0.15198587, w: 0.9883827}
+  m_LocalPosition: {x: -4.86, y: 1.43, z: -0.112}
+  m_LocalScale: {x: 10, y: 1, z: 12}
   m_Children: []
   m_Father: {fileID: 1290059782}
   m_RootOrder: 3
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: -17.484}
 --- !u!1 &441283488
 GameObject:
   m_ObjectHideFlags: 0
@@ -657,7 +657,7 @@ GameObject:
   - component: {fileID: 541163044}
   - component: {fileID: 541163043}
   m_Layer: 0
-  m_Name: Floor (1)
+  m_Name: Boss Floor
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -671,8 +671,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 541163041}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -4.42659, y: 2.67, z: -0.57027}
-  m_LocalScale: {x: 9.06315, y: 1, z: 4.14054}
+  m_LocalPosition: {x: -58.7, y: 2.9, z: 4.4072}
+  m_LocalScale: {x: 98.48077, y: 1, z: 104.69898}
   m_Children: []
   m_Father: {fileID: 1290059782}
   m_RootOrder: 4
@@ -7622,8 +7622,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1128639133}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 1.1422, y: -0, z: 0.20394}
-  m_LocalScale: {x: 2.7156274, y: 1, z: 2.5920928}
+  m_LocalPosition: {x: 7.5592, y: 0, z: -0.33}
+  m_LocalScale: {x: 15.54972, y: 1, z: 16.682035}
   m_Children: []
   m_Father: {fileID: 1290059782}
   m_RootOrder: 1
@@ -7897,7 +7897,7 @@ Rigidbody:
   m_UseGravity: 1
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 0
+  m_Constraints: 80
   m_CollisionDetection: 0
 --- !u!114 &1271312009
 MonoBehaviour:
@@ -7982,7 +7982,7 @@ Transform:
   m_GameObject: {fileID: 1290059781}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 10, y: 1, z: 10}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 705507995}
   - {fileID: 1128639134}
