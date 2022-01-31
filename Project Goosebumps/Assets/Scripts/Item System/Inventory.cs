@@ -103,7 +103,7 @@ namespace ItemSystem
                 {
                     if (g.activeInHierarchy)
                     {
-                        HUDCanvas.transform.Find("Slot " + (i+1).ToString()).gameObject.GetComponent<TextMeshProUGUI>().fontStyle = FontStyles.Normal;
+                        HUDCanvas.transform.Find("Slot " + (i + 1).ToString()).gameObject.GetComponent<TextMeshProUGUI>().fontStyle = FontStyles.Normal;
                         g.SetActive(false);
                         // If this weapon is the same slot as we asked for, end so that we don't set active true again
                         if (g == loadout[index]) { return; }
@@ -112,8 +112,7 @@ namespace ItemSystem
             }
 
             // At this point, there is no active equipped item, so we can set the queried weapon to active
-            Debug.Log(HUDCanvas.transform.Find("Slot " + (index+1).ToString()));
-            HUDCanvas.transform.Find("Slot " + (index+1).ToString()).gameObject.GetComponent<TextMeshProUGUI>().fontStyle = FontStyles.Bold;
+            HUDCanvas.transform.Find("Slot " + (index + 1).ToString()).gameObject.GetComponent<TextMeshProUGUI>().fontStyle = FontStyles.Bold;
             loadout[index].SetActive(true);
         }
     }
