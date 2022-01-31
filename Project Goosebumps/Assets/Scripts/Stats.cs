@@ -1,9 +1,11 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 public class Stats : MonoBehaviour
 {
+    public TextMeshProUGUI displayHP;
     public int maxHealth = 100;
 
     private int HP;
@@ -11,6 +13,7 @@ public class Stats : MonoBehaviour
     void Start()
     {
         HP = maxHealth;
+        displayHP.SetText(HP.ToString() + " HP");
     }
 
     public void takeDamage(int damage)
@@ -21,6 +24,8 @@ public class Stats : MonoBehaviour
         {
             gameObject.SetActive(false);
         }
+
+        displayHP.SetText(HP.ToString() + " HP");
     }
 
     public int getHealth()

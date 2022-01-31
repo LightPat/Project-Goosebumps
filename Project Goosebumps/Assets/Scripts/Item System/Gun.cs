@@ -11,6 +11,7 @@ namespace ItemSystem
         public float thrust;
         // This is in RPM (rounds per minute)
         public float rateOfFire;
+        public bool hitScan = true;
 
         private LineRenderer lineRenderer;
         private AudioSource gunshotSound;
@@ -29,32 +30,31 @@ namespace ItemSystem
                 RaycastHit hit;
                 bool bHit = Physics.Raycast(firstPersonCamera.transform.position, firstPersonCamera.transform.forward, out hit);
 
-                Debug.Log(hit.collider);
+                Vector3 tracerPosition = firstPersonCamera.transform.forward * 100;
+                Color tracerColor = Color.red;
 
-                // Apply force to object if it has a rigidbody, if it is a player, destroy it
                 if (bHit)
                 {
-                    // If we hit a player, notify that player and deduct HP from it
-                    if (hit.collider.gameObject.tag == "Player")
-                    {
-                        // This will never be called, needs to be handled better
-                        if (hit.collider.name == "Head")
-                        {
-                            hit.collider.gameObject.GetComponent<Stats>().takeDamage((int)(baseDamage * headshotMultiplier));
-                        }
-                        else
-                        {
-                            hit.collider.gameObject.GetComponent<Stats>().takeDamage((int)baseDamage);
-                        }
-                    }
+                    // Spawn bullet which triggers on collider enter
+                    // Damage handling is done on the target via OnTriggerEnter()
+                    GameObject firedBullet = GameObject.Instantiate(bullet, hit.collider.transform.position, Quaternion.identity);
+
+                    // Calculate damage here
+                    firedBullet.GetComponent<Projectile>().damage = (int)baseDamage;
+
+                    // Delay destruction by a few frames so that the collision is detected by Unity
+                    StartCoroutine(DelayedDestroy(firedBullet, 3));
+
+                    tracerPosition = hit.point;
+                    tracerColor = Color.green;
                 }
 
                 // Fire rate handling
-                StartCoroutine(FireRateCoroutine());
+                StartCoroutine(FireRateCoroutine(tracerPosition, tracerColor));
             }            
         }
 
-        IEnumerator FireRateCoroutine()
+        IEnumerator FireRateCoroutine(Vector3 tracerPosition, Color tracerColor)
         {
             allowAttack = false;
             // Rounds per second
@@ -66,13 +66,23 @@ namespace ItemSystem
 
             // Update Bullet line
             lineRenderer.enabled = true;
-            lineRenderer.material.color = Color.red;
+            lineRenderer.material.color = tracerColor;
             lineRenderer.SetPosition(0, transform.position);
-            lineRenderer.SetPosition(1, firstPersonCamera.transform.position + (firstPersonCamera.transform.forward * 10));
+            lineRenderer.SetPosition(1, tracerPosition);
 
             yield return new WaitForSeconds(seconds);
             allowAttack = true;
             lineRenderer.enabled = false;
+        }
+
+        IEnumerator DelayedDestroy(GameObject g, int frameDelay = 2)
+        {
+            for (int i = 0; i < frameDelay; i++)
+            {
+                yield return i;
+            }
+
+            Destroy(g);
         }
     }
 }

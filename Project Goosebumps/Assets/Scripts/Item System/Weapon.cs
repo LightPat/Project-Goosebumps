@@ -10,6 +10,7 @@ namespace ItemSystem
         public float baseDamage;
         public float headshotMultiplier = 2f;
         public bool fullAuto = true;
+        public GameObject bullet;
 
         [HideInInspector]
         protected bool allowAttack = true;
