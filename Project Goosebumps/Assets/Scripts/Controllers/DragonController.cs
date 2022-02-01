@@ -9,6 +9,11 @@ public class DragonController : Controller
         base.Start();
     }
 
+    void Update()
+    {
+
+    }
+
     void OnCollisionEnter(Collision collision)
     {
         // If a projectile is hitting me, deduct the damage from my HP

@@ -30,7 +30,7 @@ namespace ItemSystem
                 RaycastHit hit;
                 bool bHit = Physics.Raycast(firstPersonCamera.transform.position, firstPersonCamera.transform.forward, out hit);
 
-                Vector3 tracerPosition = firstPersonCamera.transform.forward * 100;
+                Vector3 tracerPosition = firstPersonCamera.transform.position + (firstPersonCamera.transform.forward * 100);
                 Color tracerColor = Color.red;
 
                 if (bHit)
@@ -67,7 +67,7 @@ namespace ItemSystem
             // Update Bullet line
             lineRenderer.enabled = true;
             lineRenderer.material.color = tracerColor;
-            lineRenderer.SetPosition(0, transform.position);
+            lineRenderer.SetPosition(0, transform.Find("LineSpawnPoint").position);
             lineRenderer.SetPosition(1, tracerPosition);
 
             yield return new WaitForSeconds(seconds);
