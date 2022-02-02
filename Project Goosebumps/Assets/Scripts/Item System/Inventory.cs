@@ -9,9 +9,20 @@ namespace ItemSystem
     public class Inventory : MonoBehaviour
     {
         public GameObject HUDCanvas;
+        public GameObject GUICanvas;
         public int maxCapacity;
 
         private GameObject[] loadout = new GameObject[3];
+        private GameObject[] loadoutDisplaySlots = new GameObject[3];
+
+        void Start()
+        {
+            // Get all the textmeshpro gameObjects that are used to display the loadout
+            for (int i = 0; i < loadoutDisplaySlots.Length; i++)
+            {
+                loadoutDisplaySlots[i] = HUDCanvas.transform.Find("Slot " + (i+1).ToString()).gameObject;
+            }
+        }
 
         void OnSlot1()
         {
@@ -28,6 +39,39 @@ namespace ItemSystem
             QueryLoadout(2);
         }
 
+        void OnInventoryToggle()
+        {
+            PlayerInput playerInput = GetComponent<PlayerInput>();
+
+            if (playerInput.currentActionMap.name == "First Person")
+            {
+                SyncUIElementDetails(HUDCanvas, GUICanvas);
+
+                // Enable GUI canvas
+                HUDCanvas.SetActive(false);
+                GUICanvas.SetActive(true);
+
+                Cursor.lockState = CursorLockMode.None;
+                playerInput.SwitchCurrentActionMap("Inventory");
+            }
+            else if (playerInput.currentActionMap.name == "Inventory")
+            {
+                SyncUIElementDetails(GUICanvas, HUDCanvas);
+
+                // Enable HUD canvas
+                GUICanvas.SetActive(false);
+                HUDCanvas.SetActive(true);
+
+                Cursor.lockState = CursorLockMode.Locked;
+                playerInput.SwitchCurrentActionMap("First Person");
+            }
+        }
+
+        void OnSelect()
+        {
+
+        }
+
         public void addItem(GameObject g)
         {
             ResetTransform(g);
@@ -40,14 +84,14 @@ namespace ItemSystem
                 g.GetComponent<Weapon>().updateCamera();
             }
 
-            // Append gameobject to end of loadout
-            // TODO move this functionality to a GUI
+            // Append gameobject to end of loadout if loadout is empty
+            // TODO OTHERWISE ADD IT TO THE PLAYER'S INVENTORY IF THEY HAVE SPACE
             for (int i = 0; i < loadout.Length; i++)
             {
                 if (loadout[i] == null)
                 {
                     loadout[i] = g;
-                    HUDCanvas.transform.Find("Slot " + (i + 1).ToString()).gameObject.GetComponent<TextMeshProUGUI>().SetText(g.name);
+                    loadoutDisplaySlots[i].GetComponent<TextMeshProUGUI>().SetText(g.name);
                     break;
                 }
             }
@@ -83,6 +127,21 @@ namespace ItemSystem
             return -1;
         }
 
+        private void SyncUIElementDetails(GameObject providerCanvas, GameObject dependantCanvas)
+        {
+            // Syncs the text of any objects that share the same name when switching from HUD to inventory GUI mode
+            foreach (Transform provider in providerCanvas.transform)
+            {
+                foreach (Transform dependant in dependantCanvas.transform)
+                {
+                    if (provider.name == dependant.name)
+                    {
+                        dependant.GetComponent<TextMeshProUGUI>().SetText(provider.GetComponent<TextMeshProUGUI>().text);
+                    }
+                }
+            }
+        }
+
         private void ResetTransform(GameObject g)
         {
             g.transform.localPosition = Vector3.zero;
@@ -103,7 +162,7 @@ namespace ItemSystem
                 {
                     if (g.activeInHierarchy)
                     {
-                        HUDCanvas.transform.Find("Slot " + (i+1).ToString()).gameObject.GetComponent<TextMeshProUGUI>().fontStyle = FontStyles.Normal;
+                        loadoutDisplaySlots[i].GetComponent<TextMeshProUGUI>().fontStyle = FontStyles.Normal;
                         g.SetActive(false);
                         // If this weapon is the same slot as we asked for, end so that we don't set active true again
                         if (g == loadout[index]) { return; }
@@ -112,7 +171,7 @@ namespace ItemSystem
             }
 
             // At this point, there is no active equipped item, so we can set the queried weapon to active
-            HUDCanvas.transform.Find("Slot " + (index+1).ToString()).gameObject.GetComponent<TextMeshProUGUI>().fontStyle = FontStyles.Bold;
+            loadoutDisplaySlots[index].GetComponent<TextMeshProUGUI>().fontStyle = FontStyles.Bold;
             loadout[index].SetActive(true);
         }
     }
