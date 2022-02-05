@@ -15,14 +15,16 @@ namespace ItemSystem
         public int maxCapacity;
 
         private GameObject[] loadout = new GameObject[3];
-        private GameObject[] loadoutDisplaySlots = new GameObject[3];
+        private GameObject[] HUDloadoutDisplaySlots = new GameObject[3];
+        private GameObject[] GUIloadoutDisplaySlots = new GameObject[3];
 
         void Start()
         {
             // Get all the textmeshpro gameObjects that are used to display the loadout
-            for (int i = 0; i < loadoutDisplaySlots.Length; i++)
+            for (int i = 0; i < HUDloadoutDisplaySlots.Length; i++)
             {
-                loadoutDisplaySlots[i] = HUDCanvas.transform.Find("Slot " + (i+1).ToString()).gameObject;
+                HUDloadoutDisplaySlots[i] = HUDCanvas.transform.Find("Slot " + (i+1).ToString()).gameObject;
+                GUIloadoutDisplaySlots[i] = GUICanvas.transform.Find("Slot " + (i + 1).ToString()).gameObject;
             }
         }
 
@@ -38,14 +40,15 @@ namespace ItemSystem
                 g.GetComponent<Weapon>().updateCamera();
             }
 
-            // Append gameobject to end of loadout if loadout is empty
+            // Append gameobject to end of loadout if loadout slot is empty
             // TODO OTHERWISE ADD IT TO THE PLAYER'S INVENTORY IF THEY HAVE SPACE
             for (int i = 0; i < loadout.Length; i++)
             {
                 if (loadout[i] == null)
                 {
                     loadout[i] = g;
-                    loadoutDisplaySlots[i].GetComponent<TextMeshProUGUI>().SetText(g.name);
+                    HUDloadoutDisplaySlots[i].GetComponent<TextMeshProUGUI>().SetText(g.name);
+                    loadout[i].GetComponent<Weapon>().setTextDisplay(HUDloadoutDisplaySlots[i]);
                     break;
                 }
             }
@@ -82,7 +85,6 @@ namespace ItemSystem
                 {
                     if (g.activeInHierarchy)
                     {
-                        loadoutDisplaySlots[i].GetComponent<TextMeshProUGUI>().fontStyle = FontStyles.Normal;
                         g.SetActive(false);
                         // If this weapon is the same slot as we asked for, end so that we don't set active true again
                         if (g == loadout[index]) { return; }
@@ -91,7 +93,6 @@ namespace ItemSystem
             }
 
             // At this point, there is no active equipped item, so we can set the queried weapon to active
-            loadoutDisplaySlots[index].GetComponent<TextMeshProUGUI>().fontStyle = FontStyles.Bold;
             loadout[index].SetActive(true);
         }
 
@@ -144,11 +145,6 @@ namespace ItemSystem
                 HUDCanvas.SetActive(false);
                 GUICanvas.SetActive(true);
                 
-                for (int i = 0; i < loadoutDisplaySlots.Length; i++)
-                {
-                    loadoutDisplaySlots[i] = GUICanvas.transform.Find("Slot " + (i + 1).ToString()).gameObject;
-                }
-
                 Cursor.lockState = CursorLockMode.None;
                 playerInput.SwitchCurrentActionMap("Inventory");
             }
@@ -159,11 +155,6 @@ namespace ItemSystem
                 // Enable HUD canvas
                 GUICanvas.SetActive(false);
                 HUDCanvas.SetActive(true);
-
-                for (int i = 0; i < loadoutDisplaySlots.Length; i++)
-                {
-                    loadoutDisplaySlots[i] = HUDCanvas.transform.Find("Slot " + (i + 1).ToString()).gameObject;
-                }
 
                 Cursor.lockState = CursorLockMode.Locked;
                 playerInput.SwitchCurrentActionMap("First Person");
@@ -217,6 +208,14 @@ namespace ItemSystem
             // If we haven't selected the slot we want to move, set that to our clicked object
             if (selectedSlot == null)
             {
+                foreach (GameObject g in loadout)
+                {
+                    if (g != null)
+                    {
+                        g.SetActive(false);
+                    }
+                }
+
                 selectedSlot = EventSystem.current.currentSelectedGameObject;
                 originalColor = selectedSlot.GetComponent<Image>().color;
                 selectedSlot.GetComponent<Image>().color = new Color32(0,0,0,100);
@@ -229,16 +228,23 @@ namespace ItemSystem
                 int start = int.Parse(selectedSlot.name.Substring(5, 1)) - 1;
                 int end = int.Parse(targetSlot.name.Substring(5, 1)) - 1;
 
+                // Switch the location of the object in the loadout array
                 GameObject temp = loadout[end];
                 loadout[end] = loadout[start];
                 loadout[start] = temp;
 
-                syncLoadoutWithUI();
-
-                foreach (GameObject g in loadout)
+                // Update the display slot of the weapon so that bolding is applied properly
+                if (loadout[start] != null)
                 {
-                    Debug.Log(g);
+                    loadout[start].GetComponent<Weapon>().setTextDisplay(HUDloadoutDisplaySlots[start]);
                 }
+
+                if (loadout[end] != null)
+                {
+                    loadout[end].GetComponent<Weapon>().setTextDisplay(HUDloadoutDisplaySlots[end]);
+                }
+
+                syncLoadoutWithUI();
 
                 // Reset gameObjects
                 selectedSlot.GetComponent<Image>().color = originalColor;
@@ -249,13 +255,15 @@ namespace ItemSystem
 
         private void syncLoadoutWithUI()
         {
-            foreach (GameObject g in loadoutDisplaySlots)
+            // Set all text elements to the slot names
+            foreach (GameObject g in GUIloadoutDisplaySlots)
             {
                 g.transform.Find("Text (TMP)").GetComponent<TextMeshProUGUI>().SetText(g.name);
             }
 
+            // Overwrite all text elements that have a weapon in the corresponding loadout slot
             int count = 0;
-            foreach (GameObject g in loadoutDisplaySlots)
+            foreach (GameObject g in GUIloadoutDisplaySlots)
             {
                 if (loadout[count] != null)
                 {

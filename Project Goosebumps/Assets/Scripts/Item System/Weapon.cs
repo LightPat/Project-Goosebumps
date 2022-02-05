@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TMPro;
 
 namespace ItemSystem
 {
@@ -12,9 +13,9 @@ namespace ItemSystem
         public bool fullAuto = true;
         public GameObject bullet;
 
-        [HideInInspector]
-        protected bool allowAttack = true;
+        protected GameObject inventoryTextSlot;
 
+        protected bool allowAttack = true;
         protected GameObject firstPersonCamera;
 
         public abstract void attack();
@@ -22,6 +23,29 @@ namespace ItemSystem
         public void updateCamera()
         {
             firstPersonCamera = transform.parent.parent.Find("First Person Camera").gameObject;
+        }
+
+        public void setTextDisplay(GameObject g)
+        {
+            inventoryTextSlot = g;
+        }
+
+        void OnEnable()
+        {
+            // Set text element to bold
+            if (inventoryTextSlot != null)
+            {
+                inventoryTextSlot.GetComponent<TextMeshProUGUI>().fontStyle = FontStyles.Bold;
+            }
+        }
+
+        void OnDisable()
+        {
+            // Set text element to normal
+            if (inventoryTextSlot != null)
+            {
+                inventoryTextSlot.GetComponent<TextMeshProUGUI>().fontStyle = FontStyles.Normal;
+            }
         }
     }
 }

@@ -250,6 +250,17 @@
                     "action": "Inventory Toggle",
                     "isComposite": false,
                     "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "114053d1-7130-49b5-b86f-9fc064c5d356",
+                    "path": "<Keyboard>/escape",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Inventory Toggle",
+                    "isComposite": false,
+                    "isPartOfComposite": false
                 }
             ]
         },
@@ -265,15 +276,6 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
-                },
-                {
-                    "name": "Select",
-                    "type": "Value",
-                    "id": "85587220-50b2-4f42-9a74-0d472af17600",
-                    "expectedControlType": "",
-                    "processors": "",
-                    "interactions": "",
-                    "initialStateCheck": true
                 }
             ],
             "bindings": [
@@ -296,17 +298,6 @@
                     "processors": "",
                     "groups": "",
                     "action": "Inventory Toggle",
-                    "isComposite": false,
-                    "isPartOfComposite": false
-                },
-                {
-                    "name": "",
-                    "id": "cdca703c-8225-47fb-8b93-e31f186bacb1",
-                    "path": "<Mouse>/leftButton",
-                    "interactions": "",
-                    "processors": "",
-                    "groups": "",
-                    "action": "Select",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
