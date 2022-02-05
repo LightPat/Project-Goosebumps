@@ -161,7 +161,12 @@ namespace ItemSystem
             }
 
             // Reset the loadout editing variables
-            selectedSlot = null;
+            if (selectedSlot != null)
+            {
+                selectedSlot.GetComponent<Image>().color = originalColor;
+                selectedSlot = null;
+            }
+            
             targetSlot = null;
         }
 
