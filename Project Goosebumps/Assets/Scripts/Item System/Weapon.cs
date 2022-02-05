@@ -14,7 +14,6 @@ namespace ItemSystem
         public GameObject bullet;
 
         protected GameObject inventoryTextSlot;
-
         protected bool allowAttack = true;
         protected GameObject firstPersonCamera;
 

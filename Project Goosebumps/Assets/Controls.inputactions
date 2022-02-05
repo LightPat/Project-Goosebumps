@@ -94,6 +94,15 @@
                     "processors": "",
                     "interactions": "",
                     "initialStateCheck": false
+                },
+                {
+                    "name": "Escape Toggle",
+                    "type": "Button",
+                    "id": "052f5b1e-013a-48a6-b00e-b05878644349",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
                 }
             ],
             "bindings": [
@@ -253,12 +262,12 @@
                 },
                 {
                     "name": "",
-                    "id": "114053d1-7130-49b5-b86f-9fc064c5d356",
+                    "id": "7c778491-f5de-4570-b4e8-41357df8d8e1",
                     "path": "<Keyboard>/escape",
                     "interactions": "",
                     "processors": "",
                     "groups": "",
-                    "action": "Inventory Toggle",
+                    "action": "Escape Toggle",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
@@ -289,11 +298,48 @@
                     "action": "Inventory Toggle",
                     "isComposite": false,
                     "isPartOfComposite": false
+                }
+            ]
+        },
+        {
+            "name": "Escape",
+            "id": "595f87c6-6579-4f04-9ae6-ac72ee4143be",
+            "actions": [
+                {
+                    "name": "Escape Toggle",
+                    "type": "Button",
+                    "id": "6e810a0c-f1ba-4d3e-9a9f-a91e21b10555",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
+                    "name": "Inventory Toggle",
+                    "type": "Button",
+                    "id": "695e50a5-be2d-4ea9-bbef-c240d1e4a26b",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                }
+            ],
+            "bindings": [
+                {
+                    "name": "",
+                    "id": "2dd1c66e-0dbf-4122-a84e-9efc0a3cd2cf",
+                    "path": "<Keyboard>/escape",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Escape Toggle",
+                    "isComposite": false,
+                    "isPartOfComposite": false
                 },
                 {
                     "name": "",
-                    "id": "e2294ca4-df13-41f4-a930-e113f76d0426",
-                    "path": "<Keyboard>/escape",
+                    "id": "9c34d652-aa60-4ea0-afb7-0c0b3dcbd439",
+                    "path": "<Keyboard>/i",
                     "interactions": "",
                     "processors": "",
                     "groups": "",

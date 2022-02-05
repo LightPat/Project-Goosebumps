@@ -14,6 +14,8 @@ public class PlayerController : Controller
      * This prevents clutter at the top of the script and makes it
      * more readable. */
 
+    public GameObject EscapeMenu;
+
     [Header("Input Settings")]
     public float sensitivity = 15f;
 
@@ -233,6 +235,32 @@ public class PlayerController : Controller
         else
         {
             attackHeld = false;
+        }
+    }
+
+    private GameObject canvas;
+    void OnEscapeToggle()
+    {
+        PlayerInput playerInput = GetComponent<PlayerInput>();
+
+        if (playerInput.currentActionMap.name != "Escape")
+        {
+            inventory.HUDCanvas.SetActive(false);
+
+            canvas = GameObject.Instantiate(EscapeMenu);
+
+            Cursor.lockState = CursorLockMode.None;
+
+            playerInput.SwitchCurrentActionMap("Escape");
+        }
+        else if (playerInput.currentActionMap.name == "Escape")
+        {
+            Destroy(canvas);
+            inventory.HUDCanvas.SetActive(true);
+
+            Cursor.lockState = CursorLockMode.Locked;
+
+            playerInput.SwitchCurrentActionMap("First Person");
         }
     }
 }
