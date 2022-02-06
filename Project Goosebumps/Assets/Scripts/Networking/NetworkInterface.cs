@@ -4,19 +4,33 @@ using UnityEngine;
 using Unity.Netcode;
 using TMPro;
 
-public class NetworkInterface : MonoBehaviour
+public class NetworkInterface : NetworkBehaviour
 {
     [SerializeField]
     private TextMeshProUGUI playersInGameText;
 
+    NetworkVariable<int> playersInGame = new NetworkVariable<int>();
+
     void Start()
     {
-        // Updates the GUI whenever a client connects
         NetworkManager.Singleton.OnClientConnectedCallback += (id) =>
         {
-            playersInGameText.SetText("Players Connected: " + (id+1).ToString());
+            playersInGame.Value++;
+
             Logger.Instance.LogInfo($"{id} just connected...");
         };
+
+        NetworkManager.Singleton.OnClientDisconnectCallback += (id) =>
+        {
+            playersInGame.Value--;
+
+            Logger.Instance.LogInfo($"{id} just disconnected...");
+        };
+    }
+
+    void Update()
+    {
+        playersInGameText.SetText(playersInGame.Value.ToString() + " Players Connected");
     }
 
     public void startHost()
