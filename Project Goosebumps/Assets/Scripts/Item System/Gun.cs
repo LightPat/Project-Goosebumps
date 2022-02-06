@@ -8,10 +8,7 @@ namespace ItemSystem
     public class Gun : Weapon
     {
         [Header("Gun Configuration")]
-        public float thrust;
-        // This is in RPM (rounds per minute)
         public float rateOfFire;
-        public bool hitScan = true;
 
         private LineRenderer lineRenderer;
         private AudioSource gunshotSound;
