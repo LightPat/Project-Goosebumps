@@ -239,28 +239,49 @@ public class PlayerController : Controller
     }
 
     private GameObject canvas;
+    private string lastStateName;
     void OnEscapeToggle()
     {
         PlayerInput playerInput = GetComponent<PlayerInput>();
 
-        if (playerInput.currentActionMap.name != "Escape")
+        switch (playerInput.currentActionMap.name)
         {
-            inventory.HUDCanvas.SetActive(false);
+            case "First Person":
+                inventory.HUDCanvas.SetActive(false);
 
-            canvas = GameObject.Instantiate(EscapeMenu);
+                canvas = GameObject.Instantiate(EscapeMenu);
 
-            Cursor.lockState = CursorLockMode.None;
+                Cursor.lockState = CursorLockMode.None;
 
-            playerInput.SwitchCurrentActionMap("Escape");
-        }
-        else if (playerInput.currentActionMap.name == "Escape")
-        {
-            Destroy(canvas);
-            inventory.HUDCanvas.SetActive(true);
+                lastStateName = playerInput.currentActionMap.name;
+                playerInput.SwitchCurrentActionMap("Escape");
+                break;
 
-            Cursor.lockState = CursorLockMode.Locked;
+            case "Escape":
+                Destroy(canvas);
 
-            playerInput.SwitchCurrentActionMap("First Person");
+                if (lastStateName == "Inventory")
+                {
+                    inventory.GUICanvas.SetActive(true);
+                    Cursor.lockState = CursorLockMode.None;
+                }
+                else
+                {
+                    inventory.HUDCanvas.SetActive(true);
+                    Cursor.lockState = CursorLockMode.Locked;
+                }
+
+                playerInput.SwitchCurrentActionMap(lastStateName);
+                break;
+
+            case "Inventory":
+                inventory.GUICanvas.SetActive(false);
+
+                canvas = GameObject.Instantiate(EscapeMenu);
+
+                lastStateName = playerInput.currentActionMap.name;
+                playerInput.SwitchCurrentActionMap("Escape");
+                break;
         }
     }
 }

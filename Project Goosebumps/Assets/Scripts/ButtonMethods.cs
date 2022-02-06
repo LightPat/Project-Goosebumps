@@ -11,6 +11,6 @@ public class ButtonMethods : MonoBehaviour
 
     public void OpenSettingsMenu()
     {
-
+        Debug.Log("Need to create settings menu");
     }
 }

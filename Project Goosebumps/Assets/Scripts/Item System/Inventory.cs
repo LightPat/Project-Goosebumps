@@ -175,7 +175,7 @@ namespace ItemSystem
         /// </summary>
         /// <param name="providerCanvas"></param>
         /// <param name="dependantCanvas"></param>
-        private void SyncUIElementDetails(GameObject providerCanvas, GameObject dependantCanvas)
+        public void SyncUIElementDetails(GameObject providerCanvas, GameObject dependantCanvas)
         {
             foreach (Transform provider in providerCanvas.transform)
             {
