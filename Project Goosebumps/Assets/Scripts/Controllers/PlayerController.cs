@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using ItemSystem;
+using Unity.Netcode;
 
 [RequireComponent(typeof(PlayerInput))]
 [RequireComponent(typeof(Inventory))]
@@ -21,6 +22,9 @@ public class PlayerController : Controller
 
     private Inventory inventory;
     private GameObject firstPersonCamera;
+    
+    private NetworkVariable<Vector3> networkPosition = new NetworkVariable<Vector3>();
+    private NetworkVariable<Quaternion> networkRotation = new NetworkVariable<Quaternion>();
 
     new void Start()
     {
@@ -31,10 +35,17 @@ public class PlayerController : Controller
         currentSpeed = walkingSpeed;
 
         Cursor.lockState = CursorLockMode.Locked;
+
+        // Sets the camera and input to active on the player object that this network instance owns
+        if (IsOwner)
+        {
+            transform.Find("Vertical Rotate").Find("First Person Camera").gameObject.SetActive(true);
+            GetComponent<PlayerInput>().enabled = true;
+        }
     }
 
     void Update()
-    {
+    {        
         // Look with mouse
         // Remember that Rotate() rotates AROUND that axis, so if we want to look right, we rotate along the Y axis
         lookInput *= (sensitivity * Time.deltaTime);
@@ -96,11 +107,12 @@ public class PlayerController : Controller
                     w.GetComponent<Weapon>().attack();
                 }
             }
-        }
+        }        
     }
 
     void FixedUpdate()
     {
+        oldPosition = transform.position;
         // Updating player position from WASD input
         newPosition = transform.position + rb.rotation * new Vector3(moveInput.x, 0, moveInput.y) * currentSpeed * Time.fixedDeltaTime;
         rb.MovePosition(newPosition);
@@ -109,6 +121,12 @@ public class PlayerController : Controller
         if (rb.velocity.y < 0)
         {
             rb.AddForce(new Vector3(0, (fallingGravityScale * -1), 0), ForceMode.VelocityChange);
+        }
+
+        // Send the position change to the server if there was a position update
+        if (newPosition != oldPosition)
+        {
+            UpdatePlayerPositionServerRpc(transform.position);
         }
     }
 
@@ -129,9 +147,40 @@ public class PlayerController : Controller
         //return bHit;
     }
 
+    [ServerRpc]
+    void UpdatePlayerPositionServerRpc(Vector3 newPosition)
+    {
+        // Update this player's position on the server
+        networkPosition.Value = newPosition;
+
+        if (IsServer)
+        {
+            UpdatePlayerPositionClientRpc();
+        }
+    }
+
+    [ClientRpc]
+    void UpdatePlayerPositionClientRpc()
+    {
+        // This code is executed on each client
+        GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+
+        foreach (GameObject player in players)
+        {
+            // Update the player object if they aren't the local player, since the local player moves itself
+            if (!player.GetComponent<NetworkObject>().IsLocalPlayer)
+            {
+                Vector3 newClientPosition = player.GetComponent<PlayerController>().networkPosition.Value;
+
+                player.transform.position = newClientPosition;
+            }
+        }
+    }
+
     [Header("Move Settings")]
     public float walkingSpeed = 5f;
     private Vector3 newPosition;
+    private Vector3 oldPosition;
     private Vector2 moveInput;
     private float currentSpeed;
     void OnMove(InputValue value)
@@ -165,6 +214,8 @@ public class PlayerController : Controller
         {
             float jumpForce = Mathf.Sqrt(jumpHeight * -2 * Physics.gravity.y);
             rb.AddForce(new Vector3(0, jumpForce, 0), ForceMode.VelocityChange);
+
+            // Send AddForce call here?
         }
     }
 
@@ -179,6 +230,7 @@ public class PlayerController : Controller
         if (value.isPressed)
         {
             // If crouch is pressed, shrink the player and change the speed
+            // TODO Change this to animation later
             transform.Find("Model").localScale -= new Vector3(0, crouchHeight, 0);
             currentSpeed = crouchSpeed;
         }

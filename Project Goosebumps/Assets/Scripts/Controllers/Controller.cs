@@ -1,9 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Netcode;
 
 [RequireComponent(typeof(Rigidbody))]
-public class Controller : MonoBehaviour
+public class Controller : NetworkBehaviour
 {
     protected Rigidbody rb;
 

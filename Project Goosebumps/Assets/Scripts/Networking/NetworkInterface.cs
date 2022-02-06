@@ -15,14 +15,21 @@ public class NetworkInterface : NetworkBehaviour
     {
         NetworkManager.Singleton.OnClientConnectedCallback += (id) =>
         {
-            playersInGame.Value++;
+            if (IsServer)
+            {
+                playersInGame.Value++;
+                //Logger.Instance.LogInfo(NetworkManager.Singleton.ConnectedClients[id].PlayerObject.gameObject.name);
+            }
 
             Logger.Instance.LogInfo($"{id} just connected...");
         };
 
         NetworkManager.Singleton.OnClientDisconnectCallback += (id) =>
         {
-            playersInGame.Value--;
+            if (IsServer)
+            {
+                playersInGame.Value--;
+            }
 
             Logger.Instance.LogInfo($"{id} just disconnected...");
         };
