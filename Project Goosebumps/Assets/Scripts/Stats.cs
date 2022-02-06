@@ -16,9 +16,13 @@ public class Stats : MonoBehaviour
         displayHP.SetText(HP.ToString() + " HP");
     }
 
-    public void takeDamage(int damage)
+    /// <summary>
+    /// Changes the HP of this object, if the object's HP drops to 0 or below, we disable it in the scene
+    /// </summary>
+    /// <param name="damage"></param>
+    public void changeHealth(int damage)
     {
-        HP -= damage;
+        HP += damage;
 
         if (HP <= 0)
         {

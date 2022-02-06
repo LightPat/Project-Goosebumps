@@ -14,7 +14,7 @@ public class DragonController : Controller
         // If a projectile is hitting me, deduct the damage from my HP
         if (collision.gameObject.GetComponent<Projectile>())
         {
-            GetComponent<Stats>().takeDamage(collision.gameObject.GetComponent<Projectile>().damage);
+            GetComponent<Stats>().changeHealth(collision.gameObject.GetComponent<Projectile>().damage);
         }
     }
 }

@@ -37,7 +37,7 @@ namespace ItemSystem
                     GameObject firedBullet = GameObject.Instantiate(bullet, hit.collider.transform.position, Quaternion.identity);
 
                     // Calculate damage here
-                    firedBullet.GetComponent<Projectile>().damage = (int)baseDamage;
+                    firedBullet.GetComponent<Projectile>().damage = (int)baseDamage * -1;
 
                     // Delay destruction by a few frames so that the collision is detected by Unity
                     StartCoroutine(DelayedDestroy(firedBullet, 3));

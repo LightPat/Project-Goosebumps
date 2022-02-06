@@ -282,7 +282,7 @@ GameObject:
   - component: {fileID: 295347349711555128}
   - component: {fileID: 295347349711555124}
   - component: {fileID: 295347349711555126}
-  - component: {fileID: 8184853492476762594}
+  - component: {fileID: -3916893388769105356}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -406,7 +406,7 @@ MonoBehaviour:
   HUDCanvas: {fileID: 295347350011116633}
   GUICanvas: {fileID: 295347351160974279}
   maxCapacity: 0
---- !u!114 &8184853492476762594
+--- !u!114 &-3916893388769105356
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
