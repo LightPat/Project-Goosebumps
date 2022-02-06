@@ -2,9 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-
 namespace ItemSystem
 {
+    [RequireComponent(typeof(LineRenderer))]
     public class Gun : Weapon
     {
         [Header("Gun Configuration")]
