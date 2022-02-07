@@ -6,6 +6,8 @@ using TMPro;
 
 public class NetworkInterface : NetworkBehaviour
 {
+    public GameObject ServerCamera;
+
     [SerializeField]
     private TextMeshProUGUI playersInGameText;
 
@@ -50,6 +52,8 @@ public class NetworkInterface : NetworkBehaviour
         {
             Logger.Instance.LogInfo("Unable to start host...");
         }
+
+        GameObject.Find("NetworkManager").GetComponent<Server>().enabled = true;
     }
 
     public void startClient()
@@ -74,5 +78,8 @@ public class NetworkInterface : NetworkBehaviour
         {
             Logger.Instance.LogInfo("Unable to start server...");
         }
+
+        GameObject.Find("NetworkManager").GetComponent<Server>().enabled = true;
+        ServerCamera.SetActive(true);
     }
 }
