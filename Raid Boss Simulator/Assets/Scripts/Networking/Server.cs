@@ -38,8 +38,6 @@ public class Server : NetworkBehaviour
                         // TODO Implement camera bounds
                         Quaternion newClientRotation = player.transform.rotation * Quaternion.Euler(0, input.x, 0);
                         player.GetComponent<Rigidbody>().MoveRotation(newClientRotation);
-                        player.transform.Find("Vertical Rotate").Rotate(-input.y, 0, 0);
-
                         ActionClientRpc(clientId, newClientRotation);
                         break;
                     case "Jump":
