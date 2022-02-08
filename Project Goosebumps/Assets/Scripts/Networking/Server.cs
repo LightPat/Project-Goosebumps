@@ -5,11 +5,14 @@ using Unity.Netcode;
 
 public class Server : NetworkBehaviour
 {
+    [Header("Player Controller")]
     private float currentSpeed = 5f;
     private float sensitivity = 15f;
+    public float jumpHeight = 3f;
+    public float fallingGravityScale = 0.5f;
 
     private Vector2 lookInput;
-    
+
     public void recieveClientInput(ulong clientId, Vector2 input, string action)
     {
         foreach (KeyValuePair<ulong, NetworkClient> client in NetworkManager.Singleton.ConnectedClients)
@@ -28,32 +31,95 @@ public class Server : NetworkBehaviour
                         Rigidbody rb = player.GetComponent<Rigidbody>();
                         Vector3 newClientPosition = player.transform.position + rb.rotation * new Vector3(input.x, 0, input.y) * currentSpeed * NetworkManager.Singleton.LocalTime.FixedDeltaTime;
                         rb.MovePosition(newClientPosition);
-                        // Propogate change to clients now too
+                        ActionClientRpc(clientId, newClientPosition);
                         break;
                     case "Look":
                         input *= (sensitivity * NetworkManager.Singleton.LocalTime.FixedDeltaTime);
                         // TODO Implement camera bounds
-                        player.GetComponent<Rigidbody>().MoveRotation(player.transform.rotation * Quaternion.Euler(0, input.x, 0));
-                        //player.transform.Find("Vertical Rotate").Rotate(-input.y, input.x, 0);
+                        Quaternion newClientRotation = player.transform.rotation * Quaternion.Euler(0, input.x, 0);
+                        player.GetComponent<Rigidbody>().MoveRotation(newClientRotation);
+                        player.transform.Find("Vertical Rotate").Rotate(-input.y, 0, 0);
+
+                        ActionClientRpc(clientId, newClientRotation);
+                        break;
+                    case "Jump":
+                        float jumpForce = Mathf.Sqrt(jumpHeight * -2 * Physics.gravity.y);
+                        player.GetComponent<Rigidbody>().AddForce(new Vector3(0, jumpForce, 0), ForceMode.VelocityChange);
+                        JumpClientRpc(clientId, jumpForce);
                         break;
                     default:
                         Debug.Log("The server doesn't know what to do with this action!\n" + action);
+                        Logger.Instance.LogInfo("The server doesn't know what to do with this action!\n" + action);
                         break;
                 }
+                return;
             }
         }
-
-        //Debug.Log(NetworkManager.Singleton.ConnectedClientsList[clientId]);
-        //Logger.Instance.LogInfo(NetworkManager.Singleton.ConnectedClientsList[clientId].PlayerObject.gameObject.ToString());
-
-        // Add rotation transform.position + rb.rotation
-
-        //rb.MovePosition(newPosition);
     }
 
     [ClientRpc]
-    void UpdatePlayerPositionClientRpc()
+    void ActionClientRpc(ulong clientId, Vector3 newClientPosition)
     {
+        // Find player object of client and perform an action on that object
+        GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+
+        foreach (GameObject player in players)
+        {
+            if (player.GetComponent<NetworkObject>().OwnerClientId == clientId)
+            {
+                player.GetComponent<Rigidbody>().MovePosition(newClientPosition);
+            }
+        }
+    }
+
+    [ClientRpc]
+    void ActionClientRpc(ulong clientId, Quaternion newClientRotation)
+    {
+        GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+
+        foreach (GameObject player in players)
+        {
+            if (player.GetComponent<NetworkObject>().OwnerClientId == clientId)
+            {
+                player.GetComponent<Rigidbody>().MoveRotation(newClientRotation);
+            }
+        }
+    }
+
+    [ClientRpc]
+    void JumpClientRpc(ulong clientId, float jumpForce)
+    {
+        GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+
+        foreach (GameObject player in players)
+        {
+            if (player.GetComponent<NetworkObject>().OwnerClientId == clientId)
+            {
+                player.GetComponent<Rigidbody>().AddForce(new Vector3(0, jumpForce, 0), ForceMode.VelocityChange);
+            }
+        }
+    }
+
+    //[ClientRpc]
+    //void TestClientRpc()
+    //{
+    //    return;
+        //foreach (KeyValuePair<ulong, NetworkClient> client in NetworkManager.Singleton.ConnectedClients)
+        //{
+        //    if (client.Key == clientId)
+        //    {
+        //        float jumpForce = Mathf.Sqrt(3 * -2 * Physics.gravity.y);
+
+        //        Debug.Log(client.Value.PlayerObject);
+        //        //client.Value.PlayerObject.gameObject.GetComponent<Rigidbody>().AddForce(new Vector3(0, jumpForce, 0), ForceMode.VelocityChange);
+        //        Logger.Instance.LogInfo("Jumping");
+        //    }
+        //}
+    //}
+
+    //[ClientRpc]
+    //void UpdatePlayerPositionClientRpc()
+    //{
         //Logger.Instance.LogInfo(networkPosition.ToString());
 
 
@@ -71,7 +137,7 @@ public class Server : NetworkBehaviour
         //        player.transform.position = newClientPosition;
         //    }
         //}
-    }
+    //}
 
     //[ClientRpc]
     //void UpdatePlayerRotationClientRpc()

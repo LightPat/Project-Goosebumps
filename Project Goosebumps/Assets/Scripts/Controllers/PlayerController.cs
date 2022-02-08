@@ -129,7 +129,6 @@ public class PlayerController : Controller
     {
         if (moveHeld)
         {
-            Debug.Log("Reached");
             SendInputServerRpc(moveInput, "Move");
         }
     }
@@ -137,7 +136,13 @@ public class PlayerController : Controller
     [ServerRpc]
     void SendInputServerRpc(Vector2 input, string action)
     {
-        GameObject.Find("NetworkManager").GetComponent<Server>().recieveClientInput(GetComponent<NetworkObject>().OwnerClientId, input, action);
+        GameObject.Find("Server").GetComponent<Server>().recieveClientInput(GetComponent<NetworkObject>().OwnerClientId, input, action);
+    }
+
+    [ServerRpc]
+    void SendInputServerRpc(string action)
+    {
+        GameObject.Find("Server").GetComponent<Server>().recieveClientInput(GetComponent<NetworkObject>().OwnerClientId, Vector2.zero, action);
     }
 
     private bool moveHeld;
@@ -158,8 +163,7 @@ public class PlayerController : Controller
         {
             moveHeld = false;
         }
-
-        // Input is sent to server in update()
+        SendInputServerRpc(moveInput, "Move");
     }
 
     [Header("Look Settings")]
@@ -199,15 +203,11 @@ public class PlayerController : Controller
         // If you check for velocity = 0 then you can double jump since the apex of your jump's velocity is 0
         // Check if the player is touching a gameObject under them
         // May need to change 1.5f to be a different number if you switch the asset of the player model
-        
 
         // Jump logic
         if (isGrounded())
         {
-            float jumpForce = Mathf.Sqrt(jumpHeight * -2 * Physics.gravity.y);
-            rb.AddForce(new Vector3(0, jumpForce, 0), ForceMode.VelocityChange);
-
-            // Send AddForce call here?
+            SendInputServerRpc("Jump");
         }
     }
 
