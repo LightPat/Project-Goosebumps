@@ -18,8 +18,9 @@ public class Server : NetworkBehaviour
                 // PlayerObject is the network object component
                 GameObject player = client.Value.PlayerObject.gameObject;
 
-                Logger.Instance.LogInfo(clientId.ToString() + " " + newClientPosition.ToString());
-                player.GetComponent<Rigidbody>().MovePosition(newClientPosition);
+                //Logger.Instance.LogInfo(clientId.ToString() + " " + newClientPosition.ToString());
+
+                player.transform.position = newClientPosition;
             }
         }
     }
@@ -34,9 +35,34 @@ public class Server : NetworkBehaviour
         {
             if (player.GetComponent<NetworkObject>().OwnerClientId == clientId)
             {
-                Logger.Instance.LogInfo(clientId.ToString() + " " + newClientPosition.ToString());
-                player.GetComponent<Rigidbody>().MovePosition(newClientPosition);
+                //Logger.Instance.LogInfo(clientId.ToString() + " " + newClientPosition.ToString());
+
+                player.transform.position = newClientPosition;
             }
+        }
+    }
+
+    public void rotateClient(ulong clientId, Quaternion newClientRotation)
+    {
+        foreach (KeyValuePair<ulong, NetworkClient> client in NetworkManager.Singleton.ConnectedClients)
+        {
+            if (client.Key == clientId)
+            {
+                GameObject player = client.Value.PlayerObject.gameObject;
+
+                player.GetComponent<Rigidbody>().MoveRotation(newClientRotation);
+                //player.transform.rotation = newClientRotation;
+            }
+        }
+    }
+
+    void Update()
+    {
+        foreach (KeyValuePair<ulong, NetworkClient> client in NetworkManager.Singleton.ConnectedClients)
+        {
+            GameObject player = client.Value.PlayerObject.gameObject;
+
+            Logger.Instance.LogInfo(player.transform.rotation.eulerAngles.ToString());
         }
     }
 }

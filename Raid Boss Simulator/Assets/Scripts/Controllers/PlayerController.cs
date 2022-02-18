@@ -88,7 +88,11 @@ public class PlayerController : Controller
             lookEulers.y += lookInput.y;
         }
 
-        rb.MoveRotation(Quaternion.Euler(0, lookEulers.x, 0));
+        Logger.Instance.LogInfo(transform.rotation.eulerAngles.ToString());
+
+        Quaternion newRotation = Quaternion.Euler(0, lookEulers.x, 0);
+        RotateServerRpc(newRotation);
+        rb.MoveRotation(newRotation);
         transform.Find("Vertical Rotate").rotation = Quaternion.Euler(-lookEulers.y, lookEulers.x, 0);
 
         // Full auto firing
@@ -99,7 +103,6 @@ public class PlayerController : Controller
             {
                 if (w.GetComponent<Weapon>().fullAuto)
                 {
-                    //Debug.Log("REached");
                     w.GetComponent<Weapon>().attack();
                 }
             }
@@ -109,6 +112,12 @@ public class PlayerController : Controller
     void FixedUpdate()
     {
         newPosition = transform.position + rb.rotation * new Vector3(moveInput.x, 0, moveInput.y) * currentSpeed * NetworkManager.Singleton.LocalTime.FixedDeltaTime;
+        
+        // Send position update to server
+        if (newPosition != transform.position)
+        {
+            MoveServerRpc(newPosition);
+        }
 
         rb.MovePosition(newPosition);
 
@@ -125,24 +134,20 @@ public class PlayerController : Controller
         GameObject.Find("Server").GetComponent<Server>().moveClient(GetComponent<NetworkObject>().OwnerClientId, newPosition);
     }
 
+    [ServerRpc]
+    void RotateServerRpc(Quaternion newRotation)
+    {
+        GameObject.Find("Server").GetComponent<Server>().rotateClient(GetComponent<NetworkObject>().OwnerClientId, newRotation);
+    }
+
     [Header("Move Settings")]
     public float walkingSpeed = 5f;
     private Vector2 moveInput;
     private Vector3 newPosition;
     private float currentSpeed;
-    private bool moveHeld;
     void OnMove(InputValue value)
     {
         moveInput = value.Get<Vector2>();
-
-        if (value.Get<Vector2>() != Vector2.zero)
-        {
-            moveHeld = true;
-        }
-        else
-        {
-            moveHeld = false;
-        }
     }
 
     [Header("Look Settings")]
