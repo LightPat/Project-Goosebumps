@@ -45,93 +45,8 @@ public class PlayerController : Controller
         transform.Find("Player Number").gameObject.GetComponent<TextMeshPro>().SetText("Player " + GetComponent<NetworkObject>().OwnerClientId.ToString());
     }
 
-    //void Update()
-    //{
-    //    // Look with mouse
-    //    // Remember that Rotate() rotates AROUND that axis, so if we want to look right, we rotate along the Y axis
-    //    lookInput *= (sensitivity * Time.deltaTime);
-
-    //    lookEulers.x += lookInput.x;
-
-    //    // This prevents the rotation from increasing or decreasing infinitely if the player does a bunch of spins horizontally
-    //    if (lookEulers.x >= 360)
-    //    {
-    //        lookEulers.x = lookEulers.x - 360;
-    //    }
-    //    else if (lookEulers.x <= -360)
-    //    {
-    //        lookEulers.x = lookEulers.x + 360;
-    //    }
-
-    //    /* First Person Camera Rotation Logic
-    //    Remember that the camera is a child of the player, so we don't need to worry about horizontal rotation, that has already been calculated
-    //    Calculate vertical rotation for the first person camera if you're not looking straight up or down already
-    //    If we reach the top or bottom of our vertical look bound, set the total rotation amount to 1 over or 1 under the bound
-    //    Otherwise, just change the rotation by the lookInput */
-    //    if (lookEulers.y < -verticalLookBound)
-    //    {
-    //        lookEulers.y = -verticalLookBound - 1;
-
-    //        if (lookInput.y > 0)
-    //        {
-    //            lookEulers.y += lookInput.y;
-    //        }
-    //    }
-    //    else if (lookEulers.y > verticalLookBound)
-    //    {
-    //        lookEulers.y = verticalLookBound + 1;
-
-    //        if (lookInput.y < 0)
-    //        {
-    //            lookEulers.y += lookInput.y;
-    //        }
-    //    }
-    //    else
-    //    {
-    //        lookEulers.y += lookInput.y;
-    //    }
-
-    //    // Rotate player horizontally
-    //    Quaternion newRotation = Quaternion.Euler(0, lookEulers.x, 0);
-    //    transform.rotation = newRotation;
-    //    // Rotate vertical rotation object vertically and horizontally
-    //    transform.Find("Vertical Rotate").rotation = Quaternion.Euler(-lookEulers.y, lookEulers.x, 0);
-
-    //    // Full auto firing
-    //    GameObject w = inventory.getEquippedWeapon();
-    //    if (w != null)
-    //    {
-    //        if (attackHeld)
-    //        {
-    //            if (w.GetComponent<Weapon>().fullAuto)
-    //            {
-    //                w.GetComponent<Weapon>().attack();
-    //            }
-    //        }
-    //    }
-    //}
-
-    //void FixedUpdate()
-    //{
-    //    oldPosition = transform.position;
-    //    // Updating player position from WASD input
-    //    newPosition = transform.position + rb.rotation * new Vector3(moveInput.x, 0, moveInput.y) * currentSpeed * Time.fixedDeltaTime;
-    //    rb.MovePosition(newPosition);
-
-    //    // Falling Gravity velocity increase
-    //    if (rb.velocity.y < 0)
-    //    {
-    //        rb.AddForce(new Vector3(0, (fallingGravityScale * -1), 0), ForceMode.VelocityChange);
-    //    }
-    //}
-
     void Update()
     {
-        if (moveHeld)
-        {
-            SendInputServerRpc(moveInput, "Move");
-        }
-
         lookInput *= (sensitivity * Time.deltaTime);
         lookEulers.x += lookInput.x;
 
@@ -173,19 +88,47 @@ public class PlayerController : Controller
             lookEulers.y += lookInput.y;
         }
 
+        rb.MoveRotation(Quaternion.Euler(0, lookEulers.x, 0));
         transform.Find("Vertical Rotate").rotation = Quaternion.Euler(-lookEulers.y, lookEulers.x, 0);
-        Debug.Log(lookEulers);
+
+        // Full auto firing
+        GameObject w = inventory.getEquippedWeapon();
+        if (w != null)
+        {
+            if (attackHeld)
+            {
+                if (w.GetComponent<Weapon>().fullAuto)
+                {
+                    //Debug.Log("REached");
+                    w.GetComponent<Weapon>().attack();
+                }
+            }
+        }
+    }
+
+    void FixedUpdate()
+    {
+        newPosition = transform.position + rb.rotation * new Vector3(moveInput.x, 0, moveInput.y) * currentSpeed * NetworkManager.Singleton.LocalTime.FixedDeltaTime;
+
+        rb.MovePosition(newPosition);
+
+        //// Falling Gravity velocity increase
+        //if (rb.velocity.y < 0)
+        //{
+        //    rb.AddForce(new Vector3(0, (fallingGravityScale * -1), 0), ForceMode.VelocityChange);
+        //}
     }
 
     [ServerRpc]
-    void SendInputServerRpc(Vector2 input, string action)
+    void MoveServerRpc(Vector3 newPosition)
     {
-        GameObject.Find("Server").GetComponent<Server>().recieveClientInput(GetComponent<NetworkObject>().OwnerClientId, input, action);
+        GameObject.Find("Server").GetComponent<Server>().moveClient(GetComponent<NetworkObject>().OwnerClientId, newPosition);
     }
 
     [Header("Move Settings")]
     public float walkingSpeed = 5f;
     private Vector2 moveInput;
+    private Vector3 newPosition;
     private float currentSpeed;
     private bool moveHeld;
     void OnMove(InputValue value)
@@ -200,8 +143,6 @@ public class PlayerController : Controller
         {
             moveHeld = false;
         }
-
-        SendInputServerRpc(moveInput, "Move");
     }
 
     [Header("Look Settings")]
@@ -213,8 +154,6 @@ public class PlayerController : Controller
     void OnLook(InputValue value)
     {
         lookInput = value.Get<Vector2>();
-
-        SendInputServerRpc(lookInput, "Look");
     }
 
     [Header("Is Grounded")]
@@ -247,7 +186,8 @@ public class PlayerController : Controller
         // Jump logic
         if (isGrounded())
         {
-            SendInputServerRpc(Vector2.zero, "Jump");
+            float jumpForce = Mathf.Sqrt(jumpHeight * -2 * Physics.gravity.y);
+            rb.AddForce(new Vector3(0, jumpForce, 0), ForceMode.VelocityChange);
         }
     }
 

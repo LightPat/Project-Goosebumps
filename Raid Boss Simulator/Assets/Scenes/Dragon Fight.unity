@@ -1638,8 +1638,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0a6a903a2f57003499c7e2da3846ed6a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  jumpHeight: 3
-  fallingGravityScale: 0.5
 --- !u!4 &1211459482
 Transform:
   m_ObjectHideFlags: 0
@@ -4051,7 +4049,6 @@ GameObject:
   - component: {fileID: 1811481871}
   - component: {fileID: 1811481872}
   - component: {fileID: 6874842664343111167}
-  - component: {fileID: 919132148780017316}
   m_Layer: 0
   m_Name: Scar L
   m_TagString: InventoryItem
@@ -4072,22 +4069,6 @@ BoxCollider:
   serializedVersion: 2
   m_Size: {x: 0.56406933, y: 1.7504387, z: 5.644642}
   m_Center: {x: -0.09154258, y: -0.016948227, z: 0.02300167}
---- !u!114 &919132148780017316
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 919132148780017314}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  GlobalObjectIdHash: 1813191287
-  AlwaysReplicateAsRoot: 0
-  DontDestroyWithOwner: 0
-  AutoObjectParentSync: 1
 --- !u!23 &936262970513883925
 MeshRenderer:
   m_ObjectHideFlags: 0
