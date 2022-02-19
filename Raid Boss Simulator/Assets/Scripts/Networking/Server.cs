@@ -18,8 +18,6 @@ public class Server : NetworkBehaviour
                 // PlayerObject is the network object component
                 GameObject player = client.Value.PlayerObject.gameObject;
 
-                //Logger.Instance.LogInfo(clientId.ToString() + " " + newClientPosition.ToString());
-
                 player.transform.position = newClientPosition;
             }
         }
@@ -35,14 +33,12 @@ public class Server : NetworkBehaviour
         {
             if (player.GetComponent<NetworkObject>().OwnerClientId == clientId)
             {
-                //Logger.Instance.LogInfo(clientId.ToString() + " " + newClientPosition.ToString());
-
                 player.transform.position = newClientPosition;
             }
         }
     }
 
-    public void rotateClient(ulong clientId, Quaternion newClientRotation)
+    public void rotateClient(ulong clientId, Vector3 newClientRotationEulers)
     {
         foreach (KeyValuePair<ulong, NetworkClient> client in NetworkManager.Singleton.ConnectedClients)
         {
@@ -50,19 +46,24 @@ public class Server : NetworkBehaviour
             {
                 GameObject player = client.Value.PlayerObject.gameObject;
 
-                player.GetComponent<Rigidbody>().MoveRotation(newClientRotation);
-                //player.transform.rotation = newClientRotation;
+                //player.transform.rotation = Quaternion.Euler(0, newClientRotationEulers.x, 0);
+                player.GetComponent<Rigidbody>().MoveRotation(Quaternion.Euler(0, newClientRotationEulers.x, 0));
+                player.transform.Find("Vertical Rotate").rotation = Quaternion.Euler(-newClientRotationEulers.y, newClientRotationEulers.x, 0);
             }
         }
     }
 
     void Update()
     {
-        foreach (KeyValuePair<ulong, NetworkClient> client in NetworkManager.Singleton.ConnectedClients)
+        if (IsServer)
         {
-            GameObject player = client.Value.PlayerObject.gameObject;
+            foreach (KeyValuePair<ulong, NetworkClient> client in NetworkManager.Singleton.ConnectedClients)
+            {
+                GameObject player = client.Value.PlayerObject.gameObject;
 
-            Logger.Instance.LogInfo(player.transform.rotation.eulerAngles.ToString());
+                //Debug.Log(player.transform.rotation.eulerAngles.ToString());
+            }
         }
+        
     }
 }

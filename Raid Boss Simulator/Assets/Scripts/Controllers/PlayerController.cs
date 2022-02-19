@@ -34,15 +34,20 @@ public class PlayerController : Controller
 
         Cursor.lockState = CursorLockMode.Locked;
 
+        // Assign player number
+        transform.Find("Player Number").gameObject.GetComponent<TextMeshPro>().SetText("Player " + GetComponent<NetworkObject>().OwnerClientId.ToString());
+
         // Sets the camera and input to active on the player object that this network instance owns
         if (IsOwner)
         {
             transform.Find("Vertical Rotate").Find("First Person Camera").gameObject.SetActive(true);
             GetComponent<PlayerInput>().enabled = true;
         }
-
-        // Assign player number
-        transform.Find("Player Number").gameObject.GetComponent<TextMeshPro>().SetText("Player " + GetComponent<NetworkObject>().OwnerClientId.ToString());
+        else
+        {
+            // Need to disable this component so that it doesn't interfere with server updates
+            this.enabled = false;
+        }
     }
 
     void Update()
@@ -88,11 +93,11 @@ public class PlayerController : Controller
             lookEulers.y += lookInput.y;
         }
 
-        Logger.Instance.LogInfo(transform.rotation.eulerAngles.ToString());
-
         Quaternion newRotation = Quaternion.Euler(0, lookEulers.x, 0);
-        RotateServerRpc(newRotation);
         rb.MoveRotation(newRotation);
+
+        RotateServerRpc(lookEulers);
+
         transform.Find("Vertical Rotate").rotation = Quaternion.Euler(-lookEulers.y, lookEulers.x, 0);
 
         // Full auto firing
@@ -135,9 +140,9 @@ public class PlayerController : Controller
     }
 
     [ServerRpc]
-    void RotateServerRpc(Quaternion newRotation)
+    void RotateServerRpc(Vector3 newRotationEulers)
     {
-        GameObject.Find("Server").GetComponent<Server>().rotateClient(GetComponent<NetworkObject>().OwnerClientId, newRotation);
+        GameObject.Find("Server").GetComponent<Server>().rotateClient(GetComponent<NetworkObject>().OwnerClientId, newRotationEulers);
     }
 
     [Header("Move Settings")]
