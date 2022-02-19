@@ -8,6 +8,26 @@ using Unity.Netcode;
 /// </summary>
 public class Server : NetworkBehaviour
 {
+    private static Server _instance;
+
+    public static Server Instance
+    {
+        get
+        {
+            if (_instance == null)
+            {
+                Debug.Log("Server is null");
+            }
+
+            return _instance;
+        }
+    }
+
+    private void Awake()
+    {
+        _instance = this;
+    }
+
     public void moveClient(ulong clientId, Vector3 newClientPosition)
     {
         MoveClientRpc(clientId, newClientPosition);

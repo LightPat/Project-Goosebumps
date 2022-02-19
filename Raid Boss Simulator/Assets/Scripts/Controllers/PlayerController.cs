@@ -23,7 +23,6 @@ public class PlayerController : Controller
 
     private Inventory inventory;
     private GameObject firstPersonCamera;
-    private Server server;
 
     new void Start()
     {
@@ -34,8 +33,6 @@ public class PlayerController : Controller
         currentSpeed = walkingSpeed;
 
         Cursor.lockState = CursorLockMode.Locked;
-
-        server = GameObject.Find("Server").GetComponent<Server>();
 
         // Assign player number
         transform.Find("Player Number").gameObject.GetComponent<TextMeshPro>().SetText("Player " + GetComponent<NetworkObject>().OwnerClientId.ToString());
@@ -150,7 +147,7 @@ public class PlayerController : Controller
     [ServerRpc]
     void MoveServerRpc(Vector3 newPosition)
     {
-        server.moveClient(GetComponent<NetworkObject>().OwnerClientId, newPosition);
+        Server.Instance.moveClient(GetComponent<NetworkObject>().OwnerClientId, newPosition);
     }
 
     [Header("Look Settings")]
@@ -167,7 +164,7 @@ public class PlayerController : Controller
     [ServerRpc]
     void RotateServerRpc(Vector3 newRotationEulers)
     {
-        server.rotateClient(GetComponent<NetworkObject>().OwnerClientId, newRotationEulers);
+        Server.Instance.rotateClient(GetComponent<NetworkObject>().OwnerClientId, newRotationEulers);
     }
 
     [Header("Is Grounded")]
@@ -209,7 +206,7 @@ public class PlayerController : Controller
     [ServerRpc]
     void JumpServerRpc(float jumpForce)
     {
-        server.jumpClient(GetComponent<NetworkObject>().OwnerClientId, jumpForce);
+        Server.Instance.jumpClient(GetComponent<NetworkObject>().OwnerClientId, jumpForce);
     }
 
     [Header("Crouch Settings")]
