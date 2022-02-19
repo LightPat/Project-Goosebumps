@@ -17,6 +17,7 @@ public class PlayerController : Controller
      * more readable. */
 
     public GameObject EscapeMenu;
+    public GameObject WeaponSpawnPoint;
 
     [Header("Input Settings")]
     public float sensitivity = 15f;
@@ -43,6 +44,14 @@ public class PlayerController : Controller
             transform.Find("Vertical Rotate").Find("First Person Camera").gameObject.SetActive(true);
             GetComponent<PlayerInput>().enabled = true;
         }
+
+        if (IsServer)
+        {
+            NetworkObject equippedWeaponSpawnPoint = transform.Find("Vertical Rotate").Find("Equipped Weapon Spawn Point").GetComponent<NetworkObject>();
+            equippedWeaponSpawnPoint.Spawn();
+            equippedWeaponSpawnPoint.ChangeOwnership(GetComponent<NetworkObject>().OwnerClientId);
+        }
+        
     }
 
     void Update()
