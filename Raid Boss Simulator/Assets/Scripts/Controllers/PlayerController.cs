@@ -17,6 +17,8 @@ public class PlayerController : Controller
      * more readable. */
 
     public GameObject EscapeMenu;
+    public GameObject WeaponSpawnPointPrefab;
+    public GameObject VerticalRotatePrefab;
 
     [Header("Input Settings")]
     public float sensitivity = 15f;
@@ -24,83 +26,141 @@ public class PlayerController : Controller
     private Inventory inventory;
     private GameObject firstPersonCamera;
 
+    [HideInInspector]
+    public Transform verticalRotate;
+
     new void Start()
     {
         // Call parent start method
         base.Start();
+
+        verticalRotate = null;
+        if (IsServer)
+        {
+            // Need to use SetParent so that the parent change gets propagated to all clients
+
+            GameObject verticalRotateGO = Instantiate(VerticalRotatePrefab);
+            verticalRotateGO.GetComponent<NetworkObject>().Spawn();
+            verticalRotateGO.transform.SetParent(transform, false);
+            verticalRotateGO.GetComponent<NetworkObject>().ChangeOwnership(GetComponent<NetworkObject>().OwnerClientId);
+            verticalRotate = verticalRotateGO.transform;
+
+            GameObject equippedWeaponSpawnPoint = Instantiate(WeaponSpawnPointPrefab);
+            equippedWeaponSpawnPoint.GetComponent<NetworkObject>().Spawn();
+            equippedWeaponSpawnPoint.transform.SetParent(verticalRotate, false);
+            equippedWeaponSpawnPoint.GetComponent<NetworkObject>().ChangeOwnership(GetComponent<NetworkObject>().OwnerClientId);
+        }
+        else
+        {
+            //StartCoroutine(Wait(2f));
+            verticalRotate = transform.Find("Vertical Rotate(Clone)");
+            Cursor.lockState = CursorLockMode.Locked;
+
+            Logger.Instance.LogInfo(verticalRotate.ToString());
+        }
+
         inventory = GetComponent<Inventory>();
-        firstPersonCamera = transform.Find("Vertical Rotate").Find("First Person Camera").gameObject;
+        firstPersonCamera = verticalRotate.Find("First Person Camera").gameObject;
         currentSpeed = walkingSpeed;
 
-        Cursor.lockState = CursorLockMode.Locked;
+        // Assign player number
+        transform.Find("Player Number").gameObject.GetComponent<TextMeshPro>().SetText("Player " + GetComponent<NetworkObject>().OwnerClientId.ToString());
 
         // Sets the camera and input to active on the player object that this network instance owns
         if (IsOwner)
         {
-            transform.Find("Vertical Rotate").Find("First Person Camera").gameObject.SetActive(true);
+            verticalRotate.Find("First Person Camera").gameObject.SetActive(true);
             GetComponent<PlayerInput>().enabled = true;
         }
+        else
+        {
+            transform.Find("HUD").gameObject.SetActive(false);
+        }
+    }
 
-        // Assign player number
-        transform.Find("Player Number").gameObject.GetComponent<TextMeshPro>().SetText("Player " + GetComponent<NetworkObject>().OwnerClientId.ToString());
+    IEnumerator Wait(float seconds)
+    {
+        yield return new WaitForSeconds(seconds);
     }
 
     void Update()
     {
-        lookInput *= (sensitivity * Time.deltaTime);
-        lookEulers.x += lookInput.x;
-
-        // This prevents the rotation from increasing or decreasing infinitely if the player does a bunch of spins horizontally
-        if (lookEulers.x >= 360)
+        // TODO Workaround for verticalrotate not spawning in time for assignment, don't want to call this every update
+        if (verticalRotate == null)
         {
-            lookEulers.x = lookEulers.x - 360;
-        }
-        else if (lookEulers.x <= -360)
-        {
-            lookEulers.x = lookEulers.x + 360;
-        }
+            verticalRotate = transform.Find("Vertical Rotate(Clone)");
+            firstPersonCamera = verticalRotate.Find("First Person Camera").gameObject;
 
-        /* First Person Camera Rotation Logic
-        Remember that the camera is a child of the player, so we don't need to worry about horizontal rotation, that has already been calculated
-        Calculate vertical rotation for the first person camera if you're not looking straight up or down already
-        If we reach the top or bottom of our vertical look bound, set the total rotation amount to 1 over or 1 under the bound
-        Otherwise, just change the rotation by the lookInput */
-        if (lookEulers.y < -verticalLookBound)
-        {
-            lookEulers.y = -verticalLookBound - 1;
-
-            if (lookInput.y > 0)
+            if (IsOwner)
             {
-                lookEulers.y += lookInput.y;
+                verticalRotate.Find("First Person Camera").gameObject.SetActive(true);
+                GetComponent<PlayerInput>().enabled = true;
             }
         }
-        else if (lookEulers.y > verticalLookBound)
-        {
-            lookEulers.y = verticalLookBound + 1;
 
-            if (lookInput.y < 0)
+        if (IsOwner)
+        {
+            lookInput *= (sensitivity * Time.deltaTime);
+            lookEulers.x += lookInput.x;
+
+            // This prevents the rotation from increasing or decreasing infinitely if the player does a bunch of spins horizontally
+            if (lookEulers.x >= 360)
             {
-                lookEulers.y += lookInput.y;
+                lookEulers.x = lookEulers.x - 360;
             }
-        }
-        else
-        {
-            lookEulers.y += lookInput.y;
-        }
-
-        rb.MoveRotation(Quaternion.Euler(0, lookEulers.x, 0));
-        transform.Find("Vertical Rotate").rotation = Quaternion.Euler(-lookEulers.y, lookEulers.x, 0);
-
-        // Full auto firing
-        GameObject w = inventory.getEquippedWeapon();
-        if (w != null)
-        {
-            if (attackHeld)
+            else if (lookEulers.x <= -360)
             {
-                if (w.GetComponent<Weapon>().fullAuto)
+                lookEulers.x = lookEulers.x + 360;
+            }
+
+            /* First Person Camera Rotation Logic
+            Remember that the camera is a child of the player, so we don't need to worry about horizontal rotation, that has already been calculated
+            Calculate vertical rotation for the first person camera if you're not looking straight up or down already
+            If we reach the top or bottom of our vertical look bound, set the total rotation amount to 1 over or 1 under the bound
+            Otherwise, just change the rotation by the lookInput */
+            if (lookEulers.y < -verticalLookBound)
+            {
+                lookEulers.y = -verticalLookBound - 1;
+
+                if (lookInput.y > 0)
                 {
-                    //Debug.Log("REached");
-                    w.GetComponent<Weapon>().attack();
+                    lookEulers.y += lookInput.y;
+                }
+            }
+            else if (lookEulers.y > verticalLookBound)
+            {
+                lookEulers.y = verticalLookBound + 1;
+
+                if (lookInput.y < 0)
+                {
+                    lookEulers.y += lookInput.y;
+                }
+            }
+            else
+            {
+                lookEulers.y += lookInput.y;
+            }
+
+            Quaternion newRotation = Quaternion.Euler(0, lookEulers.x, 0);
+            rb.MoveRotation(newRotation);
+
+            if (oldRotation != newRotation)
+            {
+                RotateServerRpc(lookEulers);
+            }
+
+            verticalRotate.rotation = Quaternion.Euler(-lookEulers.y, lookEulers.x, 0);
+
+            // Full auto firing
+            GameObject w = inventory.getEquippedWeapon();
+            if (w != null)
+            {
+                if (attackHeld)
+                {
+                    if (w.GetComponent<Weapon>().fullAuto)
+                    {
+                        w.GetComponent<Weapon>().attack();
+                    }
                 }
             }
         }
@@ -109,20 +169,20 @@ public class PlayerController : Controller
     void FixedUpdate()
     {
         newPosition = transform.position + rb.rotation * new Vector3(moveInput.x, 0, moveInput.y) * currentSpeed * NetworkManager.Singleton.LocalTime.FixedDeltaTime;
+        
+        // Send position update to server
+        if (newPosition != transform.position)
+        {
+            MoveServerRpc(newPosition);
+        }
 
         rb.MovePosition(newPosition);
 
-        //// Falling Gravity velocity increase
-        //if (rb.velocity.y < 0)
-        //{
-        //    rb.AddForce(new Vector3(0, (fallingGravityScale * -1), 0), ForceMode.VelocityChange);
-        //}
-    }
-
-    [ServerRpc]
-    void MoveServerRpc(Vector3 newPosition)
-    {
-        GameObject.Find("Server").GetComponent<Server>().moveClient(GetComponent<NetworkObject>().OwnerClientId, newPosition);
+        // Falling Gravity velocity increase
+        if (rb.velocity.y < 0)
+        {
+            rb.AddForce(new Vector3(0, (fallingGravityScale * -1), 0), ForceMode.VelocityChange);
+        }
     }
 
     [Header("Move Settings")]
@@ -130,19 +190,15 @@ public class PlayerController : Controller
     private Vector2 moveInput;
     private Vector3 newPosition;
     private float currentSpeed;
-    private bool moveHeld;
     void OnMove(InputValue value)
     {
         moveInput = value.Get<Vector2>();
+    }
 
-        if (value.Get<Vector2>() != Vector2.zero)
-        {
-            moveHeld = true;
-        }
-        else
-        {
-            moveHeld = false;
-        }
+    [ServerRpc]
+    void MoveServerRpc(Vector3 newPosition)
+    {
+        Server.Instance.moveClient(GetComponent<NetworkObject>().OwnerClientId, newPosition);
     }
 
     [Header("Look Settings")]
@@ -154,6 +210,12 @@ public class PlayerController : Controller
     void OnLook(InputValue value)
     {
         lookInput = value.Get<Vector2>();
+    }
+
+    [ServerRpc]
+    void RotateServerRpc(Vector3 newRotationEulers)
+    {
+        Server.Instance.rotateClient(GetComponent<NetworkObject>().OwnerClientId, newRotationEulers);
     }
 
     [Header("Is Grounded")]
@@ -188,7 +250,14 @@ public class PlayerController : Controller
         {
             float jumpForce = Mathf.Sqrt(jumpHeight * -2 * Physics.gravity.y);
             rb.AddForce(new Vector3(0, jumpForce, 0), ForceMode.VelocityChange);
+            JumpServerRpc(jumpForce);
         }
+    }
+
+    [ServerRpc]
+    void JumpServerRpc(float jumpForce)
+    {
+        Server.Instance.jumpClient(GetComponent<NetworkObject>().OwnerClientId, jumpForce);
     }
 
     [Header("Crouch Settings")]

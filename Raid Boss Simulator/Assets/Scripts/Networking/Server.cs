@@ -3,11 +3,34 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
 
+/// <summary>
+/// Every public method has a corresponding ClientRpc private method, which propogates the change that occured on the server side to each client
+/// </summary>
 public class Server : NetworkBehaviour
 {
+    private static Server _instance;
+
+    public static Server Instance
+    {
+        get
+        {
+            if (_instance == null)
+            {
+                Debug.Log("Server is null");
+            }
+
+            return _instance;
+        }
+    }
+
+    private void Awake()
+    {
+        _instance = this;
+    }
+
     public void moveClient(ulong clientId, Vector3 newClientPosition)
     {
-        //MoveClientRpc(clientId, newClientPosition);
+        MoveClientRpc(clientId, newClientPosition);
 
         foreach (KeyValuePair<ulong, NetworkClient> client in NetworkManager.Singleton.ConnectedClients)
         {
@@ -18,8 +41,7 @@ public class Server : NetworkBehaviour
                 // PlayerObject is the network object component
                 GameObject player = client.Value.PlayerObject.gameObject;
 
-                Logger.Instance.LogInfo(clientId.ToString() + " " + newClientPosition.ToString());
-                player.GetComponent<Rigidbody>().MovePosition(newClientPosition);
+                player.transform.position = newClientPosition;
             }
         }
     }
@@ -32,10 +54,71 @@ public class Server : NetworkBehaviour
 
         foreach (GameObject player in players)
         {
-            if (player.GetComponent<NetworkObject>().OwnerClientId == clientId)
+            // If this gameObject ISN'T the client who moved, and the client Ids match, propagate the move change
+            if (player.GetComponent<NetworkObject>().OwnerClientId == clientId & !player.GetComponent<NetworkObject>().IsLocalPlayer)
             {
-                Logger.Instance.LogInfo(clientId.ToString() + " " + newClientPosition.ToString());
-                player.GetComponent<Rigidbody>().MovePosition(newClientPosition);
+                player.transform.position = newClientPosition;
+            }
+        }
+    }
+
+    public void rotateClient(ulong clientId, Vector3 newClientRotationEulers)
+    {
+        RotateClientRpc(clientId, newClientRotationEulers);
+
+        foreach (KeyValuePair<ulong, NetworkClient> client in NetworkManager.Singleton.ConnectedClients)
+        {
+            if (client.Key == clientId)
+            {
+                GameObject player = client.Value.PlayerObject.gameObject;
+
+                player.GetComponent<Rigidbody>().MoveRotation(Quaternion.Euler(0, newClientRotationEulers.x, 0));
+                player.GetComponent<PlayerController>().verticalRotate.rotation = Quaternion.Euler(-newClientRotationEulers.y, newClientRotationEulers.x, 0);
+            }
+        }
+    }
+
+    [ClientRpc]
+    void RotateClientRpc(ulong clientId, Vector3 newClientRotationEulers)
+    {
+        // Update this client's position everywhere except the original
+        GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+
+        foreach (GameObject player in players)
+        {
+            if (player.GetComponent<NetworkObject>().OwnerClientId == clientId & !player.GetComponent<NetworkObject>().IsLocalPlayer)
+            {
+                player.GetComponent<Rigidbody>().MoveRotation(Quaternion.Euler(0, newClientRotationEulers.x, 0));
+                player.GetComponent<PlayerController>().verticalRotate.rotation = Quaternion.Euler(-newClientRotationEulers.y, newClientRotationEulers.x, 0);
+            }
+        }
+    }
+
+    public void jumpClient(ulong clientId, float jumpForce)
+    {
+        JumpClientRpc(clientId, jumpForce);
+
+        foreach (KeyValuePair<ulong, NetworkClient> client in NetworkManager.Singleton.ConnectedClients)
+        {
+            if (client.Key == clientId)
+            {
+                GameObject player = client.Value.PlayerObject.gameObject;
+
+                player.GetComponent<Rigidbody>().AddForce(new Vector3(0, jumpForce, 0), ForceMode.VelocityChange);
+            }
+        }
+    }
+
+    [ClientRpc]
+    void JumpClientRpc(ulong clientId, float jumpForce)
+    {
+        GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+
+        foreach (GameObject player in players)
+        {
+            if (player.GetComponent<NetworkObject>().OwnerClientId == clientId & !player.GetComponent<NetworkObject>().IsLocalPlayer)
+            {
+                player.GetComponent<Rigidbody>().AddForce(new Vector3(0, jumpForce, 0), ForceMode.VelocityChange);
             }
         }
     }

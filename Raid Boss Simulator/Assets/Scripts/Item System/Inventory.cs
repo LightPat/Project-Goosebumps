@@ -5,10 +5,12 @@ using UnityEngine.InputSystem;
 using TMPro;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
+using Unity.Netcode;
+using Unity.Netcode.Components;
 
 namespace ItemSystem
 {
-    public class Inventory : MonoBehaviour
+    public class Inventory : NetworkBehaviour
     {
         public GameObject HUDCanvas;
         public GameObject GUICanvas;
@@ -30,26 +32,108 @@ namespace ItemSystem
 
         public void addItem(GameObject g)
         {
-            ResetTransform(g);
-            g.transform.SetParent(transform.Find("Vertical Rotate").Find("Equipped Weapon Spawn Point"), false);
-            g.GetComponent<Rigidbody>().isKinematic = true;
-            g.SetActive(false);
+            // Only the server can change ownership
+            Logger.Instance.LogInfo("Target ID: " + g.GetComponent<NetworkObject>().NetworkObjectId.ToString());
+            addWeaponServerRpc(g.GetComponent<NetworkObject>().NetworkObjectId, GetComponent<NetworkObject>().OwnerClientId);
 
-            if (g.GetComponent<Weapon>())
-            {
-                g.GetComponent<Weapon>().updateCamera();
-            }
+            //g.GetComponent<NetworkRigidbody>().enabled = false;
+            //g.GetComponent<NetworkTransform>().enabled = false;
+            //ResetTransform(g);
 
-            // Append gameobject to end of loadout if loadout slot is empty
-            // TODO OTHERWISE ADD IT TO THE PLAYER'S INVENTORY IF THEY HAVE SPACE
-            for (int i = 0; i < loadout.Length; i++)
+            //g.SetActive(false);
+
+            //if (g.GetComponent<Weapon>())
+            //{
+            //    g.GetComponent<Weapon>().updateCamera();
+            //}
+
+            //// Append gameobject to end of loadout if loadout slot is empty
+            //// TODO OTHERWISE ADD IT TO THE PLAYER'S INVENTORY IF THEY HAVE SPACE
+            //for (int i = 0; i < loadout.Length; i++)
+            //{
+            //    if (loadout[i] == null)
+            //    {
+            //        loadout[i] = g;
+            //        HUDloadoutDisplaySlots[i].GetComponent<TextMeshProUGUI>().SetText(g.name);
+            //        loadout[i].GetComponent<Weapon>().setTextDisplay(HUDloadoutDisplaySlots[i]);
+            //        break;
+            //    }
+            //}
+        }
+
+        [ServerRpc]
+        void addWeaponServerRpc(ulong targetId, ulong clientId)
+        {
+            GameObject[] weapons = GameObject.FindGameObjectsWithTag("InventoryItem");
+
+            foreach (GameObject g in weapons)
             {
-                if (loadout[i] == null)
+                if (g.GetComponent<NetworkObject>().NetworkObjectId == targetId)
                 {
-                    loadout[i] = g;
-                    HUDloadoutDisplaySlots[i].GetComponent<TextMeshProUGUI>().SetText(g.name);
-                    loadout[i].GetComponent<Weapon>().setTextDisplay(HUDloadoutDisplaySlots[i]);
-                    break;
+                    ResetTransform(g);
+
+                    g.transform.SetParent(GetComponent<PlayerController>().verticalRotate.Find("Equipped Weapon Spawn Point(Clone)"), false);
+                    g.GetComponent<Rigidbody>().isKinematic = true;
+                    //g.SetActive(false);
+
+                    if (g.GetComponent<Weapon>())
+                    {
+                        g.GetComponent<Weapon>().updateCamera();
+                    }
+
+                    // Append gameobject to end of loadout if loadout slot is empty
+                    // TODO OTHERWISE ADD IT TO THE PLAYER'S INVENTORY IF THEY HAVE SPACE
+                    for (int i = 0; i < loadout.Length; i++)
+                    {
+                        if (loadout[i] == null)
+                        {
+                            loadout[i] = g;
+                            HUDloadoutDisplaySlots[i].GetComponent<TextMeshProUGUI>().SetText(g.name);
+                            loadout[i].GetComponent<Weapon>().setTextDisplay(HUDloadoutDisplaySlots[i]);
+                            break;
+                        }
+                    }
+
+                    g.GetComponent<NetworkObject>().ChangeOwnership(GetComponent<NetworkObject>().OwnerClientId);
+
+                    // Destroy network transform so that it doesn't track positions server side anymore
+                    g.GetComponent<NetworkRigidbody>().enabled = false;
+                    g.GetComponent<NetworkTransform>().enabled = false;
+
+                    //addWeaponClientRpc(targetId, clientId);
+                }
+            }
+        }
+
+        [ClientRpc]
+        void addWeaponClientRpc(ulong targetId, ulong clientId)
+        {
+            GameObject[] weapons = GameObject.FindGameObjectsWithTag("InventoryItem");
+
+            foreach (GameObject g in weapons)
+            {
+                if (g.GetComponent<NetworkObject>().NetworkObjectId == targetId)
+                {
+                    Logger.Instance.LogInfo("Found it " + g.ToString());
+
+                    // Call reset transform twice since sometimes it doesn't happen
+                    ResetTransform(g);
+                    g.GetComponent<NetworkRigidbody>().enabled = false;
+                    g.GetComponent<NetworkTransform>().enabled = false;
+                    ResetTransform(g);
+                    //g.SetActive(false);
+                    // Append gameobject to end of loadout if loadout slot is empty
+                    // TODO OTHERWISE ADD IT TO THE PLAYER'S INVENTORY IF THEY HAVE SPACE
+                    for (int i = 0; i < loadout.Length; i++)
+                    {
+                        if (loadout[i] == null)
+                        {
+                            loadout[i] = g;
+                            HUDloadoutDisplaySlots[i].GetComponent<TextMeshProUGUI>().SetText(g.name);
+                            loadout[i].GetComponent<Weapon>().setTextDisplay(HUDloadoutDisplaySlots[i]);
+                            break;
+                        }
+                    }
                 }
             }
         }
