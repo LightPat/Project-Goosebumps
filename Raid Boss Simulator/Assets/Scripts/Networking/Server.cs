@@ -73,7 +73,7 @@ public class Server : NetworkBehaviour
                 GameObject player = client.Value.PlayerObject.gameObject;
 
                 player.GetComponent<Rigidbody>().MoveRotation(Quaternion.Euler(0, newClientRotationEulers.x, 0));
-                player.transform.Find("Vertical Rotate").rotation = Quaternion.Euler(-newClientRotationEulers.y, newClientRotationEulers.x, 0);
+                player.GetComponent<PlayerController>().verticalRotate.rotation = Quaternion.Euler(-newClientRotationEulers.y, newClientRotationEulers.x, 0);
             }
         }
     }
@@ -89,7 +89,7 @@ public class Server : NetworkBehaviour
             if (player.GetComponent<NetworkObject>().OwnerClientId == clientId & !player.GetComponent<NetworkObject>().IsLocalPlayer)
             {
                 player.GetComponent<Rigidbody>().MoveRotation(Quaternion.Euler(0, newClientRotationEulers.x, 0));
-                player.transform.Find("Vertical Rotate").rotation = Quaternion.Euler(-newClientRotationEulers.y, newClientRotationEulers.x, 0);
+                player.GetComponent<PlayerController>().verticalRotate.rotation = Quaternion.Euler(-newClientRotationEulers.y, newClientRotationEulers.x, 0);
             }
         }
     }

@@ -17,7 +17,8 @@ public class PlayerController : Controller
      * more readable. */
 
     public GameObject EscapeMenu;
-    public GameObject WeaponSpawnPoint;
+    public GameObject WeaponSpawnPointPrefab;
+    public GameObject VerticalRotatePrefab;
 
     [Header("Input Settings")]
     public float sensitivity = 15f;
@@ -25,15 +26,42 @@ public class PlayerController : Controller
     private Inventory inventory;
     private GameObject firstPersonCamera;
 
+    [HideInInspector]
+    public Transform verticalRotate;
+
     new void Start()
     {
         // Call parent start method
         base.Start();
-        inventory = GetComponent<Inventory>();
-        firstPersonCamera = transform.Find("Vertical Rotate").Find("First Person Camera").gameObject;
-        currentSpeed = walkingSpeed;
 
-        Cursor.lockState = CursorLockMode.Locked;
+        verticalRotate = null;
+        if (IsServer)
+        {
+            // Need to use SetParent so that the parent change gets propagated to all clients
+
+            GameObject verticalRotateGO = Instantiate(VerticalRotatePrefab);
+            verticalRotateGO.GetComponent<NetworkObject>().Spawn();
+            verticalRotateGO.transform.SetParent(transform, false);
+            verticalRotateGO.GetComponent<NetworkObject>().ChangeOwnership(GetComponent<NetworkObject>().OwnerClientId);
+            verticalRotate = verticalRotateGO.transform;
+
+            GameObject equippedWeaponSpawnPoint = Instantiate(WeaponSpawnPointPrefab);
+            equippedWeaponSpawnPoint.GetComponent<NetworkObject>().Spawn();
+            equippedWeaponSpawnPoint.transform.SetParent(verticalRotate, false);
+            equippedWeaponSpawnPoint.GetComponent<NetworkObject>().ChangeOwnership(GetComponent<NetworkObject>().OwnerClientId);
+        }
+        else
+        {
+            //StartCoroutine(Wait(2f));
+            verticalRotate = transform.Find("Vertical Rotate(Clone)");
+            Cursor.lockState = CursorLockMode.Locked;
+
+            Logger.Instance.LogInfo(verticalRotate.ToString());
+        }
+
+        inventory = GetComponent<Inventory>();
+        firstPersonCamera = verticalRotate.Find("First Person Camera").gameObject;
+        currentSpeed = walkingSpeed;
 
         // Assign player number
         transform.Find("Player Number").gameObject.GetComponent<TextMeshPro>().SetText("Player " + GetComponent<NetworkObject>().OwnerClientId.ToString());
@@ -41,21 +69,35 @@ public class PlayerController : Controller
         // Sets the camera and input to active on the player object that this network instance owns
         if (IsOwner)
         {
-            transform.Find("Vertical Rotate").Find("First Person Camera").gameObject.SetActive(true);
+            verticalRotate.Find("First Person Camera").gameObject.SetActive(true);
             GetComponent<PlayerInput>().enabled = true;
         }
-
-        if (IsServer)
+        else
         {
-            NetworkObject equippedWeaponSpawnPoint = transform.Find("Vertical Rotate").Find("Equipped Weapon Spawn Point").GetComponent<NetworkObject>();
-            equippedWeaponSpawnPoint.Spawn();
-            equippedWeaponSpawnPoint.ChangeOwnership(GetComponent<NetworkObject>().OwnerClientId);
+            transform.Find("HUD").gameObject.SetActive(false);
         }
-        
+    }
+
+    IEnumerator Wait(float seconds)
+    {
+        yield return new WaitForSeconds(seconds);
     }
 
     void Update()
     {
+        // TODO Workaround for verticalrotate not spawning in time for assignment, don't want to call this every update
+        if (verticalRotate == null)
+        {
+            verticalRotate = transform.Find("Vertical Rotate(Clone)");
+            firstPersonCamera = verticalRotate.Find("First Person Camera").gameObject;
+
+            if (IsOwner)
+            {
+                verticalRotate.Find("First Person Camera").gameObject.SetActive(true);
+                GetComponent<PlayerInput>().enabled = true;
+            }
+        }
+
         if (IsOwner)
         {
             lookInput *= (sensitivity * Time.deltaTime);
@@ -107,7 +149,7 @@ public class PlayerController : Controller
                 RotateServerRpc(lookEulers);
             }
 
-            transform.Find("Vertical Rotate").rotation = Quaternion.Euler(-lookEulers.y, lookEulers.x, 0);
+            verticalRotate.rotation = Quaternion.Euler(-lookEulers.y, lookEulers.x, 0);
 
             // Full auto firing
             GameObject w = inventory.getEquippedWeapon();
