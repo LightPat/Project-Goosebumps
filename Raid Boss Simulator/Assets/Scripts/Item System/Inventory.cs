@@ -70,37 +70,35 @@ namespace ItemSystem
             {
                 if (g.GetComponent<NetworkObject>().NetworkObjectId == targetId)
                 {
-                    ResetTransform(g);
+                    Logger.Instance.LogInfo(targetId.ToString() + " " + g.name);
 
                     g.transform.SetParent(GetComponent<PlayerController>().verticalRotate.Find("Equipped Weapon Spawn Point(Clone)"), false);
+                    ResetTransform(g);
                     g.GetComponent<Rigidbody>().isKinematic = true;
-                    //g.SetActive(false);
 
                     if (g.GetComponent<Weapon>())
                     {
                         g.GetComponent<Weapon>().updateCamera();
                     }
 
-                    // Append gameobject to end of loadout if loadout slot is empty
-                    // TODO OTHERWISE ADD IT TO THE PLAYER'S INVENTORY IF THEY HAVE SPACE
-                    for (int i = 0; i < loadout.Length; i++)
-                    {
-                        if (loadout[i] == null)
-                        {
-                            loadout[i] = g;
-                            HUDloadoutDisplaySlots[i].GetComponent<TextMeshProUGUI>().SetText(g.name);
-                            loadout[i].GetComponent<Weapon>().setTextDisplay(HUDloadoutDisplaySlots[i]);
-                            break;
-                        }
-                    }
+                    //// Append gameobject to end of loadout if loadout slot is empty
+                    //// TODO OTHERWISE ADD IT TO THE PLAYER'S INVENTORY IF THEY HAVE SPACE
+                    //for (int i = 0; i < loadout.Length; i++)
+                    //{
+                    //    if (loadout[i] == null)
+                    //    {
+                    //        loadout[i] = g;
+                    //        HUDloadoutDisplaySlots[i].GetComponent<TextMeshProUGUI>().SetText(g.name);
+                    //        loadout[i].GetComponent<Weapon>().setTextDisplay(HUDloadoutDisplaySlots[i]);
+                    //        break;
+                    //    }
+                    //}
 
-                    g.GetComponent<NetworkObject>().ChangeOwnership(GetComponent<NetworkObject>().OwnerClientId);
+                    //g.SetActive(false);
 
-                    // Destroy network transform so that it doesn't track positions server side anymore
-                    g.GetComponent<NetworkRigidbody>().enabled = false;
-                    g.GetComponent<NetworkTransform>().enabled = false;
-
-                    //addWeaponClientRpc(targetId, clientId);
+                    
+                    //g.GetComponent<NetworkObject>().ChangeOwnership(GetComponent<NetworkObject>().OwnerClientId);
+                    addWeaponClientRpc(targetId, clientId);
                 }
             }
         }
@@ -115,13 +113,11 @@ namespace ItemSystem
                 if (g.GetComponent<NetworkObject>().NetworkObjectId == targetId)
                 {
                     Logger.Instance.LogInfo("Found it " + g.ToString());
+                    g.GetComponent<Rigidbody>().isKinematic = true;
+                    g.transform.position = transform.Find("Vertical Rotate(Clone)").Find("Equipped Weapon Spawn Point(Clone)").position;
+                    g.transform.localRotation = transform.rotation;
 
-                    // Call reset transform twice since sometimes it doesn't happen
-                    ResetTransform(g);
-                    g.GetComponent<NetworkRigidbody>().enabled = false;
-                    g.GetComponent<NetworkTransform>().enabled = false;
-                    ResetTransform(g);
-                    //g.SetActive(false);
+
                     // Append gameobject to end of loadout if loadout slot is empty
                     // TODO OTHERWISE ADD IT TO THE PLAYER'S INVENTORY IF THEY HAVE SPACE
                     for (int i = 0; i < loadout.Length; i++)
@@ -134,6 +130,9 @@ namespace ItemSystem
                             break;
                         }
                     }
+
+                    //g.SetActive(false);
+
                 }
             }
         }
@@ -371,6 +370,7 @@ namespace ItemSystem
         /// <param name="g"></param>
         private void ResetTransform(GameObject g)
         {
+            Debug.Log("Resetting transform of " + g.name);
             g.transform.localPosition = Vector3.zero;
             g.transform.localRotation = Quaternion.identity;
         }
