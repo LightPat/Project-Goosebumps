@@ -41,7 +41,7 @@ I'm just using stuff off cgtrader right now
 * After chaining lots of hits together, it gives its user the ability to unleash a devastating blast of holy light. This light blinds all players in the same room as it, like a really powerful flashbang. And deals huge damage to the target.
 
 
-## Code Write Up/Plan
+## Code Write Up/Plan OUTDATED
 ### Players/Enemies
 #### Stats
 May need to make this an abstract class, but it contains the health value of players and enemies right now

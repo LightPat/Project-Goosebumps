@@ -160,6 +160,7 @@ public class PlayerController : Controller
                     if (w.GetComponent<Weapon>().fullAuto)
                     {
                         w.GetComponent<Weapon>().attack();
+                        AttackServerRpc();
                     }
                 }
             }
@@ -257,7 +258,7 @@ public class PlayerController : Controller
     [ServerRpc]
     void JumpServerRpc(float jumpForce)
     {
-        Server.Instance.jumpClient(GetComponent<NetworkObject>().OwnerClientId, jumpForce);
+        Server.Instance.clientJump(GetComponent<NetworkObject>().OwnerClientId, jumpForce);
     }
 
     [Header("Crouch Settings")]
@@ -304,10 +305,6 @@ public class PlayerController : Controller
                 Debug.Log("Haven't implemented interactable logic yet in PlayerController.cs");
             }
         }
-
-
-        // TODO Use for equipping weapon
-        //GetComponent<NetworkObject>().ChangeOwnership(clientId);
     }
 
     private bool attackHeld;
@@ -322,6 +319,7 @@ public class PlayerController : Controller
             if (!equippedWeapon.GetComponent<Weapon>().fullAuto)
             {
                 equippedWeapon.GetComponent<Weapon>().attack();
+                AttackServerRpc();
             }
         }
 
@@ -333,6 +331,12 @@ public class PlayerController : Controller
         {
             attackHeld = false;
         }
+    }
+
+    [ServerRpc]
+    void AttackServerRpc()
+    {
+        Server.Instance.clientAttack(GetComponent<NetworkObject>().OwnerClientId);
     }
 
     private GameObject canvas;

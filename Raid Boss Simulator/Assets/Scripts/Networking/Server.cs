@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Unity.Netcode;
+using ItemSystem;
 
 /// <summary>
 /// Every public method has a corresponding ClientRpc private method, which propogates the change that occured on the server side to each client
@@ -94,7 +95,7 @@ public class Server : NetworkBehaviour
         }
     }
 
-    public void jumpClient(ulong clientId, float jumpForce)
+    public void clientJump(ulong clientId, float jumpForce)
     {
         JumpClientRpc(clientId, jumpForce);
 
@@ -119,6 +120,35 @@ public class Server : NetworkBehaviour
             if (player.GetComponent<NetworkObject>().OwnerClientId == clientId & !player.GetComponent<NetworkObject>().IsLocalPlayer)
             {
                 player.GetComponent<Rigidbody>().AddForce(new Vector3(0, jumpForce, 0), ForceMode.VelocityChange);
+            }
+        }
+    }
+
+    public void clientAttack(ulong clientId)
+    {
+        AttackClientRpc(clientId);
+
+        foreach (KeyValuePair<ulong, NetworkClient> client in NetworkManager.Singleton.ConnectedClients)
+        {
+            if (client.Key == clientId)
+            {
+                GameObject player = client.Value.PlayerObject.gameObject;
+
+                player.GetComponent<Inventory>().getEquippedWeapon().GetComponent<Weapon>().attack();
+            }
+        }
+    }
+
+    [ClientRpc]
+    void AttackClientRpc(ulong clientId)
+    {
+        GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+
+        foreach (GameObject player in players)
+        {
+            if (player.GetComponent<NetworkObject>().OwnerClientId == clientId & !player.GetComponent<NetworkObject>().IsLocalPlayer)
+            {
+                player.GetComponent<Inventory>().getEquippedWeapon().GetComponent<Weapon>().attack();
             }
         }
     }
