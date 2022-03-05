@@ -76,28 +76,27 @@ namespace ItemSystem
                     ResetTransform(g);
                     g.GetComponent<Rigidbody>().isKinematic = true;
 
+                    // For the clients I call updateCamera() when they equip their weapon
                     if (g.GetComponent<Weapon>())
                     {
                         g.GetComponent<Weapon>().updateCamera();
                     }
 
-                    //// Append gameobject to end of loadout if loadout slot is empty
-                    //// TODO OTHERWISE ADD IT TO THE PLAYER'S INVENTORY IF THEY HAVE SPACE
-                    //for (int i = 0; i < loadout.Length; i++)
-                    //{
-                    //    if (loadout[i] == null)
-                    //    {
-                    //        loadout[i] = g;
-                    //        HUDloadoutDisplaySlots[i].GetComponent<TextMeshProUGUI>().SetText(g.name);
-                    //        loadout[i].GetComponent<Weapon>().setTextDisplay(HUDloadoutDisplaySlots[i]);
-                    //        break;
-                    //    }
-                    //}
+                    // Append gameobject to end of loadout if loadout slot is empty
+                    // TODO OTHERWISE ADD IT TO THE PLAYER'S INVENTORY IF THEY HAVE SPACE
+                    for (int i = 0; i < loadout.Length; i++)
+                    {
+                        if (loadout[i] == null)
+                        {
+                            loadout[i] = g;
+                            HUDloadoutDisplaySlots[i].GetComponent<TextMeshProUGUI>().SetText(g.name);
+                            loadout[i].GetComponent<Weapon>().setTextDisplay(HUDloadoutDisplaySlots[i]);
+                            break;
+                        }
+                    }
 
-                    //g.SetActive(false);
+                    g.SetActive(false);
 
-                    
-                    //g.GetComponent<NetworkObject>().ChangeOwnership(GetComponent<NetworkObject>().OwnerClientId);
                     addWeaponClientRpc(targetId, clientId);
                 }
             }
@@ -115,8 +114,14 @@ namespace ItemSystem
                     Logger.Instance.LogInfo("Found it " + g.ToString());
                     g.GetComponent<Rigidbody>().isKinematic = true;
                     g.transform.position = transform.Find("Vertical Rotate(Clone)").Find("Equipped Weapon Spawn Point(Clone)").position;
-                    g.transform.localRotation = transform.rotation;
 
+                    // TODO FIX THIS the horizontal rotation is correct but the vertical isn't
+                    g.transform.localRotation = transform.Find("Vertical Rotate(Clone)").rotation;
+
+                    //if (g.GetComponent<Weapon>())
+                    //{
+                    //    g.GetComponent<Weapon>().updateCamera();
+                    //}
 
                     // Append gameobject to end of loadout if loadout slot is empty
                     // TODO OTHERWISE ADD IT TO THE PLAYER'S INVENTORY IF THEY HAVE SPACE
@@ -131,8 +136,7 @@ namespace ItemSystem
                         }
                     }
 
-                    //g.SetActive(false);
-
+                    g.SetActive(false);
                 }
             }
         }
@@ -156,8 +160,39 @@ namespace ItemSystem
 
         private void QueryLoadout(int index)
         {
-            int i = getEquippedWeaponIndex();
+            QueryLoadoutServerRpc(index);
+        }
 
+        [ServerRpc]
+        void QueryLoadoutServerRpc(int index)
+        {
+            // If there is no weapon in the loadout slot, return
+            if (loadout[index] == null) { return; }
+
+            // If there is a weapon active, disable it
+            foreach (GameObject g in loadout)
+            {
+                if (g != null)
+                {
+                    if (g.activeInHierarchy)
+                    {
+                        g.SetActive(false);
+                        QueryLoadoutClientRpc(index);
+                        // If this weapon is the same slot as we asked for, end so that we don't set active true again
+                        if (g == loadout[index]) { return; }
+                    }
+                }
+            }
+
+            // At this point, there is no active equipped item, so we can set the queried weapon to active
+            loadout[index].SetActive(true);
+            loadout[index].GetComponent<Weapon>().updateCamera();
+            QueryLoadoutClientRpc(index);
+        }
+
+        [ClientRpc]
+        void QueryLoadoutClientRpc(int index)
+        {
             // If there is no weapon in the loadout slot, return
             if (loadout[index] == null) { return; }
 
@@ -177,6 +212,7 @@ namespace ItemSystem
 
             // At this point, there is no active equipped item, so we can set the queried weapon to active
             loadout[index].SetActive(true);
+            loadout[index].GetComponent<Weapon>().updateCamera();
         }
 
         public GameObject getEquippedWeapon()
