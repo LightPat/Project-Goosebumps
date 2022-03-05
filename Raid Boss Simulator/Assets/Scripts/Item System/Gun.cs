@@ -9,6 +9,7 @@ namespace ItemSystem
     {
         [Header("Gun Configuration")]
         public float rateOfFire;
+        public float bulletSpeed;
 
         private LineRenderer lineRenderer;
         private AudioSource gunshotSound;
@@ -23,6 +24,7 @@ namespace ItemSystem
         {
             if (allowAttack)
             {
+                Logger.Instance.LogInfo("Shooting");
                 // Raycast hit detection from crosshair to enemy
                 RaycastHit hit;
                 bool bHit = Physics.Raycast(firstPersonCamera.transform.position, firstPersonCamera.transform.forward, out hit);
@@ -59,7 +61,7 @@ namespace ItemSystem
             // Seconds between swings
             float seconds = 1 / sps;
 
-            //gunshotSound.Play();
+            gunshotSound.Play();
 
             // Update Bullet line
             lineRenderer.enabled = true;

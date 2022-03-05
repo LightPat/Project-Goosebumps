@@ -8,13 +8,4 @@ public class DragonController : Controller
     {
         base.Start();
     }
-
-    void OnCollisionEnter(Collision collision)
-    {
-        // If a projectile is hitting me, deduct the damage from my HP
-        if (collision.gameObject.GetComponent<Projectile>())
-        {
-            GetComponent<Stats>().changeHealth(collision.gameObject.GetComponent<Projectile>().damage);
-        }
-    }
 }

@@ -262,7 +262,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   baseDamage: 20
   headshotMultiplier: 2
-  fullAuto: 1
+  fullAuto: 0
   bullet: {fileID: 4302310589480882471, guid: f5e83bbe13da96349b47a654bde2ba72, type: 3}
   rateOfFire: 500
 --- !u!33 &129594688

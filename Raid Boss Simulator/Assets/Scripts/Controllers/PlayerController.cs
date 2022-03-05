@@ -314,12 +314,15 @@ public class PlayerController : Controller
 
         // Fire if the weapon isn't full auto
         // Full auto firing is handled in update()
-        if (equippedWeapon != null)
+        if (value.isPressed)
         {
-            if (!equippedWeapon.GetComponent<Weapon>().fullAuto)
+            if (equippedWeapon != null)
             {
-                equippedWeapon.GetComponent<Weapon>().attack();
-                AttackServerRpc();
+                if (!equippedWeapon.GetComponent<Weapon>().fullAuto)
+                {
+                    equippedWeapon.GetComponent<Weapon>().attack();
+                    AttackServerRpc();
+                }
             }
         }
 

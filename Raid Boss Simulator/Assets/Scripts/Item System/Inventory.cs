@@ -118,11 +118,6 @@ namespace ItemSystem
                     // TODO FIX THIS the horizontal rotation is correct but the vertical isn't
                     g.transform.localRotation = transform.Find("Vertical Rotate(Clone)").rotation;
 
-                    //if (g.GetComponent<Weapon>())
-                    //{
-                    //    g.GetComponent<Weapon>().updateCamera();
-                    //}
-
                     // Append gameobject to end of loadout if loadout slot is empty
                     // TODO OTHERWISE ADD IT TO THE PLAYER'S INVENTORY IF THEY HAVE SPACE
                     for (int i = 0; i < loadout.Length; i++)
