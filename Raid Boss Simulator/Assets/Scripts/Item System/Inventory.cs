@@ -36,29 +36,24 @@ namespace ItemSystem
             Logger.Instance.LogInfo("Target ID: " + g.GetComponent<NetworkObject>().NetworkObjectId.ToString());
             addWeaponServerRpc(g.GetComponent<NetworkObject>().NetworkObjectId, GetComponent<NetworkObject>().OwnerClientId);
 
-            //g.GetComponent<NetworkRigidbody>().enabled = false;
-            //g.GetComponent<NetworkTransform>().enabled = false;
-            //ResetTransform(g);
+            g.GetComponent<Rigidbody>().isKinematic = true;
+            g.transform.position = transform.Find("Vertical Rotate(Clone)").Find("Equipped Weapon Spawn Point(Clone)").position;
+            g.transform.localRotation = transform.Find("Vertical Rotate(Clone)").rotation;
 
-            //g.SetActive(false);
+            // Append gameobject to end of loadout if loadout slot is empty
+            // TODO OTHERWISE ADD IT TO THE PLAYER'S INVENTORY IF THEY HAVE SPACE
+            for (int i = 0; i < loadout.Length; i++)
+            {
+                if (loadout[i] == null)
+                {
+                    loadout[i] = g;
+                    HUDloadoutDisplaySlots[i].GetComponent<TextMeshProUGUI>().SetText(g.name);
+                    loadout[i].GetComponent<Weapon>().setTextDisplay(HUDloadoutDisplaySlots[i]);
+                    break;
+                }
+            }
 
-            //if (g.GetComponent<Weapon>())
-            //{
-            //    g.GetComponent<Weapon>().updateCamera();
-            //}
-
-            //// Append gameobject to end of loadout if loadout slot is empty
-            //// TODO OTHERWISE ADD IT TO THE PLAYER'S INVENTORY IF THEY HAVE SPACE
-            //for (int i = 0; i < loadout.Length; i++)
-            //{
-            //    if (loadout[i] == null)
-            //    {
-            //        loadout[i] = g;
-            //        HUDloadoutDisplaySlots[i].GetComponent<TextMeshProUGUI>().SetText(g.name);
-            //        loadout[i].GetComponent<Weapon>().setTextDisplay(HUDloadoutDisplaySlots[i]);
-            //        break;
-            //    }
-            //}
+            g.SetActive(false);
         }
 
         [ServerRpc]
@@ -105,6 +100,8 @@ namespace ItemSystem
         [ClientRpc]
         void addWeaponClientRpc(ulong targetId, ulong clientId)
         {
+            if (IsLocalPlayer) { return; }
+
             GameObject[] weapons = GameObject.FindGameObjectsWithTag("InventoryItem");
 
             foreach (GameObject g in weapons)
@@ -115,7 +112,6 @@ namespace ItemSystem
                     g.GetComponent<Rigidbody>().isKinematic = true;
                     g.transform.position = transform.Find("Vertical Rotate(Clone)").Find("Equipped Weapon Spawn Point(Clone)").position;
 
-                    // TODO FIX THIS the horizontal rotation is correct but the vertical isn't
                     g.transform.localRotation = transform.Find("Vertical Rotate(Clone)").rotation;
 
                     // Append gameobject to end of loadout if loadout slot is empty
@@ -166,7 +162,7 @@ namespace ItemSystem
                     if (g.activeInHierarchy)
                     {
                         g.SetActive(false);
-                        //QueryLoadoutServerRpc(index);
+                        QueryLoadoutServerRpc(index);
                         // If this weapon is the same slot as we asked for, end so that we don't set active true again
                         if (g == loadout[index]) { return; }
                     }
@@ -176,7 +172,7 @@ namespace ItemSystem
             // At this point, there is no active equipped item, so we can set the queried weapon to active
             loadout[index].SetActive(true);
             loadout[index].GetComponent<Weapon>().updateCamera();
-            //QueryLoadoutServerRpc(index);
+            QueryLoadoutServerRpc(index);
         }
 
         [ServerRpc]
