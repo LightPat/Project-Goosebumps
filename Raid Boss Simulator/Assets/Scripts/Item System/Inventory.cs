@@ -6,7 +6,6 @@ using TMPro;
 using UnityEngine.UI;
 using UnityEngine.EventSystems;
 using Unity.Netcode;
-using Unity.Netcode.Components;
 
 namespace ItemSystem
 {
@@ -411,12 +410,8 @@ namespace ItemSystem
             {
                 if (client.Key == clientId)
                 {
-                    GameObject player = client.Value.PlayerObject.gameObject;
-
-                    GameObject[] targetLoadout = player.GetComponent<Inventory>().loadout;
-
                     // Set every weapon to inactive
-                    foreach (GameObject g in targetLoadout)
+                    foreach (GameObject g in loadout)
                     {
                         if (g != null)
                         {
@@ -443,10 +438,8 @@ namespace ItemSystem
             {
                 if (player.GetComponent<NetworkObject>().OwnerClientId == clientId & !player.GetComponent<NetworkObject>().IsLocalPlayer)
                 {
-                    GameObject[] targetLoadout = player.GetComponent<Inventory>().loadout;
-
                     // Set every weapon to inactive
-                    foreach (GameObject g in targetLoadout)
+                    foreach (GameObject g in loadout)
                     {
                         if (g != null)
                         {
