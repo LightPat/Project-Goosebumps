@@ -79,8 +79,5 @@ public class NetworkInterface : NetworkBehaviour
         }
 
         ServerCamera.SetActive(true);
-
-        //GameObject scar = Instantiate(ScarPrefab, new Vector3(-13f, 2f, 0), Quaternion.Euler(0, 0, -40));
-        //scar.GetComponent<NetworkObject>().Spawn();
     }
 }

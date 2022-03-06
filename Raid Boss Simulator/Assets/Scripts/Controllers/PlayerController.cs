@@ -40,19 +40,16 @@ public class PlayerController : Controller
             // Need to use SetParent so that the parent change gets propagated to all clients
 
             GameObject verticalRotateGO = Instantiate(VerticalRotatePrefab);
-            verticalRotateGO.GetComponent<NetworkObject>().Spawn();
+            verticalRotateGO.GetComponent<NetworkObject>().SpawnWithOwnership(GetComponent<NetworkObject>().OwnerClientId);
             verticalRotateGO.transform.SetParent(transform, false);
-            verticalRotateGO.GetComponent<NetworkObject>().ChangeOwnership(GetComponent<NetworkObject>().OwnerClientId);
             verticalRotate = verticalRotateGO.transform;
 
             GameObject equippedWeaponSpawnPoint = Instantiate(WeaponSpawnPointPrefab);
-            equippedWeaponSpawnPoint.GetComponent<NetworkObject>().Spawn();
+            equippedWeaponSpawnPoint.GetComponent<NetworkObject>().SpawnWithOwnership(GetComponent<NetworkObject>().OwnerClientId);
             equippedWeaponSpawnPoint.transform.SetParent(verticalRotate, false);
-            equippedWeaponSpawnPoint.GetComponent<NetworkObject>().ChangeOwnership(GetComponent<NetworkObject>().OwnerClientId);
         }
         if (IsClient)
         {
-            //StartCoroutine(Wait(2f));
             verticalRotate = transform.Find("Vertical Rotate(Clone)");
             Cursor.lockState = CursorLockMode.Locked;
 
@@ -76,11 +73,6 @@ public class PlayerController : Controller
         {
             transform.Find("HUD").gameObject.SetActive(false);
         }
-    }
-
-    IEnumerator Wait(float seconds)
-    {
-        yield return new WaitForSeconds(seconds);
     }
 
     void Update()

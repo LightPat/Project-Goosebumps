@@ -403,6 +403,9 @@ namespace ItemSystem
         [ServerRpc]
         void switchLoadoutSlotServerRpc(ulong clientId, int start, int end)
         {
+            // If we are the host just return
+            if (IsClient) { return; }
+
             foreach (KeyValuePair<ulong, NetworkClient> client in NetworkManager.Singleton.ConnectedClients)
             {
                 if (client.Key == clientId)
