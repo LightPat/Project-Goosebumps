@@ -37,8 +37,12 @@ namespace ItemSystem
             addWeaponServerRpc(g.GetComponent<NetworkObject>().NetworkObjectId, GetComponent<NetworkObject>().OwnerClientId);
 
             g.GetComponent<Rigidbody>().isKinematic = true;
-            g.transform.position = transform.Find("Vertical Rotate(Clone)").Find("Equipped Weapon Spawn Point(Clone)").position;
-            g.transform.localRotation = transform.Find("Vertical Rotate(Clone)").rotation;
+
+            if (!IsHost)
+            {
+                g.transform.position = transform.Find("Vertical Rotate(Clone)").Find("Equipped Weapon Spawn Point(Clone)").position;
+                g.transform.localRotation = transform.Find("Vertical Rotate(Clone)").rotation;
+            }
 
             // Append gameobject to end of loadout if loadout slot is empty
             // TODO OTHERWISE ADD IT TO THE PLAYER'S INVENTORY IF THEY HAVE SPACE
@@ -68,7 +72,12 @@ namespace ItemSystem
                     Logger.Instance.LogInfo(targetId.ToString() + " " + g.name);
 
                     g.transform.SetParent(GetComponent<PlayerController>().verticalRotate.Find("Equipped Weapon Spawn Point(Clone)"), false);
+
                     ResetTransform(g);
+
+                    // If this is the host end here because we already executed all this code
+                    if (IsClient) { return; }
+
                     g.GetComponent<Rigidbody>().isKinematic = true;
 
                     // For the clients I call updateCamera() when they equip their weapon
@@ -178,6 +187,9 @@ namespace ItemSystem
         [ServerRpc]
         void QueryLoadoutServerRpc(int index)
         {
+            // If this is the host end here since we already executed all this code
+            if (IsClient) { return; }
+
             // If there is no weapon in the loadout slot, return
             if (loadout[index] == null) { return; }
 

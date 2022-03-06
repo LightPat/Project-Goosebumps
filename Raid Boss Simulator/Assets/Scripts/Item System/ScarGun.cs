@@ -5,12 +5,10 @@ using UnityEngine;
 namespace ItemSystem
 {
     [RequireComponent(typeof(LineRenderer))]
-    public class Gun : Weapon
+    public class ScarGun : Weapon
     {
         [Header("Gun Configuration")]
         public float rateOfFire;
-        public bool hitscan;
-        public int bulletSpeed;
 
         private LineRenderer lineRenderer;
         private AudioSource gunshotSound;
@@ -32,32 +30,11 @@ namespace ItemSystem
                 Vector3 tracerPosition = firstPersonCamera.transform.position + (firstPersonCamera.transform.forward * 100);
                 Color tracerColor = Color.red;
 
-                // Spawn bullet which triggers on collider enter
-                // Damage handling is done on the target via OnTriggerEnter()
-
-                if (!hitscan)
-                {
-                    GameObject firedBullet = GameObject.Instantiate(bullet, transform.Find("BulletSpawnPoint").position, firstPersonCamera.transform.rotation);
-                    firedBullet.GetComponent<Projectile>().damage = (int)baseDamage * -1;
-                    firedBullet.GetComponent<Projectile>().speed = bulletSpeed;
-                    firedBullet.GetComponent<Projectile>().player = gameObject;
-                }
-
                 if (bHit)
                 {
-                    if (hitscan)
+                    if (hit.transform.gameObject.GetComponent<Stats>())
                     {
-                        // Spawn bullet which triggers on collider enter
-                        // Damage handling is done on the target via OnTriggerEnter()
-                        GameObject firedBullet = GameObject.Instantiate(bullet, hit.collider.transform.position, Quaternion.identity);
-
-                        // Calculate damage here
-                        firedBullet.GetComponent<Projectile>().damage = (int)baseDamage * -1;
-                        firedBullet.GetComponent<Projectile>().speed = bulletSpeed;
-                        firedBullet.GetComponent<Projectile>().player = gameObject;
-
-                        // Delay destruction by a few frames so that the collision is detected by Unity
-                        StartCoroutine(DelayedDestroy(firedBullet, 1));
+                        hit.transform.gameObject.GetComponent<Stats>().changeHealth((int)baseDamage * -1);
                     }
 
                     tracerPosition = hit.point;
@@ -88,16 +65,6 @@ namespace ItemSystem
             yield return new WaitForSeconds(seconds);
             allowAttack = true;
             lineRenderer.enabled = false;
-        }
-
-        IEnumerator DelayedDestroy(GameObject g, int frameDelay = 2)
-        {
-            for (int i = 0; i < frameDelay; i++)
-            {
-                yield return i;
-            }
-
-            Destroy(g);
         }
     }
 }

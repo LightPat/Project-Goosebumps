@@ -9,9 +9,8 @@ namespace ItemSystem
     {
         [Header("General Weapon Properties")]
         public float baseDamage;
-        public float headshotMultiplier = 2f;
+        public float criticalMultiplier = 2f;
         public bool fullAuto = true;
-        public GameObject bullet;
 
         protected GameObject inventoryTextSlot;
         protected bool allowAttack = true;

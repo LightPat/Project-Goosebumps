@@ -26,7 +26,8 @@ public class Stats : MonoBehaviour
 
         if (HP <= 0)
         {
-            gameObject.SetActive(false);
+            //gameObject.SetActive(false);
+            Logger.Instance.LogInfo(gameObject.name + " is dead.");
         }
 
         displayHP.SetText(HP.ToString() + " HP");
