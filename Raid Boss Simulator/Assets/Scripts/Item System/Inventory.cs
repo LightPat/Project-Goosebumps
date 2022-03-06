@@ -33,6 +33,8 @@ namespace ItemSystem
 
         public void addItem(GameObject g)
         {
+            if (g.transform.parent != null) { return; }
+
             addWeaponServerRpc(g.GetComponent<NetworkObject>().NetworkObjectId, GetComponent<NetworkObject>().OwnerClientId);
 
             g.GetComponent<Rigidbody>().isKinematic = true;

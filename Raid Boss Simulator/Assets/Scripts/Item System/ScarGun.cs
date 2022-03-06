@@ -34,6 +34,7 @@ namespace ItemSystem
                 {
                     if (hit.transform.gameObject.GetComponent<Stats>())
                     {
+                        // TODO Only send this on the server
                         hit.transform.gameObject.GetComponent<Stats>().changeHealth((int)baseDamage * -1);
                     }
 
