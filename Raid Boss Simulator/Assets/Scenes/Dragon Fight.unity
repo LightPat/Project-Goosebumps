@@ -6621,7 +6621,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   baseDamage: 50
   criticalMultiplier: 2
-  fullAuto: 0
+  fullAuto: 1
   rateOfFire: 500
 --- !u!1 &220187402
 GameObject:

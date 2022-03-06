@@ -16,7 +16,8 @@ namespace ItemSystem
         public GameObject GUICanvas;
         public int maxCapacity;
 
-        private GameObject[] loadout = new GameObject[3];
+        [HideInInspector]
+        public GameObject[] loadout = new GameObject[3];
         private GameObject[] HUDloadoutDisplaySlots = new GameObject[3];
         private GameObject[] GUIloadoutDisplaySlots = new GameObject[3];
 
@@ -32,8 +33,6 @@ namespace ItemSystem
 
         public void addItem(GameObject g)
         {
-            // Only the server can change ownership
-            Logger.Instance.LogInfo("Target ID: " + g.GetComponent<NetworkObject>().NetworkObjectId.ToString());
             addWeaponServerRpc(g.GetComponent<NetworkObject>().NetworkObjectId, GetComponent<NetworkObject>().OwnerClientId);
 
             g.GetComponent<Rigidbody>().isKinematic = true;
@@ -41,7 +40,7 @@ namespace ItemSystem
             if (!IsHost)
             {
                 g.transform.position = transform.Find("Vertical Rotate(Clone)").Find("Equipped Weapon Spawn Point(Clone)").position;
-                g.transform.localRotation = transform.Find("Vertical Rotate(Clone)").rotation;
+                g.transform.rotation = transform.Find("Vertical Rotate(Clone)").rotation;
             }
 
             // Append gameobject to end of loadout if loadout slot is empty
@@ -69,8 +68,6 @@ namespace ItemSystem
             {
                 if (g.GetComponent<NetworkObject>().NetworkObjectId == targetId)
                 {
-                    Logger.Instance.LogInfo(targetId.ToString() + " " + g.name);
-
                     g.transform.SetParent(GetComponent<PlayerController>().verticalRotate.Find("Equipped Weapon Spawn Point(Clone)"), false);
 
                     ResetTransform(g);
@@ -117,11 +114,9 @@ namespace ItemSystem
             {
                 if (g.GetComponent<NetworkObject>().NetworkObjectId == targetId)
                 {
-                    Logger.Instance.LogInfo("Found it " + g.ToString());
                     g.GetComponent<Rigidbody>().isKinematic = true;
                     g.transform.position = transform.Find("Vertical Rotate(Clone)").Find("Equipped Weapon Spawn Point(Clone)").position;
-
-                    g.transform.localRotation = transform.Find("Vertical Rotate(Clone)").rotation;
+                    g.transform.rotation = transform.Find("Vertical Rotate(Clone)").rotation;
 
                     // Append gameobject to end of loadout if loadout slot is empty
                     // TODO OTHERWISE ADD IT TO THE PLAYER'S INVENTORY IF THEY HAVE SPACE
@@ -383,6 +378,8 @@ namespace ItemSystem
                 loadout[end] = loadout[start];
                 loadout[start] = temp;
 
+                switchLoadoutSlotServerRpc(GetComponent<NetworkObject>().OwnerClientId, start, end);
+
                 // Update the display slot of the weapon so that bolding is applied properly
                 if (loadout[start] != null)
                 {
@@ -400,6 +397,64 @@ namespace ItemSystem
                 selectedSlot.GetComponent<Image>().color = originalColor;
                 selectedSlot = null;
                 targetSlot = null;
+            }
+        }
+
+        [ServerRpc]
+        void switchLoadoutSlotServerRpc(ulong clientId, int start, int end)
+        {
+            foreach (KeyValuePair<ulong, NetworkClient> client in NetworkManager.Singleton.ConnectedClients)
+            {
+                if (client.Key == clientId)
+                {
+                    GameObject player = client.Value.PlayerObject.gameObject;
+
+                    GameObject[] targetLoadout = player.GetComponent<Inventory>().loadout;
+
+                    // Set every weapon to inactive
+                    foreach (GameObject g in targetLoadout)
+                    {
+                        if (g != null)
+                        {
+                            g.SetActive(false);
+                        }
+                    }
+
+                    // Call the weapon switch here
+                    GameObject temp = loadout[end];
+                    loadout[end] = loadout[start];
+                    loadout[start] = temp;
+
+                    switchLoadoutSlotClientRpc(clientId, start, end);
+                }
+            }
+        }
+
+        [ClientRpc]
+        void switchLoadoutSlotClientRpc(ulong clientId, int start, int end)
+        {
+            GameObject[] players = GameObject.FindGameObjectsWithTag("Player");
+
+            foreach (GameObject player in players)
+            {
+                if (player.GetComponent<NetworkObject>().OwnerClientId == clientId & !player.GetComponent<NetworkObject>().IsLocalPlayer)
+                {
+                    GameObject[] targetLoadout = player.GetComponent<Inventory>().loadout;
+
+                    // Set every weapon to inactive
+                    foreach (GameObject g in targetLoadout)
+                    {
+                        if (g != null)
+                        {
+                            g.SetActive(false);
+                        }
+                    }
+
+                    // Call the weapon switch here
+                    GameObject temp = loadout[end];
+                    loadout[end] = loadout[start];
+                    loadout[start] = temp;
+                }
             }
         }
 
