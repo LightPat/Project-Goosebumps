@@ -50,7 +50,7 @@ public class PlayerController : Controller
             equippedWeaponSpawnPoint.transform.SetParent(verticalRotate, false);
             equippedWeaponSpawnPoint.GetComponent<NetworkObject>().ChangeOwnership(GetComponent<NetworkObject>().OwnerClientId);
         }
-        else
+        if (IsClient)
         {
             //StartCoroutine(Wait(2f));
             verticalRotate = transform.Find("Vertical Rotate(Clone)");
@@ -85,18 +85,18 @@ public class PlayerController : Controller
 
     void Update()
     {
-        // TODO Workaround for verticalrotate not spawning in time for assignment, don't want to call this every update
-        if (verticalRotate == null)
-        {
-            verticalRotate = transform.Find("Vertical Rotate(Clone)");
-            firstPersonCamera = verticalRotate.Find("First Person Camera").gameObject;
+        //// TODO Workaround for verticalrotate not spawning in time for assignment, don't want to call this every update
+        //if (verticalRotate == null)
+        //{
+        //    verticalRotate = transform.Find("Vertical Rotate(Clone)");
+        //    firstPersonCamera = verticalRotate.Find("First Person Camera").gameObject;
 
-            if (IsOwner)
-            {
-                verticalRotate.Find("First Person Camera").gameObject.SetActive(true);
-                GetComponent<PlayerInput>().enabled = true;
-            }
-        }
+        //    if (IsOwner)
+        //    {
+        //        verticalRotate.Find("First Person Camera").gameObject.SetActive(true);
+        //        GetComponent<PlayerInput>().enabled = true;
+        //    }
+        //}
 
         if (IsOwner)
         {

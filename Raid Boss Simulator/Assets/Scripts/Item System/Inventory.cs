@@ -155,7 +155,28 @@ namespace ItemSystem
 
         private void QueryLoadout(int index)
         {
-            QueryLoadoutServerRpc(index);
+            // If there is no weapon in the loadout slot, return
+            if (loadout[index] == null) { return; }
+
+            // If there is a weapon active, disable it
+            foreach (GameObject g in loadout)
+            {
+                if (g != null)
+                {
+                    if (g.activeInHierarchy)
+                    {
+                        g.SetActive(false);
+                        //QueryLoadoutServerRpc(index);
+                        // If this weapon is the same slot as we asked for, end so that we don't set active true again
+                        if (g == loadout[index]) { return; }
+                    }
+                }
+            }
+
+            // At this point, there is no active equipped item, so we can set the queried weapon to active
+            loadout[index].SetActive(true);
+            loadout[index].GetComponent<Weapon>().updateCamera();
+            //QueryLoadoutServerRpc(index);
         }
 
         [ServerRpc]
@@ -188,6 +209,8 @@ namespace ItemSystem
         [ClientRpc]
         void QueryLoadoutClientRpc(int index)
         {
+            if (IsLocalPlayer) { return; }
+
             // If there is no weapon in the loadout slot, return
             if (loadout[index] == null) { return; }
 
@@ -401,7 +424,6 @@ namespace ItemSystem
         /// <param name="g"></param>
         private void ResetTransform(GameObject g)
         {
-            Debug.Log("Resetting transform of " + g.name);
             g.transform.localPosition = Vector3.zero;
             g.transform.localRotation = Quaternion.identity;
         }
