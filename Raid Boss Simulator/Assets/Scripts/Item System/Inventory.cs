@@ -26,7 +26,7 @@ namespace ItemSystem
             for (int i = 0; i < HUDloadoutDisplaySlots.Length; i++)
             {
                 HUDloadoutDisplaySlots[i] = HUDCanvas.transform.Find("Slot " + (i+1).ToString()).gameObject;
-                GUIloadoutDisplaySlots[i] = GUICanvas.transform.Find("Slot " + (i + 1).ToString()).gameObject;
+                GUIloadoutDisplaySlots[i] = GUICanvas.transform.Find("Slot " + (i+1).ToString()).gameObject;
             }
         }
 
@@ -478,11 +478,73 @@ namespace ItemSystem
 
         //------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
+        // Dropping Weapons Logic
+
+        void OnDrop()
+        {
+            Logger.Instance.LogInfo("Drop pressed");
+
+            GameObject weapon = getEquippedWeapon();
+
+            if (weapon == null) { return; }
+
+            GetComponent<Rigidbody>().isKinematic = false;
+            int targetIndex = getEquippedWeaponIndex();
+            loadout[targetIndex] = null;
+            // Reset UI
+            HUDloadoutDisplaySlots[targetIndex].GetComponent<TextMeshProUGUI>().SetText("Slot " + (targetIndex+1).ToString());
+            HUDloadoutDisplaySlots[targetIndex].GetComponent<TextMeshProUGUI>().fontStyle = FontStyles.Normal;
+
+            dropWeaponServerRpc(weapon.GetComponent<NetworkObject>().NetworkObjectId);
+        }
+
+        [ServerRpc]
+        void dropWeaponServerRpc(ulong targetId)
+        {
+            GameObject[] weapons = GameObject.FindGameObjectsWithTag("InventoryItem");
+
+            foreach (GameObject g in weapons)
+            {
+                if (g.GetComponent<NetworkObject>().NetworkObjectId == targetId)
+                {
+                    g.transform.SetParent(null);
+
+                    // Don't execute the rest if we are the host
+                    if (IsClient) { return; }
+
+                    g.GetComponent<Rigidbody>().isKinematic = false;
+                    loadout[getEquippedWeaponIndex()] = null;
+
+                    dropWeaponClientRpc(targetId);
+                }
+            }
+        }
+
+        [ClientRpc]
+        void dropWeaponClientRpc(ulong targetId)
+        {
+            GameObject[] weapons = GameObject.FindGameObjectsWithTag("InventoryItem");
+
+            foreach (GameObject g in weapons)
+            {
+                if (g.GetComponent<NetworkObject>().NetworkObjectId == targetId)
+                {
+                    Logger.Instance.LogInfo(targetId.ToString() + g.ToString());
+                    g.GetComponent<Rigidbody>().isKinematic = false;
+                    loadout[getEquippedWeaponIndex()] = null;
+                }
+            }
+        }
+
+        //------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+        // Misc
+
         /// <summary>
         /// Resets the position and rotation of a gameObject
         /// </summary>
         /// <param name="g"></param>
-        private void ResetTransform(GameObject g)
+        void ResetTransform(GameObject g)
         {
             g.transform.localPosition = Vector3.zero;
             g.transform.localRotation = Quaternion.identity;

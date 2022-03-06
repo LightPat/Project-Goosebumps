@@ -87,6 +87,15 @@
                     "initialStateCheck": true
                 },
                 {
+                    "name": "Drop",
+                    "type": "Button",
+                    "id": "b49918cf-c31b-4936-a69c-2a6b54311ee0",
+                    "expectedControlType": "Button",
+                    "processors": "",
+                    "interactions": "",
+                    "initialStateCheck": false
+                },
+                {
                     "name": "Inventory Toggle",
                     "type": "Button",
                     "id": "27dd8913-585a-4c6a-a96e-ce3562d52eab",
@@ -268,6 +277,17 @@
                     "processors": "",
                     "groups": "",
                     "action": "Escape Toggle",
+                    "isComposite": false,
+                    "isPartOfComposite": false
+                },
+                {
+                    "name": "",
+                    "id": "ce96852c-d3d7-4b27-9c08-9e5e5dc54c2e",
+                    "path": "<Keyboard>/g",
+                    "interactions": "",
+                    "processors": "",
+                    "groups": "",
+                    "action": "Drop",
                     "isComposite": false,
                     "isPartOfComposite": false
                 }
