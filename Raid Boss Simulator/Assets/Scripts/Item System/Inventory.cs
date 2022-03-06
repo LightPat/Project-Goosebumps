@@ -353,6 +353,12 @@ namespace ItemSystem
             // If we haven't selected the slot we want to move, set that to our clicked object
             if (selectedSlot == null)
             {
+                selectedSlot = EventSystem.current.currentSelectedGameObject;
+                originalColor = selectedSlot.GetComponent<Image>().color;
+                selectedSlot.GetComponent<Image>().color = new Color32(0,0,0,100);
+            }
+            else
+            {
                 foreach (GameObject g in loadout)
                 {
                     if (g != null)
@@ -361,12 +367,6 @@ namespace ItemSystem
                     }
                 }
 
-                selectedSlot = EventSystem.current.currentSelectedGameObject;
-                originalColor = selectedSlot.GetComponent<Image>().color;
-                selectedSlot.GetComponent<Image>().color = new Color32(0,0,0,100);
-            }
-            else
-            {
                 // If we already have a selected slot, set the target to our next click, and then switch the slots
                 targetSlot = EventSystem.current.currentSelectedGameObject;
 
@@ -403,7 +403,6 @@ namespace ItemSystem
         [ServerRpc]
         void switchLoadoutSlotServerRpc(ulong clientId, int start, int end)
         {
-            // If we are the host just return
             if (IsClient) { return; }
 
             foreach (KeyValuePair<ulong, NetworkClient> client in NetworkManager.Singleton.ConnectedClients)
