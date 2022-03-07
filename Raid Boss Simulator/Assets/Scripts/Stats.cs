@@ -2,18 +2,23 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using Unity.Netcode;
 
-public class Stats : MonoBehaviour
+public class Stats : NetworkBehaviour
 {
     public TextMeshProUGUI displayHP;
     public int maxHealth = 100;
 
-    private int HP;
+    NetworkVariable<int> HP = new NetworkVariable<int>();
 
     void Start()
     {
-        HP = maxHealth;
-        displayHP.SetText(HP.ToString() + " HP");
+        if (IsServer)
+        {
+            HP.Value = maxHealth;
+        }
+
+        displayHP.SetText(HP.Value.ToString() + " HP");
     }
 
     /// <summary>
@@ -22,19 +27,21 @@ public class Stats : MonoBehaviour
     /// <param name="damage"></param>
     public void changeHealth(int damage)
     {
-        HP += damage;
+        if (!IsServer) { return; }
 
-        if (HP <= 0)
+        HP.Value += damage;
+
+        if (HP.Value <= 0)
         {
             //gameObject.SetActive(false);
             Logger.Instance.LogInfo(gameObject.name + " is dead.");
         }
 
-        displayHP.SetText(HP.ToString() + " HP");
+        displayHP.SetText(HP.Value.ToString() + " HP");
     }
 
     public int getHealth()
     {
-        return HP;
+        return HP.Value;
     }
 }

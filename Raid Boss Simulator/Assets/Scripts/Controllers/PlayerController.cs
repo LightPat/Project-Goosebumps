@@ -293,8 +293,25 @@ public class PlayerController : Controller
             }
             else if (hit.collider.tag == "Interactable")
             {
-                // TODO
-                Debug.Log("Haven't implemented interactable logic yet in PlayerController.cs");
+                Logger.Instance.LogInfo(hit.transform.gameObject.name);
+                InteractableServerRpc(hit.transform.gameObject.GetComponent<NetworkObject>().NetworkObjectId);
+            }
+        }
+    }
+
+    [ServerRpc]
+    void InteractableServerRpc(ulong targetId)
+    {
+        Logger.Instance.LogInfo("Server Rpc");
+        GameObject[] interactableObjects = GameObject.FindGameObjectsWithTag("Interactable");
+
+        foreach (GameObject g in interactableObjects)
+        {
+            if (g.GetComponent<NetworkObject>().NetworkObjectId == targetId)
+            {
+                Logger.Instance.LogInfo(g.name);
+                g.GetComponent<Interactable>().Invoke();
+                break;
             }
         }
     }

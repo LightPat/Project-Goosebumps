@@ -7,7 +7,6 @@ using TMPro;
 public class NetworkInterface : NetworkBehaviour
 {
     public GameObject ServerCamera;
-    public GameObject ScarPrefab;
 
     [SerializeField]
     private TextMeshProUGUI playersInGameText;
