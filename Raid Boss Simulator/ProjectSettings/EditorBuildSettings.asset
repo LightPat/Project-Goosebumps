@@ -9,6 +9,6 @@ EditorBuildSettings:
     path: Assets/Scenes/Dragon Fight.unity
     guid: 9fc0d4010bbf28b4594072e72b8655ab
   - enabled: 0
-    path: Assets/Scenes/New Scene.unity
+    path: Assets/Rpc Example/Rpc Example.unity
     guid: 83640700662e9c048831faf917ba64d9
   m_configObjects: {}

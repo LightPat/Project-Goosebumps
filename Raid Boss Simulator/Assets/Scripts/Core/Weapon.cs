@@ -2,10 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using Unity.Netcode;
 
 namespace LightPat.Core
 {
-    public abstract class Weapon : MonoBehaviour
+    public abstract class Weapon : NetworkBehaviour
     {
         [Header("General Weapon Properties")]
         public float baseDamage;

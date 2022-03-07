@@ -233,6 +233,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bbf3f778972034c45aaefe49b3150ff6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  Dragon: {fileID: 514257766565330338, guid: 575747c1023dc4d4dbcaefbc9cd7d34d, type: 3}
 --- !u!114 &42594614
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -7671,11 +7672,6 @@ MonoBehaviour:
       OverridingTargetPrefab: {fileID: 0}
     - Override: 0
       Prefab: {fileID: 514257766565330338, guid: 575747c1023dc4d4dbcaefbc9cd7d34d, type: 3}
-      SourcePrefabToOverride: {fileID: 295347349711555130, guid: 0200e127534ed6342ac50510b7c3e767, type: 3}
-      SourceHashToOverride: 0
-      OverridingTargetPrefab: {fileID: 0}
-    - Override: 0
-      Prefab: {fileID: 42594608}
       SourcePrefabToOverride: {fileID: 295347349711555130, guid: 0200e127534ed6342ac50510b7c3e767, type: 3}
       SourceHashToOverride: 0
       OverridingTargetPrefab: {fileID: 0}

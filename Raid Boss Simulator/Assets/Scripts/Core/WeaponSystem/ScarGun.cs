@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.Netcode;
 
 namespace LightPat.Core.WeaponSystem
 {
@@ -34,8 +35,7 @@ namespace LightPat.Core.WeaponSystem
                 {
                     if (hit.transform.gameObject.GetComponent<Attributes>())
                     {
-                        // TODO Only send this on the server
-                        hit.transform.gameObject.GetComponent<Attributes>().changeHealth((int)baseDamage * -1);
+                        changeHPServerRpc(hit.transform.gameObject.GetComponent<NetworkObject>().NetworkObjectId, (int)baseDamage * -1);
                     }
 
                     tracerPosition = hit.point;
@@ -44,6 +44,21 @@ namespace LightPat.Core.WeaponSystem
 
                 // Fire rate handling
                 StartCoroutine(FireRateCoroutine(tracerPosition, tracerColor));
+            }
+        }
+
+        [ServerRpc]
+        void changeHPServerRpc(ulong targetId, int damage)
+        {
+            Attributes[] attributeObjects = FindObjectsOfType<Attributes>();
+
+            foreach (Attributes a in attributeObjects)
+            {
+                if (a.gameObject.GetComponent<NetworkObject>().NetworkObjectId == targetId)
+                {
+                    a.changeHealth(damage);
+                    break;
+                }
             }
         }
 

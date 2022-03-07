@@ -311,7 +311,6 @@ namespace LightPat.Core
             {
                 if (g.GetComponent<NetworkObject>().NetworkObjectId == targetId)
                 {
-                    DisplayLogger.Instance.LogInfo(g.name);
                     g.GetComponent<Interactable>().Invoke();
                     break;
                 }

@@ -13,33 +13,30 @@ namespace LightPat.Core
 
         NetworkVariable<int> HP = new NetworkVariable<int>();
 
-        void Start()
+        public override void OnNetworkSpawn()
         {
+            HP.OnValueChanged += HPChanged;
+
             if (IsServer)
             {
                 HP.Value = maxHealth;
             }
-
-            displayHP.SetText(HP.Value.ToString() + " HP");
         }
 
-        /// <summary>
-        /// Changes the HP of this object, if the object's HP drops to 0 or below, we disable it in the scene
-        /// </summary>
-        /// <param name="damage"></param>
-        public void changeHealth(int damage)
+        void HPChanged(int oldHP, int newHP)
         {
-            if (!IsServer) { return; }
-
-            HP.Value += damage;
+            displayHP.SetText(HP.Value.ToString() + " HP");
 
             if (HP.Value <= 0)
             {
                 //gameObject.SetActive(false);
                 DisplayLogger.Instance.LogInfo(gameObject.name + " is dead.");
             }
+        }
 
-            displayHP.SetText(HP.Value.ToString() + " HP");
+        public void changeHealth(int damage)
+        {
+            HP.Value += damage;
         }
 
         public int getHealth()

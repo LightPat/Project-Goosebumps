@@ -34,8 +34,10 @@ namespace LightPat.Core.WeaponSystem
         {
             if (g.transform.parent != null) { return; }
 
-            addWeaponServerRpc(g.GetComponent<NetworkObject>().NetworkObjectId, GetComponent<NetworkObject>().OwnerClientId);
+            //DisplayLogger.Instance.LogInfo(g.GetComponent<NetworkObject>().OwnerClientId.ToString());
 
+            addWeaponServerRpc(g.GetComponent<NetworkObject>().NetworkObjectId, GetComponent<NetworkObject>().OwnerClientId);
+            
             g.GetComponent<Rigidbody>().isKinematic = true;
 
             if (!IsHost)
@@ -70,6 +72,7 @@ namespace LightPat.Core.WeaponSystem
                 if (g.GetComponent<NetworkObject>().NetworkObjectId == targetId)
                 {
                     g.transform.SetParent(GetComponent<PlayerController>().verticalRotate.Find("Equipped Weapon Spawn Point(Clone)"), false);
+                    g.GetComponent<NetworkObject>().ChangeOwnership(clientId);
 
                     ResetTransform(g);
 
@@ -133,6 +136,7 @@ namespace LightPat.Core.WeaponSystem
                     }
 
                     g.SetActive(false);
+                    //DisplayLogger.Instance.LogInfo(g.GetComponent<NetworkObject>().OwnerClientId.ToString());
                 }
             }
         }
@@ -482,8 +486,6 @@ namespace LightPat.Core.WeaponSystem
 
         void OnDrop()
         {
-            DisplayLogger.Instance.LogInfo("Drop pressed");
-
             GameObject weapon = getEquippedWeapon();
 
             if (weapon == null) { return; }
@@ -529,7 +531,6 @@ namespace LightPat.Core.WeaponSystem
             {
                 if (g.GetComponent<NetworkObject>().NetworkObjectId == targetId)
                 {
-                    DisplayLogger.Instance.LogInfo(targetId.ToString() + g.ToString());
                     g.GetComponent<Rigidbody>().isKinematic = false;
                     loadout[getEquippedWeaponIndex()] = null;
                 }
