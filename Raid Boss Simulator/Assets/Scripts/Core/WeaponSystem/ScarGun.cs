@@ -22,29 +22,28 @@ namespace LightPat.Core.WeaponSystem
 
         public override void attack()
         {
-            if (allowAttack)
+            if (!allowAttack) { return; }
+
+            // Raycast hit detection from crosshair to enemy
+            RaycastHit hit;
+            bool bHit = Physics.Raycast(firstPersonCamera.transform.position, firstPersonCamera.transform.forward, out hit);
+
+            Vector3 tracerPosition = firstPersonCamera.transform.position + firstPersonCamera.transform.forward * 100;
+            Color tracerColor = Color.red;
+
+            if (bHit)
             {
-                // Raycast hit detection from crosshair to enemy
-                RaycastHit hit;
-                bool bHit = Physics.Raycast(firstPersonCamera.transform.position, firstPersonCamera.transform.forward, out hit);
-
-                Vector3 tracerPosition = firstPersonCamera.transform.position + firstPersonCamera.transform.forward * 100;
-                Color tracerColor = Color.red;
-
-                if (bHit)
+                if (hit.transform.gameObject.GetComponent<Attributes>())
                 {
-                    if (hit.transform.gameObject.GetComponent<Attributes>())
-                    {
-                        changeHPServerRpc(hit.transform.gameObject.GetComponent<NetworkObject>().NetworkObjectId, (int)baseDamage * -1);
-                    }
-
-                    tracerPosition = hit.point;
-                    tracerColor = Color.green;
+                    changeHPServerRpc(hit.transform.gameObject.GetComponent<NetworkObject>().NetworkObjectId, (int)baseDamage * -1);
                 }
 
-                // Fire rate handling
-                StartCoroutine(FireRateCoroutine(tracerPosition, tracerColor));
+                tracerPosition = hit.point;
+                tracerColor = Color.green;
             }
+
+            // Fire rate handling
+            StartCoroutine(FireRateCoroutine(tracerPosition, tracerColor));
         }
 
         [ServerRpc]

@@ -163,22 +163,20 @@ namespace LightPat.Core.WeaponSystem
             // If there is no weapon in the loadout slot, return
             if (loadout[index] == null) { return; }
 
-            // If there is a weapon active, disable it
-            foreach (GameObject g in loadout)
+            // If there is already an equipped weapon
+            if (getEquippedWeapon() != null)
             {
-                if (g != null)
+                int equipIndex = getEquippedWeaponIndex();
+                // Set the currently active equipped weapon to inactive, and return if that was the index we were trying to query
+                getEquippedWeapon().SetActive(false);
+                
+                if (equipIndex == index)
                 {
-                    if (g.activeInHierarchy)
-                    {
-                        g.SetActive(false);
-                        QueryLoadoutServerRpc(index);
-                        // If this weapon is the same slot as we asked for, end so that we don't set active true again
-                        if (g == loadout[index]) { return; }
-                    }
+                    QueryLoadoutServerRpc(index); 
+                    return;
                 }
             }
 
-            // At this point, there is no active equipped item, so we can set the queried weapon to active
             loadout[index].SetActive(true);
             loadout[index].GetComponent<Weapon>().updateCamera();
             QueryLoadoutServerRpc(index);
@@ -190,25 +188,20 @@ namespace LightPat.Core.WeaponSystem
             // If this is the host end here since we already executed all this code
             if (IsClient) { return; }
 
-            // If there is no weapon in the loadout slot, return
-            if (loadout[index] == null) { return; }
-
-            // If there is a weapon active, disable it
-            foreach (GameObject g in loadout)
+            // If there is already an equipped weapon
+            if (getEquippedWeapon() != null)
             {
-                if (g != null)
+                int equipIndex = getEquippedWeaponIndex();
+                // Set the currently active equipped weapon to inactive, and return if that was the index we were trying to query
+                getEquippedWeapon().SetActive(false);
+
+                if (equipIndex == index)
                 {
-                    if (g.activeInHierarchy)
-                    {
-                        g.SetActive(false);
-                        QueryLoadoutClientRpc(index);
-                        // If this weapon is the same slot as we asked for, end so that we don't set active true again
-                        if (g == loadout[index]) { return; }
-                    }
+                    QueryLoadoutClientRpc(index);
+                    return;
                 }
             }
 
-            // At this point, there is no active equipped item, so we can set the queried weapon to active
             loadout[index].SetActive(true);
             loadout[index].GetComponent<Weapon>().updateCamera();
             QueryLoadoutClientRpc(index);
@@ -217,26 +210,22 @@ namespace LightPat.Core.WeaponSystem
         [ClientRpc]
         void QueryLoadoutClientRpc(int index)
         {
+            // Don't execute on client who initiated chain of calls
             if (IsLocalPlayer) { return; }
 
-            // If there is no weapon in the loadout slot, return
-            if (loadout[index] == null) { return; }
-
-            // If there is a weapon active, disable it
-            foreach (GameObject g in loadout)
+            // If there is already an equipped weapon
+            if (getEquippedWeapon() != null)
             {
-                if (g != null)
+                int equipIndex = getEquippedWeaponIndex();
+                // Set the currently active equipped weapon to inactive, and return if that was the index we were trying to query
+                getEquippedWeapon().SetActive(false);
+
+                if (equipIndex == index)
                 {
-                    if (g.activeInHierarchy)
-                    {
-                        g.SetActive(false);
-                        // If this weapon is the same slot as we asked for, end so that we don't set active true again
-                        if (g == loadout[index]) { return; }
-                    }
+                    return;
                 }
             }
 
-            // At this point, there is no active equipped item, so we can set the queried weapon to active
             loadout[index].SetActive(true);
             loadout[index].GetComponent<Weapon>().updateCamera();
         }
