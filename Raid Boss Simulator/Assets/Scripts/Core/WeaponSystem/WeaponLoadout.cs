@@ -65,7 +65,7 @@ namespace LightPat.Core.WeaponSystem
         [ServerRpc]
         void addWeaponServerRpc(ulong targetId, ulong clientId)
         {
-            GameObject[] weapons = GameObject.FindGameObjectsWithTag("InventoryItem");
+            GameObject[] weapons = GameObject.FindGameObjectsWithTag("Weapon");
 
             foreach (GameObject g in weapons)
             {
@@ -112,7 +112,7 @@ namespace LightPat.Core.WeaponSystem
         {
             if (IsLocalPlayer) { return; }
 
-            GameObject[] weapons = GameObject.FindGameObjectsWithTag("InventoryItem");
+            GameObject[] weapons = GameObject.FindGameObjectsWithTag("Weapon");
 
             foreach (GameObject g in weapons)
             {
@@ -503,7 +503,7 @@ namespace LightPat.Core.WeaponSystem
         [ServerRpc]
         void dropWeaponServerRpc(ulong targetId)
         {
-            GameObject[] weapons = GameObject.FindGameObjectsWithTag("InventoryItem");
+            GameObject[] weapons = GameObject.FindGameObjectsWithTag("Weapon");
 
             foreach (GameObject g in weapons)
             {
@@ -525,7 +525,7 @@ namespace LightPat.Core.WeaponSystem
         [ClientRpc]
         void dropWeaponClientRpc(ulong targetId)
         {
-            GameObject[] weapons = GameObject.FindGameObjectsWithTag("InventoryItem");
+            GameObject[] weapons = GameObject.FindGameObjectsWithTag("Weapon");
 
             foreach (GameObject g in weapons)
             {

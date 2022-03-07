@@ -290,7 +290,7 @@ namespace LightPat.Core
             // Have to check bHit in order to prevent a null reference exception when checking tags
             if (bHit)
             {
-                if (hit.collider.tag == "InventoryItem")
+                if (hit.collider.tag == "Weapon")
                 {
                     weaponLoadout.addItem(hit.collider.gameObject);
                 }
