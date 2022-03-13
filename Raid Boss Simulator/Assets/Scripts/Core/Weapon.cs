@@ -54,5 +54,20 @@ namespace LightPat.Core
             GetComponent<Rigidbody>().isKinematic = false;
             gameObject.SetActive(true);
         }
+
+        [ServerRpc]
+        protected void changeHPServerRpc(ulong targetId, int damage)
+        {
+            Attributes[] attributeObjects = FindObjectsOfType<Attributes>();
+
+            foreach (Attributes a in attributeObjects)
+            {
+                if (a.gameObject.GetComponent<NetworkObject>().NetworkObjectId == targetId)
+                {
+                    a.changeHealth(damage);
+                    break;
+                }
+            }
+        }
     }
 }

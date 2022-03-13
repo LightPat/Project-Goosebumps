@@ -14,7 +14,7 @@ namespace LightPat.Core.WeaponSystem
         private LineRenderer lineRenderer;
         private AudioSource gunshotSound;
 
-        void Start()
+        private void Start()
         {
             lineRenderer = GetComponent<LineRenderer>();
             gunshotSound = GetComponent<AudioSource>();
@@ -46,27 +46,12 @@ namespace LightPat.Core.WeaponSystem
             StartCoroutine(FireRateCoroutine(tracerPosition, tracerColor));
         }
 
-        [ServerRpc]
-        void changeHPServerRpc(ulong targetId, int damage)
-        {
-            Attributes[] attributeObjects = FindObjectsOfType<Attributes>();
-
-            foreach (Attributes a in attributeObjects)
-            {
-                if (a.gameObject.GetComponent<NetworkObject>().NetworkObjectId == targetId)
-                {
-                    a.changeHealth(damage);
-                    break;
-                }
-            }
-        }
-
         IEnumerator FireRateCoroutine(Vector3 tracerPosition, Color tracerColor)
         {
             allowAttack = false;
             // Rounds per second
             float sps = rateOfFire / 60;
-            // Seconds between swings
+            // Seconds between shots
             float seconds = 1 / sps;
 
             gunshotSound.Play();
