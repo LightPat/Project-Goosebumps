@@ -8,7 +8,6 @@ public class GenerateMeshFromChildren : Editor
     [MenuItem("GameObject/Generate Mesh From Children")]
     public static void generateMesh()
     {
-
         if (EditorUtility.DisplayDialog("Generate Mesh From Children", "Do you really want to generate a mesh from the children of this object ?", "Generate Mesh", "Cancel"))
         {
             // You need a mesh filter component on the parent object for this to work

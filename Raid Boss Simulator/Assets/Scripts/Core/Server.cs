@@ -35,6 +35,8 @@ namespace LightPat.Core
         {
             MoveClientRpc(clientId, newClientPosition);
 
+            if (IsHost) { return; }
+
             foreach (KeyValuePair<ulong, NetworkClient> client in NetworkManager.Singleton.ConnectedClients)
             {
                 // First index is the client Id
@@ -69,6 +71,8 @@ namespace LightPat.Core
         {
             RotateClientRpc(clientId, newClientRotationEulers);
 
+            if (IsHost) { return; }
+
             foreach (KeyValuePair<ulong, NetworkClient> client in NetworkManager.Singleton.ConnectedClients)
             {
                 if (client.Key == clientId)
@@ -101,6 +105,8 @@ namespace LightPat.Core
         {
             JumpClientRpc(clientId, jumpForce);
 
+            if (IsHost) { return; }
+
             foreach (KeyValuePair<ulong, NetworkClient> client in NetworkManager.Singleton.ConnectedClients)
             {
                 if (client.Key == clientId)
@@ -129,6 +135,8 @@ namespace LightPat.Core
         public void clientAttack(ulong clientId)
         {
             AttackClientRpc(clientId);
+
+            if (IsHost) { return; }
 
             foreach (KeyValuePair<ulong, NetworkClient> client in NetworkManager.Singleton.ConnectedClients)
             {
