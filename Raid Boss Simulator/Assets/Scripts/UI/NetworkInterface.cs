@@ -24,7 +24,7 @@ namespace LightPat.UI
                 {
                     playersInGame.Value++;
                 //DisplayLogger.Instance.LogInfo(NetworkManager.Singleton.ConnectedClients[id].PlayerObject.gameObject.name);
-            }
+                }
 
                 DisplayLogger.Instance.LogInfo($"{id} just connected...");
             };
@@ -73,7 +73,8 @@ namespace LightPat.UI
         {
             if (NetworkManager.Singleton.StartServer())
             {
-                DisplayLogger.Instance.LogInfo("Server started...");
+                DisplayLogger.Instance.LogInfo("Server started on " + NetworkManager.gameObject.GetComponent<Unity.Netcode.Transports.UNET.UNetTransport>().ConnectAddress
+                    + " on port " + NetworkManager.gameObject.GetComponent<Unity.Netcode.Transports.UNET.UNetTransport>().ServerListenPort);
             }
             else
             {

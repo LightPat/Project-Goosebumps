@@ -45,8 +45,6 @@ namespace LightPat.Core.WeaponSystem
             // Seconds between swings
             float seconds = 1 / sps;
 
-            Debug.Log(seconds);
-
             swordSlashSound.Play();
 
             yield return new WaitForSeconds(seconds);
