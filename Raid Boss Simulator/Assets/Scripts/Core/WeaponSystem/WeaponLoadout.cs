@@ -89,6 +89,7 @@ namespace LightPat.Core.WeaponSystem
                     }
 
                     g.GetComponent<NetworkObject>().Despawn();
+                    break;
                 }
             }
         }
@@ -120,6 +121,8 @@ namespace LightPat.Core.WeaponSystem
                             break;
                         }
                     }
+
+                    break;
                 }
             }
         }
@@ -481,6 +484,8 @@ namespace LightPat.Core.WeaponSystem
         [ClientRpc]
         void dropWeaponClientRpc(int weaponIndex)
         {
+            HUDloadoutDisplaySlots[weaponIndex].GetComponent<TextMeshProUGUI>().SetText("Slot " + (weaponIndex+1).ToString());
+
             Destroy(loadout[weaponIndex]);
         }
 
