@@ -24,13 +24,13 @@ namespace LightPat.Core.WeaponSystem
 
             // Raycast hit detection from crosshair to enemy
             RaycastHit hit;
-            bool bHit = Physics.Raycast(firstPersonCamera.transform.position, firstPersonCamera.transform.forward, out hit);
+            bool bHit = Physics.Raycast(firstPersonCamera.transform.position, firstPersonCamera.transform.forward, out hit, reach);
 
             if (bHit)
             {
                 if (hit.transform.gameObject.GetComponent<Attributes>())
                 {
-                    changeHPServerRpc(hit.transform.gameObject.GetComponent<NetworkObject>().NetworkObjectId, (int)baseDamage * -1);
+                    hit.transform.gameObject.GetComponent<Attributes>().changeHP((int)-baseDamage);
                 }
             }
 

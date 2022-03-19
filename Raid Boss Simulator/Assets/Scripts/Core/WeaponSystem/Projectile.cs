@@ -48,7 +48,7 @@ namespace LightPat.Core.WeaponSystem
                 if (collision.gameObject.GetComponent<Attributes>())
                 {
                     DisplayLogger.Instance.LogInfo("Hitting " + collision.gameObject.name + " for " + damage.ToString());
-                    collision.gameObject.GetComponent<Attributes>().changeHealth(damage);
+                    //collision.gameObject.GetComponent<Attributes>().changeHealth(damage);
                 }
                 collisionHappened = true;
                 Destroy(gameObject);

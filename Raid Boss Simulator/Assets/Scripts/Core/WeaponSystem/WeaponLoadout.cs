@@ -65,6 +65,12 @@ namespace LightPat.Core.WeaponSystem
             {
                 if (g.GetComponent<NetworkObject>().NetworkObjectId == targetId)
                 {
+                    if (IsHost)
+                    {
+                        g.GetComponent<NetworkObject>().Despawn();
+                        return;
+                    }
+
                     GameObject reg = Instantiate(g.GetComponent<Weapon>().regularPrefab, GetComponent<PlayerController>().verticalRotate.Find("Equipped Weapon Spawn Point"), false);
                     reg.name = g.GetComponent<Weapon>().regularPrefab.name;
 

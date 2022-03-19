@@ -15,7 +15,7 @@ namespace LightPat.Interactables
             GameObject dragon = Instantiate(Dragon, new Vector3(-108, -14, 0), Quaternion.Euler(0,90,0));
             dragon.GetComponent<NetworkObject>().Spawn();
 
-            Destroy(gameObject);
+            GetComponent<NetworkObject>().Despawn();
         }
     }
 }

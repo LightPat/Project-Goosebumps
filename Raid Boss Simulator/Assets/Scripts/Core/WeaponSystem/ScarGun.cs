@@ -35,7 +35,7 @@ namespace LightPat.Core.WeaponSystem
             {
                 if (hit.transform.gameObject.GetComponent<Attributes>())
                 {
-                    changeHPServerRpc(hit.transform.gameObject.GetComponent<NetworkObject>().NetworkObjectId, (int)baseDamage * -1);
+                    hit.transform.gameObject.GetComponent<Attributes>().changeHP((int)-baseDamage);
                 }
 
                 tracerPosition = hit.point;

@@ -6,7 +6,7 @@ using Unity.Netcode;
 
 namespace LightPat.Core
 {
-    public abstract class Weapon : NetworkBehaviour
+    public abstract class Weapon : MonoBehaviour
     {
         [Header("Spawning Variables")]
         public GameObject networkedPrefab;
@@ -18,7 +18,8 @@ namespace LightPat.Core
         public bool fullAuto = true;
 
         protected GameObject inventoryTextSlot;
-        protected bool allowAttack = true;
+        [HideInInspector]
+        public bool allowAttack = true;
         protected GameObject firstPersonCamera;
 
         public abstract void attack();
@@ -57,21 +58,6 @@ namespace LightPat.Core
 
             GetComponent<Rigidbody>().isKinematic = false;
             gameObject.SetActive(true);
-        }
-
-        [ServerRpc]
-        protected void changeHPServerRpc(ulong targetId, int damage)
-        {
-            Attributes[] attributeObjects = FindObjectsOfType<Attributes>();
-
-            foreach (Attributes a in attributeObjects)
-            {
-                if (a.gameObject.GetComponent<NetworkObject>().NetworkObjectId == targetId)
-                {
-                    a.changeHealth(damage);
-                    break;
-                }
-            }
         }
     }
 }

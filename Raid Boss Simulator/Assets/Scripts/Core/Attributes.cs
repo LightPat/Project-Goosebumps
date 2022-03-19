@@ -11,7 +11,7 @@ namespace LightPat.Core
         public TextMeshProUGUI displayHP;
         public int maxHealth = 100;
 
-        NetworkVariable<int> HP = new NetworkVariable<int>();
+        private NetworkVariable<int> HP = new NetworkVariable<int>();
 
         public override void OnNetworkSpawn()
         {
@@ -29,19 +29,18 @@ namespace LightPat.Core
 
             if (HP.Value <= 0)
             {
-                //gameObject.SetActive(false);
+                GetComponent<NetworkObject>().Despawn();
                 DisplayLogger.Instance.LogInfo(gameObject.name + " is dead.");
             }
         }
 
-        public void changeHealth(int damage)
+        public void changeHP(int changeValue)
         {
-            HP.Value += damage;
-        }
-
-        public int getHealth()
-        {
-            return HP.Value;
+            if (IsServer)
+            {
+                // Only change HP on server side, then netcode for gameObjects propogates the change throughout the network
+                HP.Value += changeValue;
+            }
         }
     }
 }
