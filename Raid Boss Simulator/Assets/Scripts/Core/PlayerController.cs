@@ -188,15 +188,12 @@ namespace LightPat.Core
         {
             RaycastHit hit;
             // Raycast any gameObject that is beneath the collider
-            bool bHit = Physics.Raycast(transform.position, transform.up * -1, out hit, checkDistance);
+            Vector3 checkPosition = transform.position;
+            checkPosition.y += 1;
+
+            bool bHit = Physics.Raycast(checkPosition, transform.up * -1, out hit, checkDistance);
 
             return bHit;
-
-            // Sweep test or capsule collide later maybe as ideas to fix this
-            //bHit = rb.SweepTest(-transform.up, out hit, 1.5f);
-
-            //Debug.Log(hit.collider);
-            //return bHit;
         }
 
         [Header("Jump Settings")]
@@ -209,7 +206,6 @@ namespace LightPat.Core
             // Check if the player is touching a gameObject under them
             // May need to change 1.5f to be a different number if you switch the asset of the player model
 
-            // Jump logic
             if (isGrounded())
             {
                 float jumpForce = Mathf.Sqrt(jumpHeight * -2 * Physics.gravity.y);

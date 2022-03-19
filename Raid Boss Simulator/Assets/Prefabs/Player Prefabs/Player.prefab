@@ -468,7 +468,7 @@ MonoBehaviour:
   verticalRotate: {fileID: 0}
   walkingSpeed: 5
   verticalLookBound: 90
-  checkDistance: 2
+  checkDistance: 1
   jumpHeight: 3
   fallingGravityScale: 0.5
   crouchSpeed: 2
