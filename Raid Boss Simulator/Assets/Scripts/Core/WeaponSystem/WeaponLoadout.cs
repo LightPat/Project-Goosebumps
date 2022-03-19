@@ -473,7 +473,6 @@ namespace LightPat.Core.WeaponSystem
 
             // Apply random torque to the throw
             Vector3 torqueForce = new Vector3(Random.Range(-10.0f, 10.0f), Random.Range(-10.0f, 10.0f), Random.Range(-0.1f, 0.1f));
-            DisplayLogger.Instance.LogInfo(torqueForce.ToString());
             netWeapon.GetComponent<Rigidbody>().AddTorque(torqueForce, ForceMode.VelocityChange);
 
             dropWeaponClientRpc(weaponIndex);

@@ -47,9 +47,27 @@ namespace LightPat.UI
 
         public void startHost()
         {
+            string IPAddress = transform.Find("IP Address").GetComponent<TMP_InputField>().text;
+
+            if (IPAddress != "")
+            {
+                NetworkManager.gameObject.GetComponent<Unity.Netcode.Transports.UNET.UNetTransport>().ConnectAddress = transform.Find("IP Address").GetComponent<TMP_InputField>().text;
+            }
+
             if (NetworkManager.Singleton.StartHost())
             {
                 DisplayLogger.Instance.LogInfo("Host started...");
+
+                DisplayLogger.Instance.LogInfo("Server started on " + NetworkManager.gameObject.GetComponent<Unity.Netcode.Transports.UNET.UNetTransport>().ConnectAddress
+                    + " on port " + NetworkManager.gameObject.GetComponent<Unity.Netcode.Transports.UNET.UNetTransport>().ServerListenPort);
+
+                foreach (Transform child in transform)
+                {
+                    if (child.transform.childCount > 0)
+                    {
+                        Destroy(child.gameObject);
+                    }
+                }
             }
             else
             {
@@ -59,9 +77,24 @@ namespace LightPat.UI
 
         public void startClient()
         {
+            string IPAddress = transform.Find("IP Address").GetComponent<TMP_InputField>().text;
+
+            if (IPAddress != "")
+            {
+                NetworkManager.gameObject.GetComponent<Unity.Netcode.Transports.UNET.UNetTransport>().ConnectAddress = transform.Find("IP Address").GetComponent<TMP_InputField>().text;
+            }
+
             if (NetworkManager.Singleton.StartClient())
             {
                 DisplayLogger.Instance.LogInfo("Client started...");
+
+                foreach (Transform child in transform)
+                {
+                    if (child.transform.childCount > 0)
+                    {
+                        Destroy(child.gameObject);
+                    }
+                }
             }
             else
             {
@@ -71,10 +104,25 @@ namespace LightPat.UI
 
         public void startServer()
         {
+            string IPAddress = transform.Find("IP Address").GetComponent<TMP_InputField>().text;
+
+            if (IPAddress != "")
+            {
+                NetworkManager.gameObject.GetComponent<Unity.Netcode.Transports.UNET.UNetTransport>().ConnectAddress = transform.Find("IP Address").GetComponent<TMP_InputField>().text;
+            }
+
             if (NetworkManager.Singleton.StartServer())
             {
                 DisplayLogger.Instance.LogInfo("Server started on " + NetworkManager.gameObject.GetComponent<Unity.Netcode.Transports.UNET.UNetTransport>().ConnectAddress
                     + " on port " + NetworkManager.gameObject.GetComponent<Unity.Netcode.Transports.UNET.UNetTransport>().ServerListenPort);
+
+                foreach (Transform child in transform)
+                {
+                    if (child.transform.childCount > 0)
+                    {
+                        Destroy(child.gameObject);
+                    }
+                }
             }
             else
             {
