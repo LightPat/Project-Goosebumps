@@ -34,81 +34,61 @@ namespace LightPat.Core.WeaponSystem
         {
             if (g.transform.parent != null) { return; }
 
-            //DisplayLogger.Instance.LogInfo(g.GetComponent<NetworkObject>().OwnerClientId.ToString());
-
-            addWeaponServerRpc(g.GetComponent<NetworkObject>().NetworkObjectId, GetComponent<NetworkObject>().OwnerClientId);
-            
-            g.GetComponent<Rigidbody>().isKinematic = true;
-
-            if (!IsHost)
-            {
-                g.transform.position = transform.Find("Vertical Rotate").Find("Equipped Weapon Spawn Point").position;
-                g.transform.rotation = transform.Find("Vertical Rotate").rotation;
-            }
+            GameObject reg = Instantiate(g.GetComponent<Weapon>().regularPrefab, GetComponent<PlayerController>().verticalRotate.Find("Equipped Weapon Spawn Point"), false);
+            reg.name = g.GetComponent<Weapon>().regularPrefab.name;
 
             // Append gameobject to end of loadout if loadout slot is empty
-            // TODO OTHERWISE ADD IT TO THE PLAYER'S INVENTORY IF THEY HAVE SPACE
             for (int i = 0; i < loadout.Length; i++)
             {
                 if (loadout[i] == null)
                 {
-                    loadout[i] = g;
-                    HUDloadoutDisplaySlots[i].GetComponent<TextMeshProUGUI>().SetText(g.name);
+                    loadout[i] = reg;
+                    HUDloadoutDisplaySlots[i].GetComponent<TextMeshProUGUI>().SetText(reg.name);
                     loadout[i].GetComponent<Weapon>().setTextDisplay(HUDloadoutDisplaySlots[i]);
+                    reg.GetComponent<Weapon>().updateCamera();
+                    reg.SetActive(false);
                     break;
                 }
             }
 
-            g.SetActive(false);
+            addWeaponServerRpc(g.GetComponent<NetworkObject>().NetworkObjectId);
         }
 
         [ServerRpc]
-        void addWeaponServerRpc(ulong targetId, ulong clientId)
+        void addWeaponServerRpc(ulong targetId)
         {
+            addWeaponClientRpc(targetId);
+
             GameObject[] weapons = GameObject.FindGameObjectsWithTag("Weapon");
 
             foreach (GameObject g in weapons)
             {
                 if (g.GetComponent<NetworkObject>().NetworkObjectId == targetId)
                 {
-                    g.transform.SetParent(GetComponent<PlayerController>().verticalRotate.Find("Equipped Weapon Spawn Point"), false);
-                    g.GetComponent<NetworkObject>().ChangeOwnership(clientId);
-
-                    ResetTransform(g);
-
-                    // If this is the host end here because we already executed all this code
-                    if (IsClient) { return; }
-
-                    g.GetComponent<Rigidbody>().isKinematic = true;
-
-                    // For the clients I call updateCamera() when they equip their weapon
-                    if (g.GetComponent<Weapon>())
-                    {
-                        g.GetComponent<Weapon>().updateCamera();
-                    }
+                    GameObject reg = Instantiate(g.GetComponent<Weapon>().regularPrefab, GetComponent<PlayerController>().verticalRotate.Find("Equipped Weapon Spawn Point"), false);
+                    reg.name = g.GetComponent<Weapon>().regularPrefab.name;
 
                     // Append gameobject to end of loadout if loadout slot is empty
-                    // TODO OTHERWISE ADD IT TO THE PLAYER'S INVENTORY IF THEY HAVE SPACE
                     for (int i = 0; i < loadout.Length; i++)
                     {
                         if (loadout[i] == null)
                         {
-                            loadout[i] = g;
-                            HUDloadoutDisplaySlots[i].GetComponent<TextMeshProUGUI>().SetText(g.name);
+                            loadout[i] = reg;
+                            HUDloadoutDisplaySlots[i].GetComponent<TextMeshProUGUI>().SetText(reg.name);
                             loadout[i].GetComponent<Weapon>().setTextDisplay(HUDloadoutDisplaySlots[i]);
+                            reg.GetComponent<Weapon>().updateCamera();
+                            reg.SetActive(false);
                             break;
                         }
                     }
 
-                    g.SetActive(false);
-
-                    addWeaponClientRpc(targetId, clientId);
+                    g.GetComponent<NetworkObject>().Despawn();
                 }
             }
         }
 
         [ClientRpc]
-        void addWeaponClientRpc(ulong targetId, ulong clientId)
+        void addWeaponClientRpc(ulong targetId)
         {
             if (IsLocalPlayer) { return; }
 
@@ -118,25 +98,22 @@ namespace LightPat.Core.WeaponSystem
             {
                 if (g.GetComponent<NetworkObject>().NetworkObjectId == targetId)
                 {
-                    g.GetComponent<Rigidbody>().isKinematic = true;
-                    g.transform.position = transform.Find("Vertical Rotate").Find("Equipped Weapon Spawn Point").position;
-                    g.transform.rotation = transform.Find("Vertical Rotate").rotation;
+                    GameObject reg = Instantiate(g.GetComponent<Weapon>().regularPrefab, GetComponent<PlayerController>().verticalRotate.Find("Equipped Weapon Spawn Point"), false);
+                    reg.name = g.GetComponent<Weapon>().regularPrefab.name;
 
                     // Append gameobject to end of loadout if loadout slot is empty
-                    // TODO OTHERWISE ADD IT TO THE PLAYER'S INVENTORY IF THEY HAVE SPACE
                     for (int i = 0; i < loadout.Length; i++)
                     {
                         if (loadout[i] == null)
                         {
-                            loadout[i] = g;
-                            HUDloadoutDisplaySlots[i].GetComponent<TextMeshProUGUI>().SetText(g.name);
+                            loadout[i] = reg;
+                            HUDloadoutDisplaySlots[i].GetComponent<TextMeshProUGUI>().SetText(reg.name);
                             loadout[i].GetComponent<Weapon>().setTextDisplay(HUDloadoutDisplaySlots[i]);
+                            reg.GetComponent<Weapon>().updateCamera();
+                            reg.SetActive(false);
                             break;
                         }
                     }
-
-                    g.SetActive(false);
-                    //DisplayLogger.Instance.LogInfo(g.GetComponent<NetworkObject>().OwnerClientId.ToString());
                 }
             }
         }
@@ -178,7 +155,6 @@ namespace LightPat.Core.WeaponSystem
             }
 
             loadout[index].SetActive(true);
-            loadout[index].GetComponent<Weapon>().updateCamera();
             QueryLoadoutServerRpc(index);
         }
 
@@ -203,7 +179,6 @@ namespace LightPat.Core.WeaponSystem
             }
 
             loadout[index].SetActive(true);
-            loadout[index].GetComponent<Weapon>().updateCamera();
             QueryLoadoutClientRpc(index);
         }
 
@@ -227,7 +202,6 @@ namespace LightPat.Core.WeaponSystem
             }
 
             loadout[index].SetActive(true);
-            loadout[index].GetComponent<Weapon>().updateCamera();
         }
 
         public GameObject getEquippedWeapon()

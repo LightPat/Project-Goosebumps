@@ -8,6 +8,10 @@ namespace LightPat.Core
 {
     public abstract class Weapon : NetworkBehaviour
     {
+        [Header("Spawning Variables")]
+        public GameObject networkedPrefab;
+        public GameObject regularPrefab;
+
         [Header("General Weapon Properties")]
         public float baseDamage;
         public float criticalMultiplier = 2f;
