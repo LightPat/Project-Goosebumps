@@ -42,8 +42,8 @@ namespace LightPat.Core.WeaponSystem
 
             if (!IsHost)
             {
-                g.transform.position = transform.Find("Vertical Rotate(Clone)").Find("Equipped Weapon Spawn Point(Clone)").position;
-                g.transform.rotation = transform.Find("Vertical Rotate(Clone)").rotation;
+                g.transform.position = transform.Find("Vertical Rotate").Find("Equipped Weapon Spawn Point").position;
+                g.transform.rotation = transform.Find("Vertical Rotate").rotation;
             }
 
             // Append gameobject to end of loadout if loadout slot is empty
@@ -71,7 +71,7 @@ namespace LightPat.Core.WeaponSystem
             {
                 if (g.GetComponent<NetworkObject>().NetworkObjectId == targetId)
                 {
-                    g.transform.SetParent(GetComponent<PlayerController>().verticalRotate.Find("Equipped Weapon Spawn Point(Clone)"), false);
+                    g.transform.SetParent(GetComponent<PlayerController>().verticalRotate.Find("Equipped Weapon Spawn Point"), false);
                     g.GetComponent<NetworkObject>().ChangeOwnership(clientId);
 
                     ResetTransform(g);
@@ -119,8 +119,8 @@ namespace LightPat.Core.WeaponSystem
                 if (g.GetComponent<NetworkObject>().NetworkObjectId == targetId)
                 {
                     g.GetComponent<Rigidbody>().isKinematic = true;
-                    g.transform.position = transform.Find("Vertical Rotate(Clone)").Find("Equipped Weapon Spawn Point(Clone)").position;
-                    g.transform.rotation = transform.Find("Vertical Rotate(Clone)").rotation;
+                    g.transform.position = transform.Find("Vertical Rotate").Find("Equipped Weapon Spawn Point").position;
+                    g.transform.rotation = transform.Find("Vertical Rotate").rotation;
 
                     // Append gameobject to end of loadout if loadout slot is empty
                     // TODO OTHERWISE ADD IT TO THE PLAYER'S INVENTORY IF THEY HAVE SPACE

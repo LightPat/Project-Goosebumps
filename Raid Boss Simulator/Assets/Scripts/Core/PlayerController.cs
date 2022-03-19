@@ -20,8 +20,6 @@ namespace LightPat.Core
          * more readable. */
 
         public GameObject EscapeMenu;
-        public GameObject WeaponSpawnPointPrefab;
-        public GameObject VerticalRotatePrefab;
 
         [Header("Input Settings")]
         public float sensitivity = 15f;
@@ -35,28 +33,12 @@ namespace LightPat.Core
 
         void Start()
         {
-            verticalRotate = null;
-            if (IsServer)
-            {
-                // Need to use SetParent so that the parent change gets propagated to all clients
-
-                GameObject verticalRotateGO = Instantiate(VerticalRotatePrefab);
-                verticalRotateGO.GetComponent<NetworkObject>().SpawnWithOwnership(GetComponent<NetworkObject>().OwnerClientId);
-                verticalRotateGO.transform.SetParent(transform, false);
-                verticalRotate = verticalRotateGO.transform;
-
-                GameObject equippedWeaponSpawnPoint = Instantiate(WeaponSpawnPointPrefab);
-                equippedWeaponSpawnPoint.GetComponent<NetworkObject>().SpawnWithOwnership(GetComponent<NetworkObject>().OwnerClientId);
-                equippedWeaponSpawnPoint.transform.SetParent(verticalRotate, false);
-            }
             if (IsClient)
             {
-                verticalRotate = transform.Find("Vertical Rotate(Clone)");
                 Cursor.lockState = CursorLockMode.Locked;
-
-                DisplayLogger.Instance.LogInfo(verticalRotate.ToString());
             }
 
+            verticalRotate = transform.Find("Vertical Rotate");
             weaponLoadout = GetComponent<WeaponLoadout>();
             firstPersonCamera = verticalRotate.Find("First Person Camera").gameObject;
             currentSpeed = walkingSpeed;
@@ -80,83 +62,69 @@ namespace LightPat.Core
 
         void Update()
         {
-            //// TODO Workaround for verticalrotate not spawning in time for assignment, don't want to call this every update
-            //if (verticalRotate == null)
-            //{
-            //    verticalRotate = transform.Find("Vertical Rotate(Clone)");
-            //    firstPersonCamera = verticalRotate.Find("First Person Camera").gameObject;
+            if (!IsOwner) { return; }
 
-            //    if (IsOwner)
-            //    {
-            //        verticalRotate.Find("First Person Camera").gameObject.SetActive(true);
-            //        GetComponent<PlayerInput>().enabled = true;
-            //    }
-            //}
+            lookInput *= (sensitivity * Time.deltaTime);
+            lookEulers.x += lookInput.x;
 
-            if (IsOwner)
+            // This prevents the rotation from increasing or decreasing infinitely if the player does a bunch of spins horizontally
+            if (lookEulers.x >= 360)
             {
-                lookInput *= (sensitivity * Time.deltaTime);
-                lookEulers.x += lookInput.x;
+                lookEulers.x = lookEulers.x - 360;
+            }
+            else if (lookEulers.x <= -360)
+            {
+                lookEulers.x = lookEulers.x + 360;
+            }
 
-                // This prevents the rotation from increasing or decreasing infinitely if the player does a bunch of spins horizontally
-                if (lookEulers.x >= 360)
-                {
-                    lookEulers.x = lookEulers.x - 360;
-                }
-                else if (lookEulers.x <= -360)
-                {
-                    lookEulers.x = lookEulers.x + 360;
-                }
+            /* First Person Camera Rotation Logic
+            Remember that the camera is a child of the player, so we don't need to worry about horizontal rotation, that has already been calculated
+            Calculate vertical rotation for the first person camera if you're not looking straight up or down already
+            If we reach the top or bottom of our vertical look bound, set the total rotation amount to 1 over or 1 under the bound
+            Otherwise, just change the rotation by the lookInput */
+            if (lookEulers.y < -verticalLookBound)
+            {
+                lookEulers.y = -verticalLookBound - 1;
 
-                /* First Person Camera Rotation Logic
-                Remember that the camera is a child of the player, so we don't need to worry about horizontal rotation, that has already been calculated
-                Calculate vertical rotation for the first person camera if you're not looking straight up or down already
-                If we reach the top or bottom of our vertical look bound, set the total rotation amount to 1 over or 1 under the bound
-                Otherwise, just change the rotation by the lookInput */
-                if (lookEulers.y < -verticalLookBound)
-                {
-                    lookEulers.y = -verticalLookBound - 1;
-
-                    if (lookInput.y > 0)
-                    {
-                        lookEulers.y += lookInput.y;
-                    }
-                }
-                else if (lookEulers.y > verticalLookBound)
-                {
-                    lookEulers.y = verticalLookBound + 1;
-
-                    if (lookInput.y < 0)
-                    {
-                        lookEulers.y += lookInput.y;
-                    }
-                }
-                else
+                if (lookInput.y > 0)
                 {
                     lookEulers.y += lookInput.y;
                 }
+            }
+            else if (lookEulers.y > verticalLookBound)
+            {
+                lookEulers.y = verticalLookBound + 1;
 
-                Quaternion newRotation = Quaternion.Euler(0, lookEulers.x, 0);
-                rb.MoveRotation(newRotation);
-
-                if (oldRotation != newRotation)
+                if (lookInput.y < 0)
                 {
-                    RotateServerRpc(lookEulers);
+                    lookEulers.y += lookInput.y;
                 }
+            }
+            else
+            {
+                lookEulers.y += lookInput.y;
+            }
 
-                verticalRotate.rotation = Quaternion.Euler(-lookEulers.y, lookEulers.x, 0);
+            Quaternion newRotation = Quaternion.Euler(0, lookEulers.x, 0);
+            rb.MoveRotation(newRotation);
 
-                // Full auto firing
-                GameObject w = weaponLoadout.getEquippedWeapon();
-                if (w != null)
+            if (oldRotation != newRotation)
+            {
+                RotateServerRpc(lookEulers);
+            }
+
+            verticalRotate.rotation = Quaternion.Euler(-lookEulers.y, lookEulers.x, 0);
+
+            // Full auto firing
+            GameObject w = weaponLoadout.getEquippedWeapon();
+            if (w != null)
+            {
+                if (attackHeld)
                 {
-                    if (attackHeld)
+                    if (w.GetComponent<Weapon>().fullAuto)
                     {
-                        if (w.GetComponent<Weapon>().fullAuto)
-                        {
-                            w.GetComponent<Weapon>().attack();
-                            AttackServerRpc();
-                        }
+                        w.GetComponent<Weapon>().attack();
+                        AttackServerRpc();
                     }
                 }
             }
