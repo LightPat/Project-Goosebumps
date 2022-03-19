@@ -455,55 +455,34 @@ namespace LightPat.Core.WeaponSystem
 
         void OnDrop()
         {
-            GameObject weapon = getEquippedWeapon();
+            if (getEquippedWeapon() == null) { return; }
 
-            if (weapon == null) { return; }
-
-            GetComponent<Rigidbody>().isKinematic = false;
-            int targetIndex = getEquippedWeaponIndex();
-            loadout[targetIndex] = null;
-            // Reset UI
-            HUDloadoutDisplaySlots[targetIndex].GetComponent<TextMeshProUGUI>().SetText("Slot " + (targetIndex+1).ToString());
-            HUDloadoutDisplaySlots[targetIndex].GetComponent<TextMeshProUGUI>().fontStyle = FontStyles.Normal;
-
-            dropWeaponServerRpc(weapon.GetComponent<NetworkObject>().NetworkObjectId);
+            dropWeaponServerRpc(getEquippedWeaponIndex());
         }
 
         [ServerRpc]
-        void dropWeaponServerRpc(ulong targetId)
+        void dropWeaponServerRpc(int weaponIndex)
         {
-            GameObject[] weapons = GameObject.FindGameObjectsWithTag("Weapon");
+            GameObject netWeapon = Instantiate(loadout[weaponIndex].GetComponent<Weapon>().networkedPrefab, loadout[weaponIndex].transform.position, loadout[weaponIndex].transform.rotation);
+            netWeapon.GetComponent<NetworkObject>().Spawn();
+            Destroy(loadout[weaponIndex]);
 
-            foreach (GameObject g in weapons)
-            {
-                if (g.GetComponent<NetworkObject>().NetworkObjectId == targetId)
-                {
-                    g.transform.SetParent(null);
+            Vector3 dropForce = netWeapon.transform.forward * 5;
+            dropForce.y += 5;
+            netWeapon.GetComponent<Rigidbody>().AddForce(dropForce, ForceMode.VelocityChange);
 
-                    // Don't execute the rest if we are the host
-                    if (IsClient) { return; }
+            // Apply random torque to the throw
+            Vector3 torqueForce = new Vector3(Random.Range(-10.0f, 10.0f), Random.Range(-10.0f, 10.0f), Random.Range(-0.1f, 0.1f));
+            DisplayLogger.Instance.LogInfo(torqueForce.ToString());
+            netWeapon.GetComponent<Rigidbody>().AddTorque(torqueForce, ForceMode.VelocityChange);
 
-                    g.GetComponent<Rigidbody>().isKinematic = false;
-                    loadout[getEquippedWeaponIndex()] = null;
-
-                    dropWeaponClientRpc(targetId);
-                }
-            }
+            dropWeaponClientRpc(weaponIndex);
         }
 
         [ClientRpc]
-        void dropWeaponClientRpc(ulong targetId)
+        void dropWeaponClientRpc(int weaponIndex)
         {
-            GameObject[] weapons = GameObject.FindGameObjectsWithTag("Weapon");
-
-            foreach (GameObject g in weapons)
-            {
-                if (g.GetComponent<NetworkObject>().NetworkObjectId == targetId)
-                {
-                    g.GetComponent<Rigidbody>().isKinematic = false;
-                    loadout[getEquippedWeaponIndex()] = null;
-                }
-            }
+            Destroy(loadout[weaponIndex]);
         }
 
         //------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

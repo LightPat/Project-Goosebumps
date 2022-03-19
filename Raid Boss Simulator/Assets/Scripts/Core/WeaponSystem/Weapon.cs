@@ -51,13 +51,5 @@ namespace LightPat.Core
                 inventoryTextSlot.GetComponent<TextMeshProUGUI>().fontStyle = FontStyles.Normal;
             }
         }
-
-        void OnTransformParentChanged()
-        {
-            if (transform.parent != null) { return; }
-
-            GetComponent<Rigidbody>().isKinematic = false;
-            gameObject.SetActive(true);
-        }
     }
 }
