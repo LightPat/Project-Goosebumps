@@ -9,7 +9,7 @@ namespace LightPat.UI
 {
     public class NetworkInterface : NetworkBehaviour
     {
-        public GameObject ServerCamera;
+        public GameObject ServerObjects;
 
         [SerializeField]
         private TextMeshProUGUI playersInGameText;
@@ -129,7 +129,7 @@ namespace LightPat.UI
                 DisplayLogger.Instance.LogInfo("Unable to start server...");
             }
 
-            ServerCamera.SetActive(true);
+            ServerObjects.SetActive(true);
         }
     }
 }
