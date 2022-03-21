@@ -16,6 +16,7 @@ namespace LightPat.Core.WeaponSystem
         private void Start()
         {
             swordSlashSound = GetComponent<AudioSource>();
+            swordSlashSound.volume = volume;
         }
 
         public override void attack()

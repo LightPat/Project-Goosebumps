@@ -18,6 +18,7 @@ namespace LightPat.Core.WeaponSystem
         {
             lineRenderer = GetComponent<LineRenderer>();
             gunshotSound = GetComponent<AudioSource>();
+            gunshotSound.volume = volume;
         }
 
         public override void attack()
@@ -53,6 +54,7 @@ namespace LightPat.Core.WeaponSystem
             float sps = rateOfFire / 60;
             // Seconds between shots
             float seconds = 1 / sps;
+
 
             gunshotSound.Play();
 

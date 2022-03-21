@@ -6051,7 +6051,9 @@ MonoBehaviour:
   baseDamage: 50
   criticalMultiplier: 2
   fullAuto: 1
+  allowAttack: 1
   rateOfFire: 500
+  volume: 0.1
 --- !u!1 &6901378238141330347
 GameObject:
   m_ObjectHideFlags: 0

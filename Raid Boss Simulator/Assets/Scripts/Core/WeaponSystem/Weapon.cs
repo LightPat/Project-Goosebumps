@@ -16,6 +16,7 @@ namespace LightPat.Core
         public float baseDamage;
         public float criticalMultiplier = 2f;
         public bool fullAuto = true;
+        public float volume;
 
         protected GameObject inventoryTextSlot;
         [HideInInspector]

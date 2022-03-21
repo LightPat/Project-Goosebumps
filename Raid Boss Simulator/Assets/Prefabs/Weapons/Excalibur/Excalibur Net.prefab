@@ -277,6 +277,8 @@ MonoBehaviour:
   baseDamage: 20
   criticalMultiplier: 2
   fullAuto: 0
+  volume: 0.1
+  allowAttack: 1
   swingRate: 100
   reach: 5
 --- !u!114 &3694578424528917843

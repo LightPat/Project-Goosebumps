@@ -1225,6 +1225,10 @@ PrefabInstance:
   m_Modification:
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 4111316805484961838, guid: b5a826f5878461142b00823c06dc4eaf, type: 3}
+      propertyPath: volume
+      value: 0.1
+      objectReference: {fileID: 0}
     - target: {fileID: 4111316805484961874, guid: b5a826f5878461142b00823c06dc4eaf, type: 3}
       propertyPath: m_Name
       value: Scar Net
