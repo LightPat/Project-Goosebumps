@@ -29,13 +29,21 @@ namespace LightPat.UI
 
             List<string> resolutionOptions = new List<string>();
 
-            foreach (Resolution res in resolutions)
+            int currentResIndex = 0;
+            for (int i = 0; i < resolutions.Length; i++)
             {
-                resolutionOptions.Add(res.ToString());
+                resolutionOptions.Add(resolutions[i].ToString());
+
+                if (resolutions[i].ToString() == Screen.currentResolution.ToString())
+                {
+                    currentResIndex = i;
+                }
             }
 
             SettingsMenuParent.transform.Find("Resolution Dropdown").GetComponent<TMP_Dropdown>().ClearOptions();
             SettingsMenuParent.transform.Find("Resolution Dropdown").GetComponent<TMP_Dropdown>().AddOptions(resolutionOptions);
+            SettingsMenuParent.transform.Find("Resolution Dropdown").GetComponent<TMP_Dropdown>().value = currentResIndex;
+            Debug.Log(currentResIndex + " " + resolutions[currentResIndex]);
 
             SettingsMenuParent.SetActive(true);
 
