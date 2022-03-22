@@ -463,6 +463,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ac8965d8ae6aa2444add8f54fc773aab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  playerName: Player
   EscapeMenu: {fileID: 8791646990712437994, guid: 2fa35ecf95ecbe947b3d4241267ac45e, type: 3}
   sensitivity: 15
   verticalRotate: {fileID: 0}
@@ -9174,7 +9175,7 @@ GameObject:
   - component: {fileID: 7608852786739903169}
   - component: {fileID: 7193884435674648603}
   m_Layer: 0
-  m_Name: Player Number
+  m_Name: Player Name
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -9189,14 +9190,14 @@ RectTransform:
   m_GameObject: {fileID: 8042470089332258622}
   m_LocalRotation: {x: 0, y: 1, z: 0, w: 0}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 0.3, y: 0.3, z: 0.3}
   m_Children: []
   m_Father: {fileID: 295347349711555129}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 180, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 2.75}
+  m_AnchoredPosition: {x: 0, y: 4.25}
   m_SizeDelta: {x: 5, y: 2}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!23 &7608852786739903169

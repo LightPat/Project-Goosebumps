@@ -18,15 +18,25 @@ namespace LightPat.UI
 
         void Start()
         {
+            NetworkManager.Singleton.ConnectionApprovalCallback += ApprovalCheck;
+
             NetworkManager.Singleton.OnClientConnectedCallback += (id) =>
             {
+                string playerName = System.Text.Encoding.ASCII.GetString(NetworkManager.Singleton.NetworkConfig.ConnectionData);
+
                 if (IsServer)
                 {
                     playersInGame.Value++;
-                //DisplayLogger.Instance.LogInfo(NetworkManager.Singleton.ConnectedClients[id].PlayerObject.gameObject.name);
+
+                    NetworkManager.Singleton.ConnectedClients[id].PlayerObject.gameObject.GetComponent<PlayerController>().playerName = playerName;
+
+                    //DisplayLogger.Instance.LogInfo(playerName);
+
+                    //DisplayLogger.Instance.LogInfo(NetworkManager.Singleton.ConnectedClients[id].PlayerObject.gameObject.GetComponent<PlayerController>().playerName);
+                    //DisplayLogger.Instance.LogInfo(NetworkManager.Singleton.ConnectedClients[id].PlayerObject.gameObject.name);
                 }
 
-                DisplayLogger.Instance.LogInfo($"{id} just connected...");
+                DisplayLogger.Instance.LogInfo($"{playerName} just connected...");
             };
 
             NetworkManager.Singleton.OnClientDisconnectCallback += (id) =>
@@ -38,6 +48,24 @@ namespace LightPat.UI
 
                 DisplayLogger.Instance.LogInfo($"{id} just disconnected...");
             };
+        }
+
+        private void ApprovalCheck(byte[] connectionData, ulong clientId, NetworkManager.ConnectionApprovedDelegate callback)
+        {
+            DisplayLogger.Instance.LogInfo(connectionData.Length.ToString());
+
+            //Your logic here
+            bool approve = true;
+            bool createPlayerObject = true;
+
+            // Position to spawn the player object at, set to null to use the default position
+            Vector3? positionToSpawnAt = Vector3.zero;
+
+            // Rotation to spawn the player object at, set to null to use the default rotation
+            Quaternion rotationToSpawnWith = Quaternion.identity;
+
+            //If approve is true, the connection gets added. If it's false. The client gets disconnected
+            callback(createPlayerObject, null, approve, positionToSpawnAt, rotationToSpawnWith);
         }
 
         void Update()
@@ -78,10 +106,16 @@ namespace LightPat.UI
         public void startClient()
         {
             string IPAddress = transform.Find("IP Address").GetComponent<TMP_InputField>().text;
+            string playerName = transform.Find("Player Name").GetComponent<TMP_InputField>().text;
 
             if (IPAddress != "")
             {
                 NetworkManager.gameObject.GetComponent<Unity.Netcode.Transports.UNET.UNetTransport>().ConnectAddress = transform.Find("IP Address").GetComponent<TMP_InputField>().text;
+            }
+
+            if (playerName != "")
+            {
+                NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(playerName);
             }
 
             if (NetworkManager.Singleton.StartClient())
