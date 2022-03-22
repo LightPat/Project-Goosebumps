@@ -13,8 +13,9 @@ namespace LightPat.UI
 
         [SerializeField]
         private TextMeshProUGUI playersInGameText;
+        private NetworkVariable<int> playersInGame = new NetworkVariable<int>();
+        private string playerName;
 
-        NetworkVariable<int> playersInGame = new NetworkVariable<int>();
 
         void Start()
         {
@@ -22,21 +23,12 @@ namespace LightPat.UI
 
             NetworkManager.Singleton.OnClientConnectedCallback += (id) =>
             {
-                string playerName = System.Text.Encoding.ASCII.GetString(NetworkManager.Singleton.NetworkConfig.ConnectionData);
-
                 if (IsServer)
                 {
                     playersInGame.Value++;
-
-                    NetworkManager.Singleton.ConnectedClients[id].PlayerObject.gameObject.GetComponent<PlayerController>().playerName = playerName;
-
-                    //DisplayLogger.Instance.LogInfo(playerName);
-
-                    //DisplayLogger.Instance.LogInfo(NetworkManager.Singleton.ConnectedClients[id].PlayerObject.gameObject.GetComponent<PlayerController>().playerName);
-                    //DisplayLogger.Instance.LogInfo(NetworkManager.Singleton.ConnectedClients[id].PlayerObject.gameObject.name);
                 }
 
-                DisplayLogger.Instance.LogInfo($"{playerName} just connected...");
+                NetworkManager.Singleton.ConnectedClients[id].PlayerObject.gameObject.GetComponent<PlayerController>().updateName(playerName);
             };
 
             NetworkManager.Singleton.OnClientDisconnectCallback += (id) =>
@@ -52,9 +44,9 @@ namespace LightPat.UI
 
         private void ApprovalCheck(byte[] connectionData, ulong clientId, NetworkManager.ConnectionApprovedDelegate callback)
         {
-            DisplayLogger.Instance.LogInfo(connectionData.Length.ToString());
+            playerName = System.Text.Encoding.ASCII.GetString(connectionData);
+            DisplayLogger.Instance.LogInfo($"{playerName} just connected...");
 
-            //Your logic here
             bool approve = true;
             bool createPlayerObject = true;
 
@@ -117,6 +109,8 @@ namespace LightPat.UI
             {
                 NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(playerName);
             }
+
+            DisplayLogger.Instance.LogInfo(NetworkManager.Singleton.NetworkConfig.ConnectionData.Length.ToString());
 
             if (NetworkManager.Singleton.StartClient())
             {
