@@ -61,6 +61,15 @@ namespace LightPat.Core
         {
             name = newName;
             transform.Find("Player Name").gameObject.GetComponent<TextMeshPro>().SetText(newName);
+
+            updateNameClientRpc(newName);
+        }
+
+        [ClientRpc]
+        public void updateNameClientRpc(string newName)
+        {
+            name = newName;
+            transform.Find("Player Name").gameObject.GetComponent<TextMeshPro>().SetText(newName);
         }
 
         void Update()

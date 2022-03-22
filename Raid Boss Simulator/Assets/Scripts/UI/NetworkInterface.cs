@@ -14,8 +14,7 @@ namespace LightPat.UI
         [SerializeField]
         private TextMeshProUGUI playersInGameText;
         private NetworkVariable<int> playersInGame = new NetworkVariable<int>();
-        private string playerName;
-
+        private Dictionary<ulong, string> clientNames = new Dictionary<ulong, string>();
 
         void Start()
         {
@@ -26,9 +25,12 @@ namespace LightPat.UI
                 if (IsServer)
                 {
                     playersInGame.Value++;
-                }
 
-                NetworkManager.Singleton.ConnectedClients[id].PlayerObject.gameObject.GetComponent<PlayerController>().updateName(playerName);
+                    for (ulong i = 1; i <= id; i++)
+                    {
+                        NetworkManager.Singleton.ConnectedClients[i].PlayerObject.gameObject.GetComponent<PlayerController>().updateName(clientNames[i]);
+                    }
+                }
             };
 
             NetworkManager.Singleton.OnClientDisconnectCallback += (id) =>
@@ -44,7 +46,8 @@ namespace LightPat.UI
 
         private void ApprovalCheck(byte[] connectionData, ulong clientId, NetworkManager.ConnectionApprovedDelegate callback)
         {
-            playerName = System.Text.Encoding.ASCII.GetString(connectionData);
+            string playerName = System.Text.Encoding.ASCII.GetString(connectionData);
+            clientNames.Add(clientId, playerName);
             DisplayLogger.Instance.LogInfo($"{playerName} just connected...");
 
             bool approve = true;
