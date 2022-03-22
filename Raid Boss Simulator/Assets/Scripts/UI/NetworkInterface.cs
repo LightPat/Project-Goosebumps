@@ -30,7 +30,11 @@ namespace LightPat.UI
                     {
                         NetworkManager.Singleton.ConnectedClients[i].PlayerObject.gameObject.GetComponent<PlayerController>().updateName(clientNames[i]);
                     }
+
+                    DisplayLogger.Instance.LogInfo(clientNames[id] + " just connected...");
                 }
+
+                
             };
 
             NetworkManager.Singleton.OnClientDisconnectCallback += (id) =>
@@ -38,9 +42,11 @@ namespace LightPat.UI
                 if (IsServer)
                 {
                     playersInGame.Value--;
-                }
 
-                DisplayLogger.Instance.LogInfo($"{id} just disconnected...");
+                    DisplayLogger.Instance.LogInfo(clientNames[id] + " just disconnected...");
+
+                    clientNames.Remove(id);
+                }
             };
         }
 
@@ -48,7 +54,6 @@ namespace LightPat.UI
         {
             string playerName = System.Text.Encoding.ASCII.GetString(connectionData);
             clientNames.Add(clientId, playerName);
-            DisplayLogger.Instance.LogInfo($"{playerName} just connected...");
 
             bool approve = true;
             bool createPlayerObject = true;
@@ -108,12 +113,14 @@ namespace LightPat.UI
                 NetworkManager.gameObject.GetComponent<Unity.Netcode.Transports.UNET.UNetTransport>().ConnectAddress = transform.Find("IP Address").GetComponent<TMP_InputField>().text;
             }
 
-            if (playerName != "")
+            if (playerName == "")
+            {
+                NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes("Player");
+            }
+            else
             {
                 NetworkManager.Singleton.NetworkConfig.ConnectionData = System.Text.Encoding.ASCII.GetBytes(playerName);
             }
-
-            DisplayLogger.Instance.LogInfo(NetworkManager.Singleton.NetworkConfig.ConnectionData.Length.ToString());
 
             if (NetworkManager.Singleton.StartClient())
             {
