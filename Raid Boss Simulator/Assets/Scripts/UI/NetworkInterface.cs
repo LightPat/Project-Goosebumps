@@ -162,5 +162,11 @@ namespace LightPat.UI
 
             ServerObjects.SetActive(true);
         }
+
+        public void QuitGame()
+        {
+            Debug.Log("Quitting Game");
+            Application.Quit();
+        }
     }
 }
