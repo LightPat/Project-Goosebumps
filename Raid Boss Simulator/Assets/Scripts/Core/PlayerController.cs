@@ -19,6 +19,7 @@ namespace LightPat.Core
          * This prevents clutter at the top of the script and makes it
          * more readable. */
 
+        public string playerName;
         public GameObject EscapeMenu;
 
         [Header("Input Settings")]
@@ -43,8 +44,9 @@ namespace LightPat.Core
             firstPersonCamera = verticalRotate.Find("First Person Camera").gameObject;
             currentSpeed = walkingSpeed;
 
-            // Assign player number
-            transform.Find("Player Number").gameObject.GetComponent<TextMeshPro>().SetText("Player " + GetComponent<NetworkObject>().OwnerClientId.ToString());
+            // Assign player name
+            name = playerName;
+            transform.Find("Player Name").gameObject.GetComponent<TextMeshPro>().SetText(playerName);
 
             // Sets the camera and input to active on the player object that this network instance owns
             if (IsOwner)
