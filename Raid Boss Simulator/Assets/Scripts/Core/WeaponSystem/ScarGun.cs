@@ -10,6 +10,8 @@ namespace LightPat.Core.WeaponSystem
     {
         [Header("Gun Configuration")]
         public float rateOfFire;
+        public int magazineSize;
+        public int bulletsRemaining = 1;
 
         private LineRenderer lineRenderer;
         private AudioSource gunshotSound;
@@ -19,12 +21,22 @@ namespace LightPat.Core.WeaponSystem
             lineRenderer = GetComponent<LineRenderer>();
             gunshotSound = GetComponent<AudioSource>();
             gunshotSound.volume = volume;
+            bulletsRemaining = magazineSize;
+        }
+
+        private void Update()
+        {
+            if (bulletsRemaining == 0)
+            {
+                reload();
+            }
         }
 
         public override void attack()
         {
             if (!allowAttack) { return; }
 
+            bulletsRemaining--;
             allowAttack = false;
             // Raycast hit detection from crosshair to enemy
             RaycastHit hit;
@@ -70,6 +82,10 @@ namespace LightPat.Core.WeaponSystem
 
         public override void reload()
         {
+            if (reloading) { return; }
+
+            reloading = true;
+
             // Check if mag is full here
 
             StopAllCoroutines();
@@ -93,6 +109,8 @@ namespace LightPat.Core.WeaponSystem
             yield return new WaitForSeconds(1);
             newMag.SetActive(true);
             allowAttack = true;
+            reloading = false;
+            bulletsRemaining = magazineSize;
 
             // Destroy the old magazine that's on the ground now
             yield return new WaitForSeconds(3);

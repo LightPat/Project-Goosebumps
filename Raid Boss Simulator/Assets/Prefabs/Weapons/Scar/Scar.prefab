@@ -6070,6 +6070,7 @@ MonoBehaviour:
   volume: 0.1
   allowAttack: 1
   rateOfFire: 500
+  magazineSize: 30
 --- !u!95 &4218768641062493319
 Animator:
   serializedVersion: 3

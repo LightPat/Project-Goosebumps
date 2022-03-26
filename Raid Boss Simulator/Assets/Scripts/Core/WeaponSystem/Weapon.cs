@@ -22,6 +22,7 @@ namespace LightPat.Core
         [HideInInspector]
         public bool allowAttack = true;
         protected GameObject firstPersonCamera;
+        protected bool reloading = false;
 
         public abstract void attack();
         public abstract void reload();
