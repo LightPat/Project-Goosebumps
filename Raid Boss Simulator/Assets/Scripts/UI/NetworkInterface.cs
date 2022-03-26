@@ -96,6 +96,11 @@ namespace LightPat.UI
                         Destroy(child.gameObject);
                     }
                 }
+
+                if (Server.Instance.GetComponent<ObjectsToSpawn>())
+                {
+                    Server.Instance.GetComponent<ObjectsToSpawn>().SpawnObjects();
+                }
             }
             else
             {
