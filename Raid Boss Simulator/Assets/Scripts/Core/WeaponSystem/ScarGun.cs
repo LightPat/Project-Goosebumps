@@ -11,7 +11,8 @@ namespace LightPat.Core.WeaponSystem
         [Header("Gun Configuration")]
         public float rateOfFire;
         public int magazineSize;
-        public int bulletsRemaining = 1;
+        [HideInInspector]
+        public int bulletsRemaining;
 
         private LineRenderer lineRenderer;
         private AudioSource gunshotSound;
@@ -34,7 +35,7 @@ namespace LightPat.Core.WeaponSystem
 
         public override void attack()
         {
-            if (!allowAttack) { return; }
+            if (!allowAttack | reloading) { return; }
 
             bulletsRemaining--;
             allowAttack = false;
@@ -82,15 +83,12 @@ namespace LightPat.Core.WeaponSystem
 
         public override void reload()
         {
-            if (reloading) { return; }
+            if (reloading | bulletsRemaining == magazineSize) { return; }
 
             reloading = true;
 
             // Check if mag is full here
 
-            StopAllCoroutines();
-
-            allowAttack = false;
             Transform magazine = transform.Find("Magazine");
 
             GameObject newMag = Instantiate(magazine.gameObject, transform);
@@ -108,7 +106,6 @@ namespace LightPat.Core.WeaponSystem
         {
             yield return new WaitForSeconds(1);
             newMag.SetActive(true);
-            allowAttack = true;
             reloading = false;
             bulletsRemaining = magazineSize;
 
