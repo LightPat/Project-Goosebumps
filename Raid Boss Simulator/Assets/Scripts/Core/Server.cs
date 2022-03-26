@@ -47,6 +47,7 @@ namespace LightPat.Core
                     GameObject player = client.Value.PlayerObject.gameObject;
 
                     player.transform.position = newClientPosition;
+                    break;
                 }
             }
         }
@@ -63,6 +64,7 @@ namespace LightPat.Core
                 if (player.GetComponent<NetworkObject>().OwnerClientId == clientId & !player.GetComponent<NetworkObject>().IsLocalPlayer)
                 {
                     player.transform.position = newClientPosition;
+                    break;
                 }
             }
         }
@@ -81,6 +83,7 @@ namespace LightPat.Core
 
                     player.GetComponent<Rigidbody>().MoveRotation(Quaternion.Euler(0, newClientRotationEulers.x, 0));
                     player.GetComponent<PlayerController>().verticalRotate.rotation = Quaternion.Euler(-newClientRotationEulers.y, newClientRotationEulers.x, 0);
+                    break;
                 }
             }
         }
@@ -97,6 +100,7 @@ namespace LightPat.Core
                 {
                     player.GetComponent<Rigidbody>().MoveRotation(Quaternion.Euler(0, newClientRotationEulers.x, 0));
                     player.GetComponent<PlayerController>().verticalRotate.rotation = Quaternion.Euler(-newClientRotationEulers.y, newClientRotationEulers.x, 0);
+                    break;
                 }
             }
         }
@@ -114,6 +118,7 @@ namespace LightPat.Core
                     GameObject player = client.Value.PlayerObject.gameObject;
 
                     player.GetComponent<Rigidbody>().AddForce(new Vector3(0, jumpForce, 0), ForceMode.VelocityChange);
+                    break;
                 }
             }
         }
@@ -128,6 +133,7 @@ namespace LightPat.Core
                 if (player.GetComponent<NetworkObject>().OwnerClientId == clientId & !player.GetComponent<NetworkObject>().IsLocalPlayer)
                 {
                     player.GetComponent<Rigidbody>().AddForce(new Vector3(0, jumpForce, 0), ForceMode.VelocityChange);
+                    break;
                 }
             }
         }
@@ -145,6 +151,7 @@ namespace LightPat.Core
                     GameObject player = client.Value.PlayerObject.gameObject;
 
                     player.GetComponent<WeaponLoadout>().getEquippedWeapon().GetComponent<Weapon>().attack();
+                    break;
                 }
             }
         }
@@ -159,6 +166,7 @@ namespace LightPat.Core
                 if (player.GetComponent<NetworkObject>().OwnerClientId == clientId & !player.GetComponent<NetworkObject>().IsLocalPlayer)
                 {
                     player.GetComponent<WeaponLoadout>().getEquippedWeapon().GetComponent<Weapon>().attack();
+                    break;
                 }
             }
         }

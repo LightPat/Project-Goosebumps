@@ -13,6 +13,7 @@ namespace LightPat.Core.WeaponSystem
 
         private LineRenderer lineRenderer;
         private AudioSource gunshotSound;
+        private int shotsFired = 0;
 
         private void Start()
         {
@@ -43,6 +44,10 @@ namespace LightPat.Core.WeaponSystem
                 tracerColor = Color.green;
             }
 
+            DisplayLogger.Instance.LogInfo(shotsFired.ToString());
+
+            shotsFired++;
+
             // Fire rate handling
             StartCoroutine(FireRateCoroutine(tracerPosition, tracerColor));
         }
@@ -54,7 +59,6 @@ namespace LightPat.Core.WeaponSystem
             float sps = rateOfFire / 60;
             // Seconds between shots
             float seconds = 1 / sps;
-
 
             gunshotSound.Play();
 

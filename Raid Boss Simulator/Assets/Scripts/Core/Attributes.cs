@@ -10,6 +10,7 @@ namespace LightPat.Core
     {
         public TextMeshProUGUI displayHP;
         public int maxHealth = 100;
+        public int localHealth;
 
         private NetworkVariable<int> HP = new NetworkVariable<int>();
 
@@ -21,6 +22,8 @@ namespace LightPat.Core
             {
                 HP.Value = maxHealth;
             }
+
+            localHealth = HP.Value;
         }
 
         void HPChanged(int oldHP, int newHP)
@@ -36,6 +39,9 @@ namespace LightPat.Core
 
         public void changeHP(int changeValue)
         {
+            localHealth += changeValue;
+            DisplayLogger.Instance.LogInfo(localHealth.ToString());
+
             if (IsServer)
             {
                 // Only change HP on server side, then netcode for gameObjects propogates the change throughout the network

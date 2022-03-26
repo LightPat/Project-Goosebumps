@@ -43,7 +43,6 @@ namespace LightPat.UI
             SettingsMenuParent.transform.Find("Resolution Dropdown").GetComponent<TMP_Dropdown>().ClearOptions();
             SettingsMenuParent.transform.Find("Resolution Dropdown").GetComponent<TMP_Dropdown>().AddOptions(resolutionOptions);
             SettingsMenuParent.transform.Find("Resolution Dropdown").GetComponent<TMP_Dropdown>().value = currentResIndex;
-            Debug.Log(currentResIndex + " " + resolutions[currentResIndex]);
 
             SettingsMenuParent.SetActive(true);
 
