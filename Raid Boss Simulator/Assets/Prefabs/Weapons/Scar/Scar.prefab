@@ -6053,7 +6053,7 @@ MonoBehaviour:
   fullAuto: 1
   volume: 0.1
   allowAttack: 1
-  rateOfFire: 50
+  rateOfFire: 500
 --- !u!1 &6901378238141330347
 GameObject:
   m_ObjectHideFlags: 0
