@@ -13,7 +13,7 @@ namespace LightPat.Core
         [SerializeField]
         private TextMeshProUGUI debugAreaText = null;
 
-        private int maxLines = 1;
+        private int maxLines = 15;
 
         public static DisplayLogger Instance
         {
