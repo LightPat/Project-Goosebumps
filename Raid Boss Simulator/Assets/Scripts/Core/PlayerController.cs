@@ -168,6 +168,17 @@ namespace LightPat.Core
         private float currentSpeed;
         void OnMove(InputValue value)
         {
+            if (value.Get<Vector2>() != Vector2.zero)
+            {
+                GetComponent<Animator>().SetBool("Walk", true);
+                Debug.Log("true");
+            }
+            else
+            {
+                Debug.Log("false");
+                GetComponent<Animator>().SetBool("Walk", false);
+            }
+
             moveInput = value.Get<Vector2>();
         }
 
