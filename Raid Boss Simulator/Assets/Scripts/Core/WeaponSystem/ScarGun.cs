@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Unity.Netcode;
+using TMPro;
 
 namespace LightPat.Core.WeaponSystem
 {
@@ -38,6 +38,7 @@ namespace LightPat.Core.WeaponSystem
             if (!allowAttack | reloading) { return; }
 
             bulletsRemaining--;
+            displayAmmoCount(bulletsRemaining.ToString() + " / " + magazineSize.ToString());
             allowAttack = false;
             // Raycast hit detection from crosshair to enemy
             RaycastHit hit;
@@ -108,10 +109,16 @@ namespace LightPat.Core.WeaponSystem
             newMag.SetActive(true);
             reloading = false;
             bulletsRemaining = magazineSize;
+            displayAmmoCount(bulletsRemaining.ToString() + " / " + magazineSize.ToString());
 
             // Destroy the old magazine that's on the ground now
             yield return new WaitForSeconds(3);
             Destroy(oldMag);
+        }
+
+        void displayAmmoCount(string ammo)
+        {
+            inventoryTextSlot.GetComponent<TextMeshProUGUI>().SetText(name + " " + ammo);
         }
     }
 }

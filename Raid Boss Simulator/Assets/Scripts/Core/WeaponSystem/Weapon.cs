@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
-using Unity.Netcode;
 
 namespace LightPat.Core
 {
@@ -19,8 +18,7 @@ namespace LightPat.Core
         public float volume;
 
         protected GameObject inventoryTextSlot;
-        [HideInInspector]
-        public bool allowAttack = true;
+        protected bool allowAttack = true;
         protected GameObject firstPersonCamera;
         protected bool reloading = false;
 
