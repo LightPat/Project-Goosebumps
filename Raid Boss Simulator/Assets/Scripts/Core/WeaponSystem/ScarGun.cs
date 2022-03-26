@@ -25,6 +25,7 @@ namespace LightPat.Core.WeaponSystem
         {
             if (!allowAttack) { return; }
 
+            allowAttack = false;
             // Raycast hit detection from crosshair to enemy
             RaycastHit hit;
             bool bHit = Physics.Raycast(firstPersonCamera.transform.position, firstPersonCamera.transform.forward, out hit);
@@ -49,7 +50,6 @@ namespace LightPat.Core.WeaponSystem
 
         IEnumerator FireRateCoroutine(Vector3 tracerPosition, Color tracerColor)
         {
-            allowAttack = false;
             // Rounds per second
             float sps = rateOfFire / 60;
             // Seconds between shots
@@ -66,6 +66,37 @@ namespace LightPat.Core.WeaponSystem
             yield return new WaitForSeconds(seconds);
             allowAttack = true;
             lineRenderer.enabled = false;
+        }
+
+        public override void reload()
+        {
+            // Check if mag is full here
+
+            StopAllCoroutines();
+
+            allowAttack = false;
+            Transform magazine = transform.Find("Magazine");
+
+            GameObject newMag = Instantiate(magazine.gameObject, transform);
+            newMag.name = magazine.name;
+            newMag.SetActive(false);
+
+            magazine.parent = null;
+            magazine.GetComponent<Rigidbody>().isKinematic = false;
+            GetComponent<Animator>().Play("Reload");
+
+            StartCoroutine(ReloadCoroutine(magazine.gameObject, newMag));
+        }
+
+        IEnumerator ReloadCoroutine(GameObject oldMag, GameObject newMag)
+        {
+            yield return new WaitForSeconds(1);
+            newMag.SetActive(true);
+            allowAttack = true;
+
+            // Destroy the old magazine that's on the ground now
+            yield return new WaitForSeconds(3);
+            Destroy(oldMag);
         }
     }
 }

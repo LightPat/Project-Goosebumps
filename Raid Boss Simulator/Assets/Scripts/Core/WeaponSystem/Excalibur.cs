@@ -51,5 +51,10 @@ namespace LightPat.Core.WeaponSystem
             yield return new WaitForSeconds(seconds);
             allowAttack = true;
         }
+
+        public override void reload()
+        {
+            Debug.Log("Reloading");
+        }
     }
 }

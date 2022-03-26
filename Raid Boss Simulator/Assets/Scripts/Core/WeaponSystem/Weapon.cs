@@ -24,6 +24,7 @@ namespace LightPat.Core
         protected GameObject firstPersonCamera;
 
         public abstract void attack();
+        public abstract void reload();
 
         public void updateCamera()
         {
