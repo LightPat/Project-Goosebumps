@@ -1777,9 +1777,9 @@ MonoBehaviour:
   baseDamage: 50
   criticalMultiplier: 2
   fullAuto: 1
+  volume: 0.1
   allowAttack: 1
   rateOfFire: 500
-  volume: 0.1
 --- !u!114 &-3099241561403217421
 MonoBehaviour:
   m_ObjectHideFlags: 0
