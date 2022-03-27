@@ -350,7 +350,7 @@ namespace LightPat.Core
             {
                 if (hit.collider.tag == "Weapon")
                 {
-                    weaponLoadout.addItem(hit.collider.gameObject);
+                    weaponLoadout.addWeapon(hit.collider.gameObject);
                 }
                 else if (hit.collider.tag == "Interactable")
                 {

@@ -30,9 +30,21 @@ namespace LightPat.Core.WeaponSystem
             }
         }
 
-        public void addItem(GameObject g)
+        public void addWeapon(GameObject g)
         {
             if (g.transform.parent != null) { return; }
+
+            bool openSlot = false;
+            foreach(GameObject w in loadout)
+            {
+                if (w == null)
+                {
+                    openSlot = true;
+                    break;
+                }
+            }
+
+            if (!openSlot) { DisplayLogger.Instance.LogInfo("Loadout Full!"); return; }
 
             GameObject reg = Instantiate(g.GetComponent<Weapon>().regularPrefab, GetComponent<PlayerController>().verticalRotate.Find("Equipped Weapon Spawn Point"), false);
             reg.name = g.GetComponent<Weapon>().regularPrefab.name;
