@@ -4,6 +4,7 @@ using UnityEngine;
 using Unity.Netcode;
 using TMPro;
 using LightPat.Core;
+using LightPat.Server;
 
 namespace LightPat.UI
 {
@@ -97,10 +98,7 @@ namespace LightPat.UI
                     }
                 }
 
-                if (ServerCamera.GetComponent<ObjectsToSpawn>())
-                {
-                    ServerCamera.GetComponent<ObjectsToSpawn>().SpawnObjects();
-                }
+                ServerCamera.GetComponent<ServerController>().SpawnObjects();
             }
             else
             {
@@ -168,11 +166,7 @@ namespace LightPat.UI
                 }
 
                 ServerCamera.SetActive(true);
-
-                if (ServerCamera.GetComponent<ObjectsToSpawn>())
-                {
-                    ServerCamera.GetComponent<ObjectsToSpawn>().SpawnObjects();
-                }
+                ServerCamera.GetComponent<ServerController>().SpawnObjects();
             }
             else
             {
