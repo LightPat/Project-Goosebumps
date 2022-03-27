@@ -270,10 +270,16 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   objectsToSpawn:
   - {fileID: 4111316805484961874, guid: b5a826f5878461142b00823c06dc4eaf, type: 3}
+  - {fileID: 4111316805484961874, guid: b5a826f5878461142b00823c06dc4eaf, type: 3}
+  - {fileID: 4111316805484961874, guid: b5a826f5878461142b00823c06dc4eaf, type: 3}
+  - {fileID: 4111316805484961874, guid: b5a826f5878461142b00823c06dc4eaf, type: 3}
   - {fileID: 3694578424528917851, guid: 68be300dd8325d14a9ae894dd9f5903d, type: 3}
   spawnPositions:
   - {x: 4, y: 1, z: 0}
   - {x: -4, y: 1, z: 0}
+  - {x: -16, y: 1, z: 0}
+  - {x: 16, y: 1, z: 0}
+  - {x: 20, y: 1, z: 20}
 --- !u!114 &3662049
 MonoBehaviour:
   m_ObjectHideFlags: 0

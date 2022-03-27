@@ -248,25 +248,59 @@ namespace LightPat.Core
         [Header("Jump Settings")]
         public float jumpHeight = 3f;
         public float fallingGravityScale = 0.5f;
-        void OnJump()
+        void OnJump(InputValue value)
         {
             // TODO this isn't really an elegant solution, if you stand on the edge of something it doesn't realize that you are still grouded
             // If you check for velocity = 0 then you can double jump since the apex of your jump's velocity is 0
             // Check if the player is touching a gameObject under them
             // May need to change 1.5f to be a different number if you switch the asset of the player model
 
-            if (isGrounded())
+            if (value.isPressed)
             {
-                float jumpForce = Mathf.Sqrt(jumpHeight * -2 * Physics.gravity.y);
-                rb.AddForce(new Vector3(0, jumpForce, 0), ForceMode.VelocityChange);
-                JumpServerRpc(jumpForce);
+                if (isGrounded())
+                {
+                    float jumpForce = Mathf.Sqrt(jumpHeight * -2 * Physics.gravity.y);
+
+                    if (animator.GetCurrentAnimatorStateInfo(0).IsName("Idle"))
+                    {
+                        StartCoroutine(IdleJump(jumpForce));
+                    }
+                    else
+                    {
+                        rb.AddForce(new Vector3(0, jumpForce, 0), ForceMode.VelocityChange);
+                    }
+
+                    animator.SetBool("Jump", true);
+                    JumpServerRpc(jumpForce);
+                }
             }
+            else
+            {
+                animator.SetBool("Jump", false);
+            }
+        }
+
+        IEnumerator IdleJump(float jumpForce)
+        {
+            yield return new WaitForSeconds(0.5f);
+            rb.AddForce(new Vector3(0, jumpForce, 0), ForceMode.VelocityChange);
         }
 
         [ServerRpc]
         void JumpServerRpc(float jumpForce)
         {
-            rb.AddForce(new Vector3(0, jumpForce, 0), ForceMode.VelocityChange);
+            if (!IsHost)
+            {
+                if (animator.GetCurrentAnimatorStateInfo(0).IsName("Idle"))
+                {
+                    StartCoroutine(IdleJump(jumpForce));
+                }
+                else
+                {
+                    rb.AddForce(new Vector3(0, jumpForce, 0), ForceMode.VelocityChange);
+                }
+            }
+
             JumpClientRpc(jumpForce);
         }
 
@@ -275,7 +309,14 @@ namespace LightPat.Core
         {
             if (IsLocalPlayer) { return; }
 
-            rb.AddForce(new Vector3(0, jumpForce, 0), ForceMode.VelocityChange);
+            if (animator.GetCurrentAnimatorStateInfo(0).IsName("Idle"))
+            {
+                StartCoroutine(IdleJump(jumpForce));
+            }
+            else
+            {
+                rb.AddForce(new Vector3(0, jumpForce, 0), ForceMode.VelocityChange);
+            }
         }
 
         [Header("Crouch Settings")]
