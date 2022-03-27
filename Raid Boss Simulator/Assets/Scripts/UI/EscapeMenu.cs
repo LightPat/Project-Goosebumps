@@ -3,17 +3,16 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using LightPat.Core;
+using System;
 
 namespace LightPat.UI
 {
     public class EscapeMenu : MonoBehaviour
     {
-        private Resolution[] resolutions;
+        public TMP_Dropdown resolutionDropdown, fullscreenModeDropdown;
 
-        private void Start()
-        {
-            resolutions = Screen.resolutions;
-        }
+        private FullScreenMode[] fsModes = new FullScreenMode[3];
+        private List<Resolution> supportedResolutions = new List<Resolution>();
 
         public void QuitGame()
         {
@@ -28,31 +27,48 @@ namespace LightPat.UI
             List<string> resolutionOptions = new List<string>();
 
             int currentResIndex = 0;
-            for (int i = 0; i < resolutions.Length; i++)
+            for (int i = 0; i < Screen.resolutions.Length; i++)
             {
-                resolutionOptions.Add(resolutions[i].ToString());
-
-                if (resolutions[i].ToString() == Screen.currentResolution.ToString())
+                // If the resolution is 16:9
+                if ((Screen.resolutions[i].width * 9 / Screen.resolutions[i].height) == 16 & Screen.currentResolution.refreshRate == Screen.resolutions[i].refreshRate)
                 {
-                    currentResIndex = i;
+                    resolutionOptions.Add(Screen.resolutions[i].ToString());
+                    supportedResolutions.Add(Screen.resolutions[i]);
+                }
+
+                if (Screen.resolutions[i].Equals(Screen.currentResolution))
+                {
+                    currentResIndex = resolutionOptions.Count-1;
                 }
             }
 
-            SettingsMenuParent.transform.Find("Resolution Dropdown").GetComponent<TMP_Dropdown>().ClearOptions();
-            SettingsMenuParent.transform.Find("Resolution Dropdown").GetComponent<TMP_Dropdown>().AddOptions(resolutionOptions);
-            SettingsMenuParent.transform.Find("Resolution Dropdown").GetComponent<TMP_Dropdown>().value = currentResIndex;
+            resolutionDropdown.ClearOptions();
+            resolutionDropdown.AddOptions(resolutionOptions);
+            resolutionDropdown.value = currentResIndex;
+
+            // Full screen mode dropdown
+            // Dropdown Options are assigned in inspector since these don't vary
+            fsModes[0] = FullScreenMode.ExclusiveFullScreen;
+            fsModes[1] = FullScreenMode.FullScreenWindow;
+            fsModes[2] = FullScreenMode.Windowed;
+            int fsModeIndex = Array.IndexOf(fsModes, Screen.fullScreenMode);
+            fullscreenModeDropdown.value = fsModeIndex;
 
             SettingsMenuParent.SetActive(true);
             transform.Find("Settings Button").gameObject.SetActive(false);
+            transform.Find("Quit Button").localPosition = new Vector3(0, -400, 0);
         }
 
-        public void OnResolutionDropdownChanged(TMP_Dropdown dropdown)
+        public void ApplyChanges()
         {
-            Resolution res = resolutions[dropdown.value];
+            // Fullscreen Dropdown
+            FullScreenMode fsMode = fsModes[fullscreenModeDropdown.value];
 
-            Debug.Log(res.ToString());
+            // Resolution Dropdown
+            // Options are assigned automatically in OpenSettingsMenu()
+            Resolution res = supportedResolutions[resolutionDropdown.value];
 
-            Screen.SetResolution(res.width, res.height, FullScreenMode.FullScreenWindow, res.refreshRate);
+            Screen.SetResolution(res.width, res.height, fsMode, res.refreshRate);
         }
     }
 }
