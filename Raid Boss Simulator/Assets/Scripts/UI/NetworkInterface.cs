@@ -9,7 +9,7 @@ namespace LightPat.UI
 {
     public class NetworkInterface : NetworkBehaviour
     {
-        public GameObject ServerObjects;
+        public GameObject ServerCamera;
 
         [SerializeField]
         private TextMeshProUGUI playersInGameText;
@@ -97,9 +97,9 @@ namespace LightPat.UI
                     }
                 }
 
-                if (Server.Instance.GetComponent<ObjectsToSpawn>())
+                if (ServerCamera.GetComponent<ObjectsToSpawn>())
                 {
-                    Server.Instance.GetComponent<ObjectsToSpawn>().SpawnObjects();
+                    ServerCamera.GetComponent<ObjectsToSpawn>().SpawnObjects();
                 }
             }
             else
@@ -167,22 +167,21 @@ namespace LightPat.UI
                     }
                 }
 
-                if (Server.Instance.GetComponent<ObjectsToSpawn>())
+                ServerCamera.SetActive(true);
+
+                if (ServerCamera.GetComponent<ObjectsToSpawn>())
                 {
-                    Server.Instance.GetComponent<ObjectsToSpawn>().SpawnObjects();
+                    ServerCamera.GetComponent<ObjectsToSpawn>().SpawnObjects();
                 }
             }
             else
             {
                 DisplayLogger.Instance.LogInfo("Unable to start server...");
             }
-
-            ServerObjects.SetActive(true);
         }
 
         public void QuitGame()
         {
-            Debug.Log("Quitting Game");
             Application.Quit();
         }
     }

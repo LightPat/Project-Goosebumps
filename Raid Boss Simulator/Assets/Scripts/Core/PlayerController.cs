@@ -49,6 +49,7 @@ namespace LightPat.Core
             {
                 verticalRotate.Find("First Person Camera").gameObject.SetActive(true);
                 GetComponent<PlayerInput>().enabled = true;
+                firstPersonCamera.tag = "MainCamera";
             }
             else
             {
@@ -59,6 +60,7 @@ namespace LightPat.Core
             animator = GetComponent<Animator>();
         }
 
+        // This method is called in NetworkUI, only by the server
         public void updateName(string newName)
         {
             name = newName;
@@ -68,7 +70,7 @@ namespace LightPat.Core
         }
 
         [ClientRpc]
-        public void updateNameClientRpc(string newName)
+        void updateNameClientRpc(string newName)
         {
             name = newName;
             transform.Find("Player Name").gameObject.GetComponent<TextMeshPro>().SetText(newName);
@@ -144,6 +146,7 @@ namespace LightPat.Core
             }
 
             animator.SetBool("Airborne", !isGrounded());
+            UpdateAnimationStateServerRpc("Airborne", !isGrounded());
         }
 
         void FixedUpdate()
@@ -175,10 +178,12 @@ namespace LightPat.Core
             if (value.Get<Vector2>() != Vector2.zero)
             {
                 animator.SetBool("Walk", true);
+                UpdateAnimationStateServerRpc("Walk", true);
             }
             else
             {
                 animator.SetBool("Walk", false);
+                UpdateAnimationStateServerRpc("Walk", false);
             }
 
             moveInput = value.Get<Vector2>();
@@ -187,12 +192,20 @@ namespace LightPat.Core
         [ServerRpc]
         void MoveServerRpc(Vector3 newPosition)
         {
-            Server.Instance.moveClient(GetComponent<NetworkObject>().OwnerClientId, newPosition);
+            transform.position = newPosition;
+            MoveClientRpc(newPosition);
+        }
+
+        [ClientRpc]
+        void MoveClientRpc(Vector3 newPosition)
+        {
+            if (IsLocalPlayer) { return; }
+
+            transform.position = newPosition;
         }
 
         [Header("Look Settings")]
         public float verticalLookBound = 90f;
-        private Quaternion newRotation;
         private Quaternion oldRotation;
         private Vector3 lookEulers;
         private Vector2 lookInput;
@@ -204,7 +217,18 @@ namespace LightPat.Core
         [ServerRpc]
         void RotateServerRpc(Vector3 newRotationEulers)
         {
-            Server.Instance.rotateClient(GetComponent<NetworkObject>().OwnerClientId, newRotationEulers);
+            rb.MoveRotation(Quaternion.Euler(0, newRotationEulers.x, 0));
+            verticalRotate.rotation = Quaternion.Euler(-newRotationEulers.y, newRotationEulers.x, 0);
+            RotateClientRpc(newRotationEulers);
+        }
+
+        [ClientRpc]
+        void RotateClientRpc(Vector3 newRotationEulers)
+        {
+            if (IsLocalPlayer) { return; }
+
+            rb.MoveRotation(Quaternion.Euler(0, newRotationEulers.x, 0));
+            verticalRotate.rotation = Quaternion.Euler(-newRotationEulers.y, newRotationEulers.x, 0);
         }
 
         [Header("Is Grounded")]
@@ -242,7 +266,16 @@ namespace LightPat.Core
         [ServerRpc]
         void JumpServerRpc(float jumpForce)
         {
-            Server.Instance.clientJump(GetComponent<NetworkObject>().OwnerClientId, jumpForce);
+            rb.AddForce(new Vector3(0, jumpForce, 0), ForceMode.VelocityChange);
+            JumpClientRpc(jumpForce);
+        }
+
+        [ClientRpc]
+        void JumpClientRpc(float jumpForce)
+        {
+            if (IsLocalPlayer) { return; }
+
+            rb.AddForce(new Vector3(0, jumpForce, 0), ForceMode.VelocityChange);
         }
 
         [Header("Crouch Settings")]
@@ -253,11 +286,13 @@ namespace LightPat.Core
             {
                 currentSpeed = crouchSpeed;
                 animator.SetBool("Crouch", true);
+                UpdateAnimationStateServerRpc("Crouch", true);
             }
             else
             {
                 currentSpeed = walkingSpeed;
                 animator.SetBool("Crouch", false);
+                UpdateAnimationStateServerRpc("Crouch", false);
             }
         }
 
@@ -331,7 +366,16 @@ namespace LightPat.Core
         [ServerRpc]
         void AttackServerRpc()
         {
-            Server.Instance.clientAttack(GetComponent<NetworkObject>().OwnerClientId);
+            weaponLoadout.getEquippedWeapon().GetComponent<Weapon>().attack();
+            AttackClientRpc();
+        }
+
+        [ClientRpc]
+        void AttackClientRpc()
+        {
+            if (IsLocalPlayer) { return; }
+
+            weaponLoadout.getEquippedWeapon().GetComponent<Weapon>().attack();
         }
 
         private GameObject canvas;
@@ -379,6 +423,21 @@ namespace LightPat.Core
                     playerInput.SwitchCurrentActionMap("Escape");
                     break;
             }
+        }
+
+        [ServerRpc]
+        void UpdateAnimationStateServerRpc(string stateName, bool value)
+        {
+            animator.SetBool(stateName, value);
+            UpdateAnimationStateClientRpc(stateName, value);
+        }
+
+        [ClientRpc]
+        void UpdateAnimationStateClientRpc(string stateName, bool value)
+        {
+            if (IsLocalPlayer) { return; }
+
+            animator.SetBool(stateName, value);
         }
     }
 }

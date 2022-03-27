@@ -1,8 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Unity.Netcode;
 using TMPro;
+using LightPat.Core;
 
 namespace LightPat.UI
 {
@@ -17,16 +17,14 @@ namespace LightPat.UI
 
         public void QuitGame()
         {
-            Debug.Log("Quitting Game");
             Application.Quit();
         }
 
         public void OpenSettingsMenu()
         {
-            Debug.Log("Opening settings menu");
-
             GameObject SettingsMenuParent = transform.Find("Settings Menu").gameObject;
 
+            // Resolution Dropdown
             List<string> resolutionOptions = new List<string>();
 
             int currentResIndex = 0;
@@ -45,11 +43,10 @@ namespace LightPat.UI
             SettingsMenuParent.transform.Find("Resolution Dropdown").GetComponent<TMP_Dropdown>().value = currentResIndex;
 
             SettingsMenuParent.SetActive(true);
-
             transform.Find("Settings Button").gameObject.SetActive(false);
         }
 
-        public void OnDropdownChanged(TMP_Dropdown dropdown)
+        public void OnResolutionDropdownChanged(TMP_Dropdown dropdown)
         {
             Resolution res = resolutions[dropdown.value];
 

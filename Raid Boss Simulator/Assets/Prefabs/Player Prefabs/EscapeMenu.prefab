@@ -346,7 +346,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 5826585095380563406}
         m_TargetAssemblyTypeName: LightPat.UI.EscapeMenu, Runtime
-        m_MethodName: OnDropdownChanged
+        m_MethodName: OnResolutionDropdownChanged
         m_Mode: 2
         m_Arguments:
           m_ObjectArgument: {fileID: 188223052871581893}
