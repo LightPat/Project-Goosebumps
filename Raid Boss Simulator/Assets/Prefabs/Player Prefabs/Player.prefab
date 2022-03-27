@@ -378,7 +378,6 @@ MonoBehaviour:
   jumpHeight: 3
   fallingGravityScale: 0.5
   crouchSpeed: 2
-  crouchHeight: 1.5
   reach: 10
 --- !u!114 &295347349711555124
 MonoBehaviour:

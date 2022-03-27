@@ -27,6 +27,7 @@ namespace LightPat.Core
         private WeaponLoadout weaponLoadout;
         private GameObject firstPersonCamera;
         private Rigidbody rb;
+        private Animator animator;
 
         [HideInInspector]
         public Transform verticalRotate;
@@ -55,6 +56,7 @@ namespace LightPat.Core
             }
 
             rb = GetComponent<Rigidbody>();
+            animator = GetComponent<Animator>();
         }
 
         public void updateName(string newName)
@@ -140,6 +142,8 @@ namespace LightPat.Core
                     }
                 }
             }
+
+            animator.SetBool("Airborne", !isGrounded());
         }
 
         void FixedUpdate()
@@ -170,13 +174,11 @@ namespace LightPat.Core
         {
             if (value.Get<Vector2>() != Vector2.zero)
             {
-                GetComponent<Animator>().SetBool("Walk", true);
-                Debug.Log("true");
+                animator.SetBool("Walk", true);
             }
             else
             {
-                Debug.Log("false");
-                GetComponent<Animator>().SetBool("Walk", false);
+                animator.SetBool("Walk", false);
             }
 
             moveInput = value.Get<Vector2>();
@@ -245,24 +247,17 @@ namespace LightPat.Core
 
         [Header("Crouch Settings")]
         public float crouchSpeed = 2f;
-        public float crouchHeight = 1.5f;
         void OnCrouch(InputValue value)
         {
-            // Half the collider's height
-            // GetComponent<Collider>().bounds.size.y/2
-
             if (value.isPressed)
             {
-                // If crouch is pressed, shrink the player and change the speed
-                // TODO Change this to animation later
-                transform.Find("Model").localScale -= new Vector3(0, crouchHeight, 0);
                 currentSpeed = crouchSpeed;
+                animator.SetBool("Crouch", true);
             }
             else
             {
-                // If crouch is released, grow the player and revert the speed change
-                transform.Find("Model").localScale += new Vector3(0, crouchHeight, 0);
                 currentSpeed = walkingSpeed;
+                animator.SetBool("Crouch", false);
             }
         }
 
