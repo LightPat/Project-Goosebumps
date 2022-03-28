@@ -143,8 +143,10 @@ namespace LightPat.Core
                 }
             }
 
-            animator.SetBool("Airborne", !isGrounded());
-            UpdateAnimationStateServerRpc("Airborne", !isGrounded());
+            bool grounded = isGrounded();
+
+            animator.SetBool("Airborne", !grounded);
+            UpdateAnimationStateServerRpc("Airborne", !grounded);
         }
 
         void FixedUpdate()
@@ -256,33 +258,32 @@ namespace LightPat.Core
 
             if (value.isPressed)
             {
-                if (isGrounded())
+                if (isGrounded() & !jumpRunning)
                 {
                     float jumpForce = Mathf.Sqrt(jumpHeight * -2 * Physics.gravity.y);
 
                     if (animator.GetCurrentAnimatorStateInfo(0).IsName("Idle"))
                     {
+                        animator.SetBool("Jump", true);
                         StartCoroutine(IdleJump(jumpForce));
                     }
                     else
                     {
                         rb.AddForce(new Vector3(0, jumpForce, 0), ForceMode.VelocityChange);
                     }
-
-                    animator.SetBool("Jump", true);
                     JumpServerRpc(jumpForce);
                 }
             }
-            else
-            {
-                animator.SetBool("Jump", false);
-            }
         }
 
+        private bool jumpRunning = false;
         IEnumerator IdleJump(float jumpForce)
         {
+            jumpRunning = true;
             yield return new WaitForSeconds(0.5f);
             rb.AddForce(new Vector3(0, jumpForce, 0), ForceMode.VelocityChange);
+            animator.SetBool("Jump", false);
+            jumpRunning = false;
         }
 
         [ServerRpc]
@@ -290,7 +291,7 @@ namespace LightPat.Core
         {
             if (!IsHost)
             {
-                if (animator.GetCurrentAnimatorStateInfo(0).IsName("Idle"))
+                if (animator.GetCurrentAnimatorStateInfo(0).IsName("Idle") & animator.GetCurrentAnimatorStateInfo(0).IsName("Jump"))
                 {
                     StartCoroutine(IdleJump(jumpForce));
                 }
@@ -308,7 +309,7 @@ namespace LightPat.Core
         {
             if (IsLocalPlayer) { return; }
 
-            if (animator.GetCurrentAnimatorStateInfo(0).IsName("Idle"))
+            if (animator.GetCurrentAnimatorStateInfo(0).IsName("Idle") & animator.GetCurrentAnimatorStateInfo(0).IsName("Jump"))
             {
                 StartCoroutine(IdleJump(jumpForce));
             }

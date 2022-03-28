@@ -372,11 +372,12 @@ MonoBehaviour:
   EscapeMenu: {fileID: 4434792374772850268, guid: 2fa35ecf95ecbe947b3d4241267ac45e, type: 3}
   verticalRotate: {fileID: 0}
   walkingSpeed: 5
-  sensitivity: 0.2
+  sensitivity: 0.1
   verticalLookBound: 90
   checkDistance: 1
   jumpHeight: 3
   fallingGravityScale: 0.5
+  jumpAnimation: {fileID: 7400000, guid: 4ee5d9bd515dd59448a9bf5509377e87, type: 2}
   crouchSpeed: 2
   reach: 10
 --- !u!114 &295347349711555124
