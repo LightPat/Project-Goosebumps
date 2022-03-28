@@ -369,7 +369,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ac8965d8ae6aa2444add8f54fc773aab, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  EscapeMenu: {fileID: 8791646990712437994, guid: 2fa35ecf95ecbe947b3d4241267ac45e, type: 3}
+  EscapeMenu: {fileID: 4434792374772850268, guid: 2fa35ecf95ecbe947b3d4241267ac45e, type: 3}
   sensitivity: 15
   verticalRotate: {fileID: 0}
   walkingSpeed: 5

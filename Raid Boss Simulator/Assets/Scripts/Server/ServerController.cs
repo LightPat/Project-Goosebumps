@@ -8,6 +8,8 @@ namespace LightPat.Server
 {
     public class ServerController : NetworkBehaviour
     {
+        public GameObject EscapeMenuPrefab;
+
         [Header("Camera Settings")]
         public int moveSpeed;
         public int sprintSpeed;
@@ -77,7 +79,6 @@ namespace LightPat.Server
             }
         }
 
-        public GameObject EscapeMenuPrefab;
         private GameObject canvas;
         void OnEscapeToggle()
         {
