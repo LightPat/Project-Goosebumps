@@ -258,50 +258,54 @@ namespace LightPat.Core
 
             if (value.isPressed)
             {
-                if (isGrounded() & !jumpRunning)
+                if (isGrounded() & !idleJumpRunning)
                 {
                     float jumpForce = Mathf.Sqrt(jumpHeight * -2 * Physics.gravity.y);
 
                     if (animator.GetCurrentAnimatorStateInfo(0).IsName("Idle"))
                     {
-                        animator.SetBool("Jump", true);
+                        DisplayLogger.Instance.LogInfo("Idle Jumping");
                         StartCoroutine(IdleJump(jumpForce));
+                        JumpServerRpc(jumpForce, true);
                     }
                     else
                     {
+                        DisplayLogger.Instance.LogInfo("Jumping");
                         rb.AddForce(new Vector3(0, jumpForce, 0), ForceMode.VelocityChange);
+                        JumpServerRpc(jumpForce, false);
                     }
-                    JumpServerRpc(jumpForce);
                 }
             }
         }
 
-        private bool jumpRunning = false;
-        IEnumerator IdleJump(float jumpForce)
+        private bool idleJumpRunning = false;
+        private IEnumerator IdleJump(float jumpForce)
         {
-            jumpRunning = true;
+            idleJumpRunning = true;
+            animator.SetBool("Jump", true);
             yield return new WaitForSeconds(0.5f);
             rb.AddForce(new Vector3(0, jumpForce, 0), ForceMode.VelocityChange);
             animator.SetBool("Jump", false);
-            jumpRunning = false;
+            idleJumpRunning = false;
         }
 
         [ServerRpc]
-        void JumpServerRpc(float jumpForce)
+        void JumpServerRpc(float jumpForce, bool idleJump)
         {
             if (!IsHost)
             {
-                if (animator.GetCurrentAnimatorStateInfo(0).IsName("Idle") & animator.GetCurrentAnimatorStateInfo(0).IsName("Jump"))
+                if (idleJump)
                 {
+                    DisplayLogger.Instance.LogInfo("Idle Jumping");
                     StartCoroutine(IdleJump(jumpForce));
                 }
                 else
                 {
+                    DisplayLogger.Instance.LogInfo("Jumping");
                     rb.AddForce(new Vector3(0, jumpForce, 0), ForceMode.VelocityChange);
                 }
             }
-
-            JumpClientRpc(jumpForce);
+            //JumpClientRpc(jumpForce);
         }
 
         [ClientRpc]
@@ -309,14 +313,8 @@ namespace LightPat.Core
         {
             if (IsLocalPlayer) { return; }
 
-            if (animator.GetCurrentAnimatorStateInfo(0).IsName("Idle") & animator.GetCurrentAnimatorStateInfo(0).IsName("Jump"))
-            {
-                StartCoroutine(IdleJump(jumpForce));
-            }
-            else
-            {
-                rb.AddForce(new Vector3(0, jumpForce, 0), ForceMode.VelocityChange);
-            }
+            DisplayLogger.Instance.LogInfo("Jumping");
+            rb.AddForce(new Vector3(0, jumpForce, 0), ForceMode.VelocityChange);
         }
 
         [Header("Crouch Settings")]
