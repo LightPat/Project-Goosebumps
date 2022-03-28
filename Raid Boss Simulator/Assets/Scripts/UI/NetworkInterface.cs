@@ -98,7 +98,9 @@ namespace LightPat.UI
                     }
                 }
 
+                ServerCamera.SetActive(true);
                 ServerCamera.GetComponent<ServerController>().SpawnObjects();
+                ServerCamera.SetActive(false);
             }
             else
             {
