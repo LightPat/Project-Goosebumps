@@ -11,6 +11,9 @@ namespace LightPat.UI
     {
         public GameObject SettingsMenu;
 
+        [HideInInspector]
+        public PlayerController playerController;
+
         public void QuitGame()
         {
             Application.Quit();

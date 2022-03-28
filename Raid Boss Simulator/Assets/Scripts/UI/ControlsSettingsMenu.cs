@@ -1,16 +1,28 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
+using TMPro;
 
-public class ControlsSettingsMenu : MonoBehaviour
+namespace LightPat.UI
 {
-    public void Start()
+    public class ControlsSettingsMenu : MonoBehaviour
     {
-        Debug.Log("Opening");
-    }
+        public TMP_InputField mouseSensitivity;
 
-    public void QuitGame()
-    {
-        Application.Quit();
+        private void Start()
+        {
+            mouseSensitivity.text = transform.parent.GetComponent<EscapeMenu>().playerController.sensitivity.ToString();
+        }
+
+        public void OnSensitivityChanged()
+        {
+            transform.parent.GetComponent<EscapeMenu>().playerController.sensitivity = float.Parse(mouseSensitivity.text);
+        }
+
+        public void QuitGame()
+        {
+            Application.Quit();
+        }
     }
 }

@@ -2,17 +2,20 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class SettingsMenu : MonoBehaviour
+namespace LightPat.UI
 {
-    public void OpenSubMenu(GameObject menuPrefab)
+    public class SettingsMenu : MonoBehaviour
     {
-        Instantiate(menuPrefab, transform.parent);
+        public void OpenSubMenu(GameObject menuPrefab)
+        {
+            Instantiate(menuPrefab, transform.parent);
 
-        Destroy(gameObject);
-    }
+            Destroy(gameObject);
+        }
 
-    public void QuitGame()
-    {
-        Application.Quit();
+        public void QuitGame()
+        {
+            Application.Quit();
+        }
     }
 }

@@ -5,6 +5,7 @@ using UnityEngine.InputSystem;
 using Unity.Netcode;
 using TMPro;
 using LightPat.Core.WeaponSystem;
+using LightPat.UI;
 
 namespace LightPat.Core
 {
@@ -429,6 +430,7 @@ namespace LightPat.Core
                     weaponLoadout.HUDCanvas.SetActive(false);
 
                     canvas = GameObject.Instantiate(EscapeMenu);
+                    canvas.GetComponent<EscapeMenu>().playerController = this;
 
                     Cursor.lockState = CursorLockMode.None;
 
