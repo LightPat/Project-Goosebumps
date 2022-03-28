@@ -264,13 +264,11 @@ namespace LightPat.Core
 
                     if (animator.GetCurrentAnimatorStateInfo(0).IsName("Idle"))
                     {
-                        DisplayLogger.Instance.LogInfo("Idle Jumping");
                         StartCoroutine(IdleJump(jumpForce));
                         JumpServerRpc(jumpForce, true);
                     }
                     else
                     {
-                        DisplayLogger.Instance.LogInfo("Jumping");
                         rb.AddForce(new Vector3(0, jumpForce, 0), ForceMode.VelocityChange);
                         JumpServerRpc(jumpForce, false);
                     }
@@ -296,25 +294,29 @@ namespace LightPat.Core
             {
                 if (idleJump)
                 {
-                    DisplayLogger.Instance.LogInfo("Idle Jumping");
                     StartCoroutine(IdleJump(jumpForce));
                 }
                 else
                 {
-                    DisplayLogger.Instance.LogInfo("Jumping");
                     rb.AddForce(new Vector3(0, jumpForce, 0), ForceMode.VelocityChange);
                 }
             }
-            //JumpClientRpc(jumpForce);
+            JumpClientRpc(jumpForce, idleJump);
         }
 
         [ClientRpc]
-        void JumpClientRpc(float jumpForce)
+        void JumpClientRpc(float jumpForce, bool idleJump)
         {
             if (IsLocalPlayer) { return; }
 
-            DisplayLogger.Instance.LogInfo("Jumping");
-            rb.AddForce(new Vector3(0, jumpForce, 0), ForceMode.VelocityChange);
+            if (idleJump)
+            {
+                StartCoroutine(IdleJump(jumpForce));
+            }
+            else
+            {
+                rb.AddForce(new Vector3(0, jumpForce, 0), ForceMode.VelocityChange);
+            }
         }
 
         [Header("Crouch Settings")]
