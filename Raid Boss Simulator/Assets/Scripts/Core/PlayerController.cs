@@ -21,9 +21,6 @@ namespace LightPat.Core
 
         public GameObject EscapeMenu;
 
-        [Header("Input Settings")]
-        public float sensitivity = 15f;
-
         private WeaponLoadout weaponLoadout;
         private GameObject firstPersonCamera;
         private Rigidbody rb;
@@ -80,7 +77,7 @@ namespace LightPat.Core
         {
             if (!IsOwner) { return; }
 
-            lookInput *= (sensitivity * Time.deltaTime);
+            lookInput *= (sensitivity);
             lookEulers.x += lookInput.x;
 
             // This prevents the rotation from increasing or decreasing infinitely if the player does a bunch of spins horizontally
@@ -205,6 +202,7 @@ namespace LightPat.Core
         }
 
         [Header("Look Settings")]
+        public float sensitivity = 15f;
         public float verticalLookBound = 90f;
         private Quaternion oldRotation;
         private Vector3 lookEulers;

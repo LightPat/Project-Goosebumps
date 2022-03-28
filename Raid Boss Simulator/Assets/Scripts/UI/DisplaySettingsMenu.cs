@@ -3,13 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using System;
-using LightPat.Core;
+using System.Linq;
 
 namespace LightPat.UI
 {
     public class DisplaySettingsMenu : MonoBehaviour
     {
-        public TMP_Dropdown resolutionDropdown, fullscreenModeDropdown;
+        public TMP_Dropdown resolutionDropdown, fullscreenModeDropdown, graphicsQualityDropdown;
 
         private FullScreenMode[] fsModes = new FullScreenMode[3];
         private List<Resolution> supportedResolutions = new List<Resolution>();
@@ -35,7 +35,6 @@ namespace LightPat.UI
                 }
             }
 
-            resolutionDropdown.ClearOptions();
             resolutionDropdown.AddOptions(resolutionOptions);
             resolutionDropdown.value = currentResIndex;
 
@@ -46,6 +45,10 @@ namespace LightPat.UI
             fsModes[2] = FullScreenMode.Windowed;
             int fsModeIndex = Array.IndexOf(fsModes, Screen.fullScreenMode);
             fullscreenModeDropdown.value = fsModeIndex;
+
+            // Graphics Quality dropdown
+            graphicsQualityDropdown.AddOptions(QualitySettings.names.ToList());
+            graphicsQualityDropdown.value = QualitySettings.GetQualityLevel();
         }
 
         public void ApplyChanges()
@@ -56,6 +59,8 @@ namespace LightPat.UI
             // Resolution Dropdown
             // Options are assigned automatically in OpenSettingsMenu()
             Resolution res = supportedResolutions[resolutionDropdown.value];
+
+            QualitySettings.SetQualityLevel(graphicsQualityDropdown.value, true);
 
             Screen.SetResolution(res.width, res.height, fsMode, res.refreshRate);
         }
