@@ -162,12 +162,14 @@ namespace LightPat.Core
                     moveInputChanged = false;
                 }
 
-                // If current speed is less than maxSpeed
-                if (rb.velocity.magnitude < maxSpeed)
+                // If current speed on the x and z axis is less than maxSpeed
+                if (new Vector2(rb.velocity.x, rb.velocity.z).magnitude < maxSpeed)
                 {
                     // Scale the amount of velocity we're adding so that we don't go over the max speed
                     float speedDiff = maxSpeed - rb.velocity.magnitude;
-                    rb.AddForce(rb.rotation * new Vector3(moveInput.x, 0, moveInput.y) * speedDiff, ForceMode.VelocityChange);
+                    // Clamp Magnitude of force vector so that we never add too much force
+                    // This affects acceleration rates
+                    rb.AddForce(rb.rotation * Vector3.ClampMagnitude(new Vector3(moveInput.x, 0, moveInput.y) * speedDiff, acceleration), ForceMode.VelocityChange);
                 }
             }
             else
@@ -175,7 +177,6 @@ namespace LightPat.Core
                 // Deceleration
                 if (decelerate)
                 {
-                    //rb.velocity = new Vector3(0, rb.velocity.y, 0);
                     StartCoroutine(decelerateCoroutine());
                     decelerate = false;
                 }
@@ -194,9 +195,28 @@ namespace LightPat.Core
         private IEnumerator decelerateCoroutine()
         {
             // Add force in the opposite direction that we were just moving
-            Debug.Log(rb.velocity);
-            //rb.AddForce(new Vector3(-rb.velocity.x, 0, -rb.velocity.z) * 3/4, ForceMode.VelocityChange);
-            yield return new WaitForSeconds(0);
+
+            Vector3 startingVelocity = rb.velocity;
+            Vector3 talliedVelocity = Vector3.zero;
+
+            while (startingVelocity.magnitude > talliedVelocity.magnitude)
+            {
+                Vector3 force = rb.rotation * Vector3.ClampMagnitude(new Vector3(-rb.velocity.x, 0, -rb.velocity.z), deceleration);
+                talliedVelocity += force;
+
+                Debug.Log(talliedVelocity);
+
+                rb.AddForce(force, ForceMode.VelocityChange);
+                yield return new WaitForEndOfFrame();
+            }
+
+            yield return new WaitForEndOfFrame();
+
+            //for (int i = 0; i < 50; i++)
+            //{
+            //    rb.AddForce(rb.rotation * Vector3.ClampMagnitude(new Vector3(-rb.velocity.x, 0, -rb.velocity.z), deceleration), ForceMode.VelocityChange);
+            //    yield return new WaitForEndOfFrame();
+            //}
         }
 
         void OnBounce()
@@ -206,7 +226,9 @@ namespace LightPat.Core
 
         [Header("Move Settings")]
         public float maxSpeed = 15f;
-        public float walkingSpeed = 5f;
+        public float acceleration = 5f;
+        public float deceleration = 5f;
+        private float walkingSpeed = 5f;
         private Vector2 moveInput;
         private bool moveInputChanged = false;
         private Vector3 newPosition;
