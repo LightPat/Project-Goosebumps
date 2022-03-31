@@ -151,15 +151,34 @@ namespace LightPat.Core
 
         void FixedUpdate()
         {
-            newPosition = transform.position + rb.rotation * new Vector3(moveInput.x, 0, moveInput.y) * currentSpeed * NetworkManager.Singleton.LocalTime.FixedDeltaTime;
-
-            // Send position update to server
-            if (newPosition != transform.position)
+            if (moveInput != Vector2.zero)
             {
-                MoveServerRpc(newPosition);
+                if (moveInputChanged)
+                {
+                    rb.velocity = new Vector3(0, rb.velocity.y, 0);
+                }
+
+                // If current speed is less than maxSpeed
+                if (rb.velocity.magnitude < maxSpeed)
+                {
+                    // Scale the amount of velocity we're adding so that we don't go over the max speed
+                    float speedDiff = maxSpeed - rb.velocity.magnitude;
+                    rb.AddForce(rb.rotation * new Vector3(moveInput.x, 0, moveInput.y) * speedDiff, ForceMode.VelocityChange);
+                }
+            }
+            else
+            {
+                // Deceleration
+                if (decelerate)
+                {
+                    //rb.velocity = new Vector3(0, rb.velocity.y, 0);
+                    StartCoroutine(decelerateCoroutine());
+                    decelerate = false;
+                }
             }
 
-            rb.MovePosition(newPosition);
+            // TODO Edit acceleration and deceleration rates
+            // If we go into moving diagonally just switch modes, right no we keep the velocity moving in the wrong direction
 
             // Falling Gravity velocity increase
             if (rb.velocity.y < 0)
@@ -168,11 +187,27 @@ namespace LightPat.Core
             }
         }
 
+        private IEnumerator decelerateCoroutine()
+        {
+            // Add force in the opposite direction that we were just moving
+            Debug.Log(rb.velocity);
+            //rb.AddForce(new Vector3(-rb.velocity.x, 0, -rb.velocity.z) * 3/4, ForceMode.VelocityChange);
+            yield return new WaitForSeconds(0);
+        }
+
+        void OnBounce()
+        {
+            rb.AddForce(new Vector3(100, 0, 100), ForceMode.VelocityChange);
+        }
+
         [Header("Move Settings")]
+        public float maxSpeed = 15f;
         public float walkingSpeed = 5f;
         private Vector2 moveInput;
+        private bool moveInputChanged = false;
         private Vector3 newPosition;
         private float currentSpeed;
+        private bool decelerate = false;
         void OnMove(InputValue value)
         {
             if (value.Get<Vector2>() != Vector2.zero)
@@ -182,17 +217,22 @@ namespace LightPat.Core
             }
             else
             {
+                decelerate = true;
                 animator.SetBool("Walk", false);
                 UpdateAnimationStateServerRpc("Walk", false);
             }
 
+            if (value.Get<Vector2>() != moveInput) { moveInputChanged = true; }
             moveInput = value.Get<Vector2>();
         }
 
         [ServerRpc]
         void MoveServerRpc(Vector3 newPosition)
         {
-            transform.position = newPosition;
+            if (!IsHost)
+            {
+                transform.position = newPosition;
+            }
             MoveClientRpc(newPosition);
         }
 
@@ -218,8 +258,12 @@ namespace LightPat.Core
         [ServerRpc]
         void RotateServerRpc(Vector3 newRotationEulers)
         {
-            rb.MoveRotation(Quaternion.Euler(0, newRotationEulers.x, 0));
-            verticalRotate.rotation = Quaternion.Euler(-newRotationEulers.y, newRotationEulers.x, 0);
+            if (!IsHost)
+            {
+                rb.MoveRotation(Quaternion.Euler(0, newRotationEulers.x, 0));
+                verticalRotate.rotation = Quaternion.Euler(-newRotationEulers.y, newRotationEulers.x, 0);
+            }
+
             RotateClientRpc(newRotationEulers);
         }
 
@@ -407,7 +451,11 @@ namespace LightPat.Core
         [ServerRpc]
         void AttackServerRpc()
         {
-            weaponLoadout.getEquippedWeapon().GetComponent<Weapon>().attack();
+            if (!IsHost)
+            {
+                weaponLoadout.getEquippedWeapon().GetComponent<Weapon>().attack();
+            }
+
             AttackClientRpc();
         }
 
@@ -470,7 +518,10 @@ namespace LightPat.Core
         [ServerRpc]
         void UpdateAnimationStateServerRpc(string stateName, bool value)
         {
-            animator.SetBool(stateName, value);
+            if (!IsHost)
+            {
+                animator.SetBool(stateName, value);
+            }
             UpdateAnimationStateClientRpc(stateName, value);
         }
 
