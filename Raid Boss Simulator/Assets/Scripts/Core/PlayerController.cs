@@ -151,11 +151,15 @@ namespace LightPat.Core
 
         void FixedUpdate()
         {
+            // If the user is inputting a key
             if (moveInput != Vector2.zero)
             {
+                // Reset the velocity when the user switches keys
+                // Useful when the user goes from holding W to holding W and D
                 if (moveInputChanged)
                 {
                     rb.velocity = new Vector3(0, rb.velocity.y, 0);
+                    moveInputChanged = false;
                 }
 
                 // If current speed is less than maxSpeed
