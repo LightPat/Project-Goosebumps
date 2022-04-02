@@ -153,13 +153,15 @@ namespace LightPat.Core
         {
             newPosition = transform.position + rb.rotation * new Vector3(moveInput.x, 0, moveInput.y) * currentSpeed * NetworkManager.Singleton.LocalTime.FixedDeltaTime;
 
-            // Send position update to server
-            if (newPosition != transform.position)
-            {
-                MoveServerRpc(newPosition);
-            }
+            //// Send position update to server
+            //if (newPosition != transform.position)
+            //{
+            //    MoveServerRpc(newPosition);
+            //}
 
-            rb.MovePosition(newPosition);
+            Debug.Log(transform.position + " " + newPosition);
+            rb.AddForce(rb.rotation * new Vector3(moveInput.x, 0, moveInput.y) * currentSpeed - rb.velocity, ForceMode.VelocityChange);
+            //rb.MovePosition(newPosition);
 
             // Falling Gravity velocity increase
             if (rb.velocity.y < 0)
