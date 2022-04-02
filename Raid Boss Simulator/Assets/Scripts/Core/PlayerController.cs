@@ -151,24 +151,37 @@ namespace LightPat.Core
 
         void FixedUpdate()
         {
-            //newPosition = transform.position + rb.rotation * new Vector3(moveInput.x, 0, moveInput.y) * currentSpeed * NetworkManager.Singleton.LocalTime.FixedDeltaTime;
 
-            //// Send position update to server
-            //if (newPosition != transform.position)
-            //{
-            //    MoveServerRpc(newPosition);
-            //}
+            Vector3 moveForce = rb.rotation * new Vector3(moveInput.x, 0, moveInput.y) * currentSpeed;
+            moveForce.x -= rb.velocity.x;
+            moveForce.z -= rb.velocity.z;
+            rb.AddForce(moveForce, ForceMode.VelocityChange);
 
-            Vector3 force = rb.rotation * new Vector3(moveInput.x, 0, moveInput.y) * currentSpeed;
-            force.x -= rb.velocity.x;
-            force.z -= rb.velocity.z;
-            rb.AddForce(force, ForceMode.VelocityChange);
+            //MoveServerRpc(moveForce);
 
             // Falling Gravity velocity increase
             if (rb.velocity.y < 0)
             {
                 rb.AddForce(new Vector3(0, (fallingGravityScale * -1), 0), ForceMode.VelocityChange);
             }
+        }
+
+        [ServerRpc]
+        void MoveServerRpc(Vector3 moveForce)
+        {
+            if (!IsHost)
+            {
+                rb.AddForce(moveForce, ForceMode.VelocityChange);
+            }
+            MoveClientRpc(moveForce);
+        }
+
+        [ClientRpc]
+        void MoveClientRpc(Vector3 moveForce)
+        {
+            if (IsLocalPlayer) { return; }
+
+            rb.AddForce(moveForce, ForceMode.VelocityChange);
         }
 
         [Header("Move Settings")]
@@ -190,24 +203,6 @@ namespace LightPat.Core
             }
 
             moveInput = value.Get<Vector2>();
-        }
-
-        [ServerRpc]
-        void MoveServerRpc(Vector3 newPosition)
-        {
-            if (!IsHost)
-            {
-                transform.position = newPosition;
-            }
-            MoveClientRpc(newPosition);
-        }
-
-        [ClientRpc]
-        void MoveClientRpc(Vector3 newPosition)
-        {
-            if (IsLocalPlayer) { return; }
-
-            transform.position = newPosition;
         }
 
         [Header("Look Settings")]
