@@ -151,7 +151,7 @@ namespace LightPat.Core
 
         void FixedUpdate()
         {
-            newPosition = transform.position + rb.rotation * new Vector3(moveInput.x, 0, moveInput.y) * currentSpeed * NetworkManager.Singleton.LocalTime.FixedDeltaTime;
+            //newPosition = transform.position + rb.rotation * new Vector3(moveInput.x, 0, moveInput.y) * currentSpeed * NetworkManager.Singleton.LocalTime.FixedDeltaTime;
 
             //// Send position update to server
             //if (newPosition != transform.position)
@@ -159,9 +159,10 @@ namespace LightPat.Core
             //    MoveServerRpc(newPosition);
             //}
 
-            Debug.Log(transform.position + " " + newPosition);
-            rb.AddForce(rb.rotation * new Vector3(moveInput.x, 0, moveInput.y) * currentSpeed - rb.velocity, ForceMode.VelocityChange);
-            //rb.MovePosition(newPosition);
+            Vector3 force = rb.rotation * new Vector3(moveInput.x, 0, moveInput.y) * currentSpeed;
+            force.x -= rb.velocity.x;
+            force.z -= rb.velocity.z;
+            rb.AddForce(force, ForceMode.VelocityChange);
 
             // Falling Gravity velocity increase
             if (rb.velocity.y < 0)
@@ -170,40 +171,11 @@ namespace LightPat.Core
             }
         }
 
-        private IEnumerator decelerateCoroutine()
-        {
-            // Add force in the opposite direction that we were just moving
-
-            Vector3 startingVelocity = rb.velocity;
-            Vector3 talliedVelocity = Vector3.zero;
-
-            while (startingVelocity.magnitude - talliedVelocity.magnitude > 3)
-            {
-                // Don't apply rotation since we're pulling velocity from the rigidbody already
-                Vector3 force = Vector3.ClampMagnitude(new Vector3(-rb.velocity.x, 0, -rb.velocity.z), deceleration);
-                talliedVelocity += force;
-                rb.AddForce(force, ForceMode.VelocityChange);
-                yield return new WaitForEndOfFrame();
-            }
-
-            yield return new WaitForEndOfFrame();
-        }
-
-        void OnBounce()
-        {
-            rb.AddForce(new Vector3(100, 0, 100), ForceMode.VelocityChange);
-        }
-
         [Header("Move Settings")]
-        public float maxSpeed = 15f;
-        public float acceleration = 5f;
-        public float deceleration = 5f;
-        private float walkingSpeed = 5f;
+        public float walkingSpeed = 5f;
         private Vector2 moveInput;
-        private bool moveInputChanged = false;
         private Vector3 newPosition;
         private float currentSpeed;
-        private bool decelerate = false;
         void OnMove(InputValue value)
         {
             if (value.Get<Vector2>() != Vector2.zero)
@@ -213,12 +185,10 @@ namespace LightPat.Core
             }
             else
             {
-                decelerate = true;
                 animator.SetBool("Walk", false);
                 UpdateAnimationStateServerRpc("Walk", false);
             }
 
-            if (value.Get<Vector2>() != moveInput) { moveInputChanged = true; }
             moveInput = value.Get<Vector2>();
         }
 
