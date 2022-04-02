@@ -156,11 +156,11 @@ namespace LightPat.Core
             {
                 // Reset the velocity when the user switches keys
                 // Useful when the user goes from holding W to holding W and D
-                if (moveInputChanged)
-                {
-                    rb.velocity = new Vector3(0, rb.velocity.y, 0);
-                    moveInputChanged = false;
-                }
+                //if (moveInputChanged)
+                //{
+                //    rb.velocity = new Vector3(0, rb.velocity.y, 0);
+                //    moveInputChanged = false;
+                //}
 
                 // If current speed on the x and z axis is less than maxSpeed
                 if (new Vector2(rb.velocity.x, rb.velocity.z).magnitude < maxSpeed)
@@ -169,7 +169,8 @@ namespace LightPat.Core
                     float speedDiff = maxSpeed - rb.velocity.magnitude;
                     // Clamp Magnitude of force vector so that we never add too much force
                     // This affects acceleration rates
-                    rb.AddForce(rb.rotation * Vector3.ClampMagnitude(new Vector3(moveInput.x, 0, moveInput.y) * speedDiff, acceleration), ForceMode.VelocityChange);
+                    //rb.AddForce(rb.rotation * Vector3.ClampMagnitude(new Vector3(moveInput.x, 0, moveInput.y) * speedDiff, acceleration), ForceMode.VelocityChange);
+                    rb.AddForce(rb.rotation * new Vector3(moveInput.x, 0, moveInput.y) * speedDiff, ForceMode.VelocityChange);
                 }
             }
             else
@@ -177,7 +178,8 @@ namespace LightPat.Core
                 // Deceleration
                 if (decelerate)
                 {
-                    StartCoroutine(decelerateCoroutine());
+                    //StartCoroutine(decelerateCoroutine());
+                    rb.AddForce(new Vector3(-rb.velocity.x, 0, -rb.velocity.z), ForceMode.VelocityChange);
                     decelerate = false;
                 }
             }
@@ -199,24 +201,16 @@ namespace LightPat.Core
             Vector3 startingVelocity = rb.velocity;
             Vector3 talliedVelocity = Vector3.zero;
 
-            while (startingVelocity.magnitude > talliedVelocity.magnitude)
+            while (startingVelocity.magnitude - talliedVelocity.magnitude > 3)
             {
-                Vector3 force = rb.rotation * Vector3.ClampMagnitude(new Vector3(-rb.velocity.x, 0, -rb.velocity.z), deceleration);
+                // Don't apply rotation since we're pulling velocity from the rigidbody already
+                Vector3 force = Vector3.ClampMagnitude(new Vector3(-rb.velocity.x, 0, -rb.velocity.z), deceleration);
                 talliedVelocity += force;
-
-                Debug.Log(talliedVelocity);
-
                 rb.AddForce(force, ForceMode.VelocityChange);
                 yield return new WaitForEndOfFrame();
             }
 
             yield return new WaitForEndOfFrame();
-
-            //for (int i = 0; i < 50; i++)
-            //{
-            //    rb.AddForce(rb.rotation * Vector3.ClampMagnitude(new Vector3(-rb.velocity.x, 0, -rb.velocity.z), deceleration), ForceMode.VelocityChange);
-            //    yield return new WaitForEndOfFrame();
-            //}
         }
 
         void OnBounce()
