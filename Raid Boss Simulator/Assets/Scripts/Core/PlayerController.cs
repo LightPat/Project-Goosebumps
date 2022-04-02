@@ -151,41 +151,17 @@ namespace LightPat.Core
 
         void FixedUpdate()
         {
-            // If the user is inputting a key
-            if (moveInput != Vector2.zero)
-            {
-                // Reset the velocity when the user switches keys
-                // Useful when the user goes from holding W to holding W and D
-                //if (moveInputChanged)
-                //{
-                //    rb.velocity = new Vector3(0, rb.velocity.y, 0);
-                //    moveInputChanged = false;
-                //}
+            newPosition = transform.position + rb.rotation * new Vector3(moveInput.x, 0, moveInput.y) * currentSpeed * NetworkManager.Singleton.LocalTime.FixedDeltaTime;
 
-                // If current speed on the x and z axis is less than maxSpeed
-                if (new Vector2(rb.velocity.x, rb.velocity.z).magnitude < maxSpeed)
-                {
-                    // Scale the amount of velocity we're adding so that we don't go over the max speed
-                    float speedDiff = maxSpeed - rb.velocity.magnitude;
-                    // Clamp Magnitude of force vector so that we never add too much force
-                    // This affects acceleration rates
-                    //rb.AddForce(rb.rotation * Vector3.ClampMagnitude(new Vector3(moveInput.x, 0, moveInput.y) * speedDiff, acceleration), ForceMode.VelocityChange);
-                    rb.AddForce(rb.rotation * new Vector3(moveInput.x, 0, moveInput.y) * speedDiff, ForceMode.VelocityChange);
-                }
-            }
-            else
-            {
-                // Deceleration
-                if (decelerate)
-                {
-                    //StartCoroutine(decelerateCoroutine());
-                    rb.AddForce(new Vector3(-rb.velocity.x, 0, -rb.velocity.z), ForceMode.VelocityChange);
-                    decelerate = false;
-                }
-            }
+            //// Send position update to server
+            //if (newPosition != transform.position)
+            //{
+            //    MoveServerRpc(newPosition);
+            //}
 
-            // TODO Edit acceleration and deceleration rates
-            // If we go into moving diagonally just switch modes, right no we keep the velocity moving in the wrong direction
+            Debug.Log(transform.position + " " + newPosition);
+            rb.AddForce(rb.rotation * new Vector3(moveInput.x, 0, moveInput.y) * currentSpeed - rb.velocity, ForceMode.VelocityChange);
+            //rb.MovePosition(newPosition);
 
             // Falling Gravity velocity increase
             if (rb.velocity.y < 0)
