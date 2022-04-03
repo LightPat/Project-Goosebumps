@@ -94,7 +94,9 @@ namespace LightPat.Core.WeaponSystem
                         return;
                     }
 
-                    GameObject reg = Instantiate(g.GetComponent<Weapon>().regularPrefab, primaryHand, false);
+                    GameObject reg = Instantiate(g.GetComponent<Weapon>().regularPrefab, primaryHand.position, transform.rotation);
+                    reg.transform.SetParent(transform, true);
+                    reg.GetComponent<WeaponFollow>().followTarget = primaryHand;
                     reg.name = g.GetComponent<Weapon>().regularPrefab.name;
 
                     // Append gameobject to end of loadout if loadout slot is empty
@@ -128,7 +130,9 @@ namespace LightPat.Core.WeaponSystem
             {
                 if (g.GetComponent<NetworkObject>().NetworkObjectId == targetId)
                 {
-                    GameObject reg = Instantiate(g.GetComponent<Weapon>().regularPrefab, primaryHand, false);
+                    GameObject reg = Instantiate(g.GetComponent<Weapon>().regularPrefab, primaryHand.position, transform.rotation);
+                    reg.transform.SetParent(transform, true);
+                    reg.GetComponent<WeaponFollow>().followTarget = primaryHand;
                     reg.name = g.GetComponent<Weapon>().regularPrefab.name;
 
                     // Append gameobject to end of loadout if loadout slot is empty
@@ -177,7 +181,7 @@ namespace LightPat.Core.WeaponSystem
             {
                 int equipIndex = getEquippedWeaponIndex();
                 // Set the currently active equipped weapon to inactive, and return if that was the index we were trying to query
-                animator.SetBool("Holding Weapon", false);
+                animator.SetBool("Holding Rifle", false);
                 getEquippedWeapon().SetActive(false);
 
                 if (equipIndex == index)
@@ -187,7 +191,7 @@ namespace LightPat.Core.WeaponSystem
                 }
             }
 
-            animator.SetBool("Holding Weapon", true);
+            animator.SetBool("Holding Rifle", true);
 
             loadout[index].SetActive(true);
             QueryLoadoutServerRpc(index);
@@ -486,7 +490,8 @@ namespace LightPat.Core.WeaponSystem
         {
             if (getEquippedWeapon() == null) { return; }
 
-            animator.SetBool("Holding Weapon", false);
+            animator.SetBool("Holding Rifle", false);
+            UpdateAnimationStateServerRpc("Holding Rifle", false);
             dropWeaponServerRpc(getEquippedWeaponIndex());
         }
 
@@ -542,6 +547,24 @@ namespace LightPat.Core.WeaponSystem
         {
             g.transform.localPosition = Vector3.zero;
             g.transform.localRotation = Quaternion.identity;
+        }
+
+        [ServerRpc]
+        void UpdateAnimationStateServerRpc(string stateName, bool value)
+        {
+            if (!IsHost)
+            {
+                animator.SetBool(stateName, value);
+            }
+            UpdateAnimationStateClientRpc(stateName, value);
+        }
+
+        [ClientRpc]
+        void UpdateAnimationStateClientRpc(string stateName, bool value)
+        {
+            if (IsLocalPlayer) { return; }
+
+            animator.SetBool(stateName, value);
         }
     }
 }
