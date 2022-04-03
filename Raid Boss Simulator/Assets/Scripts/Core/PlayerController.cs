@@ -143,11 +143,6 @@ namespace LightPat.Core
                 }
             }
 
-            if (moveInput != Vector2.zero)
-            {
-                MoveServerRpc(transform.position);
-            }
-
             bool grounded = isGrounded();
 
             animator.SetBool("Airborne", !grounded);
@@ -170,8 +165,6 @@ namespace LightPat.Core
 
         [Header("Move Settings")]
         public float walkingSpeed = 5f;
-        public float interpolationRate;
-        private bool interpolationRunning = false;
         private Vector2 moveInput;
         private float currentSpeed;
         void OnMove(InputValue value)
@@ -188,49 +181,6 @@ namespace LightPat.Core
             }
 
             moveInput = value.Get<Vector2>();
-        }
-
-        [ServerRpc]
-        void MoveServerRpc(Vector3 newPosition)
-        {
-            if (!IsHost)
-            {
-                //transform.position = Vector3.Lerp(transform.position, newPosition, interpolationRate);
-                if (!interpolationRunning)
-                {
-                    StartCoroutine(interpolateMovement(newPosition));
-                }
-            }
-            MoveClientRpc(newPosition);
-        }
-
-        [ClientRpc]
-        void MoveClientRpc(Vector3 newPosition)
-        {
-            if (IsLocalPlayer) { return; }
-
-            if (!interpolationRunning)
-            {
-                StartCoroutine(interpolateMovement(newPosition));
-            }
-        }
-
-        private IEnumerator interpolateMovement(Vector3 endPosition)
-        {
-            interpolationRunning = true;
-            Vector3 startingPosition = transform.position;
-            Vector3 interpolationFactor = (endPosition - transform.position) * interpolationRate;
-
-            Debug.Log(startingPosition + " " + interpolationFactor + " " + endPosition);
-
-            for (float i = 0; i < 1; i += interpolationRate)
-            {
-                transform.position += interpolationFactor;
-                yield return new WaitForEndOfFrame();
-            }
-
-            yield return new WaitForEndOfFrame();
-            interpolationRunning = false;
         }
 
         [Header("Look Settings")]

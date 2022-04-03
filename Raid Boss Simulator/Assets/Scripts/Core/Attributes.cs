@@ -29,8 +29,10 @@ namespace LightPat.Core
 
             if (HP.Value <= 0)
             {
-                GetComponent<NetworkObject>().Despawn();
+                //GetComponent<NetworkObject>().Despawn();
                 DisplayLogger.Instance.LogInfo(gameObject.name + " is dead.");
+                HP.Value += maxHealth;
+                transform.position = new Vector3(0, 1, 0);
             }
         }
 
