@@ -98,6 +98,7 @@ namespace LightPat.Core.WeaponSystem
 
             magazine.parent = null;
             magazine.GetComponent<Rigidbody>().isKinematic = false;
+            magazine.GetComponent<Collider>().enabled = true;
             GetComponent<Animator>().Play("Reload");
 
             StartCoroutine(ReloadCoroutine(magazine.gameObject, newMag));

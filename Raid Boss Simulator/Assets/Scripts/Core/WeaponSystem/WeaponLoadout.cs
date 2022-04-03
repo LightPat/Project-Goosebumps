@@ -60,7 +60,6 @@ namespace LightPat.Core.WeaponSystem
             // Set to point where hand and weapon handle intersect
             reg.transform.localPosition = reg.transform.Find("Weapon Handle").localPosition * -1;
             reg.transform.SetParent(transform, true);
-            Debug.Log(reg.transform.position);
             reg.name = g.GetComponent<Weapon>().regularPrefab.name;
 
             // Append gameobject to end of loadout if loadout slot is empty
