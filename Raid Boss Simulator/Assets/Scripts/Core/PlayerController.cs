@@ -124,6 +124,7 @@ namespace LightPat.Core
 
             if (oldRotation != newRotation)
             {
+                pingWatch.Start();
                 RotateServerRpc(lookEulers);
             }
 
@@ -189,6 +190,8 @@ namespace LightPat.Core
         private Quaternion oldRotation;
         private Vector3 lookEulers;
         private Vector2 lookInput;
+        private System.Diagnostics.Stopwatch pingWatch = new System.Diagnostics.Stopwatch();
+        public TextMeshProUGUI pingDisplay;
         void OnLook(InputValue value)
         {
             lookInput = value.Get<Vector2>();
@@ -209,6 +212,11 @@ namespace LightPat.Core
         [ClientRpc]
         void RotateClientRpc(Vector3 newRotationEulers)
         {
+            if (pingWatch.ElapsedMilliseconds > 0)
+            {
+                pingDisplay.SetText(pingWatch.ElapsedMilliseconds.ToString() + " ms");
+            }
+            pingWatch.Reset();
             if (IsLocalPlayer) { return; }
 
             rb.MoveRotation(Quaternion.Euler(0, newRotationEulers.x, 0));
