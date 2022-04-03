@@ -1,5 +1,35 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
+--- !u!1 &5015740864280155672
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5934169972228615445}
+  m_Layer: 0
+  m_Name: Weapon Handle
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5934169972228615445
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5015740864280155672}
+  m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -0, y: -0.622, z: -1.145}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 6901378238141329974}
+  m_RootOrder: 75
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &6901378238141329984
 GameObject:
   m_ObjectHideFlags: 0
@@ -741,7 +771,7 @@ GameObject:
   - component: {fileID: 6901378238141330060}
   - component: {fileID: 6901378238141330128}
   m_Layer: 0
-  m_Name: Untitled_26
+  m_Name: Untilted_26
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2052,7 +2082,7 @@ MeshCollider:
   m_GameObject: {fileID: 6901378238141330032}
   m_Material: {fileID: 0}
   m_IsTrigger: 0
-  m_Enabled: 1
+  m_Enabled: 0
   serializedVersion: 4
   m_Convex: 1
   m_CookingOptions: 30
@@ -5839,6 +5869,7 @@ Transform:
   - {fileID: 6901378238141329926}
   - {fileID: 6901378238141329940}
   - {fileID: 6901378238141329971}
+  - {fileID: 5934169972228615445}
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -6067,7 +6098,6 @@ MonoBehaviour:
   criticalMultiplier: 2
   fullAuto: 1
   volume: 0.1
-  allowAttack: 1
   rateOfFire: 500
   magazineSize: 30
   bulletsRemaining: 1

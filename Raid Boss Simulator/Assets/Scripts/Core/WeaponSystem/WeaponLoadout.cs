@@ -20,8 +20,17 @@ namespace LightPat.Core.WeaponSystem
         private GameObject[] HUDloadoutDisplaySlots = new GameObject[3];
         private GameObject[] GUIloadoutDisplaySlots = new GameObject[3];
 
+        private Transform rightShoulder;
+        private Transform primaryHand;
+        private Transform equippedWeaponSpawnPoint;
+        private Animator animator;
+
         void Start()
         {
+            rightShoulder = transform.Find("Model").Find("Body").Find("Shoulder R");
+            primaryHand = rightShoulder.Find("Upper Arm").Find("Elbow").Find("Lower Arm").Find("Hand");
+            animator = GetComponent<Animator>();
+
             // Get all the textmeshpro gameObjects that are used to display the loadout
             for (int i = 0; i < HUDloadoutDisplaySlots.Length; i++)
             {
@@ -46,7 +55,12 @@ namespace LightPat.Core.WeaponSystem
 
             if (!openSlot) { DisplayLogger.Instance.LogInfo("Loadout Full!"); return; }
 
-            GameObject reg = Instantiate(g.GetComponent<Weapon>().regularPrefab, GetComponent<PlayerController>().verticalRotate.Find("Equipped Weapon Spawn Point"), false);
+            GameObject reg = Instantiate(g.GetComponent<Weapon>().regularPrefab, Vector3.zero, transform.rotation);
+            reg.transform.SetParent(primaryHand, true);
+            // Set to point where hand and weapon handle intersect
+            reg.transform.localPosition = reg.transform.Find("Weapon Handle").localPosition * -1;
+            reg.transform.SetParent(transform, true);
+            Debug.Log(reg.transform.position);
             reg.name = g.GetComponent<Weapon>().regularPrefab.name;
 
             // Append gameobject to end of loadout if loadout slot is empty
@@ -83,7 +97,7 @@ namespace LightPat.Core.WeaponSystem
                         return;
                     }
 
-                    GameObject reg = Instantiate(g.GetComponent<Weapon>().regularPrefab, GetComponent<PlayerController>().verticalRotate.Find("Equipped Weapon Spawn Point"), false);
+                    GameObject reg = Instantiate(g.GetComponent<Weapon>().regularPrefab, primaryHand, false);
                     reg.name = g.GetComponent<Weapon>().regularPrefab.name;
 
                     // Append gameobject to end of loadout if loadout slot is empty
@@ -117,7 +131,7 @@ namespace LightPat.Core.WeaponSystem
             {
                 if (g.GetComponent<NetworkObject>().NetworkObjectId == targetId)
                 {
-                    GameObject reg = Instantiate(g.GetComponent<Weapon>().regularPrefab, GetComponent<PlayerController>().verticalRotate.Find("Equipped Weapon Spawn Point"), false);
+                    GameObject reg = Instantiate(g.GetComponent<Weapon>().regularPrefab, primaryHand, false);
                     reg.name = g.GetComponent<Weapon>().regularPrefab.name;
 
                     // Append gameobject to end of loadout if loadout slot is empty
@@ -156,6 +170,18 @@ namespace LightPat.Core.WeaponSystem
             QueryLoadout(2);
         }
 
+        private void Update()
+        {
+            //if (getEquippedWeapon() != null)
+            //{
+            //    rightShoulder.rotation = Quaternion.LookRotation(getEquippedWeapon().transform.Find("Weapon Handle").position);
+            //}
+            //else
+            //{
+            //    rightShoulder.rotation = Quaternion.identity;
+            //}
+        }
+
         private void QueryLoadout(int index)
         {
             // If there is no weapon in the loadout slot, return
@@ -167,13 +193,18 @@ namespace LightPat.Core.WeaponSystem
                 int equipIndex = getEquippedWeaponIndex();
                 // Set the currently active equipped weapon to inactive, and return if that was the index we were trying to query
                 getEquippedWeapon().SetActive(false);
-                
+
                 if (equipIndex == index)
                 {
+                    
                     QueryLoadoutServerRpc(index); 
                     return;
                 }
             }
+
+            //FakeChild fc = loadout[index].gameObject.AddComponent(typeof(FakeChild)) as FakeChild;
+            //fc.SetFakeParent(primaryHand);
+            //rightShoulder.Find("Upper Arm").Find("Elbow").rotation = Quaternion.Euler(-45, 0, 0);
 
             loadout[index].SetActive(true);
             QueryLoadoutServerRpc(index);

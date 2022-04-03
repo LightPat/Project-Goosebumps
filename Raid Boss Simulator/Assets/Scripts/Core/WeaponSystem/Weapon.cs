@@ -27,7 +27,8 @@ namespace LightPat.Core
 
         public void updateCamera()
         {
-            firstPersonCamera = transform.parent.parent.Find("First Person Camera").gameObject;
+            //firstPersonCamera = transform.parent.parent.Find("First Person Camera").gameObject;
+            firstPersonCamera = Camera.main.gameObject;
         }
 
         public void setTextDisplay(GameObject g)
