@@ -143,6 +143,8 @@ namespace LightPat.Core
                 }
             }
 
+            MoveServerRpc(transform.position);
+
             bool grounded = isGrounded();
 
             animator.SetBool("Airborne", !grounded);
@@ -151,13 +153,10 @@ namespace LightPat.Core
 
         void FixedUpdate()
         {
-
             Vector3 moveForce = rb.rotation * new Vector3(moveInput.x, 0, moveInput.y) * currentSpeed;
             moveForce.x -= rb.velocity.x;
             moveForce.z -= rb.velocity.z;
             rb.AddForce(moveForce, ForceMode.VelocityChange);
-
-            //MoveServerRpc(moveForce);
 
             // Falling Gravity velocity increase
             if (rb.velocity.y < 0)
@@ -166,28 +165,11 @@ namespace LightPat.Core
             }
         }
 
-        [ServerRpc]
-        void MoveServerRpc(Vector3 moveForce)
-        {
-            if (!IsHost)
-            {
-                rb.AddForce(moveForce, ForceMode.VelocityChange);
-            }
-            MoveClientRpc(moveForce);
-        }
-
-        [ClientRpc]
-        void MoveClientRpc(Vector3 moveForce)
-        {
-            if (IsLocalPlayer) { return; }
-
-            rb.AddForce(moveForce, ForceMode.VelocityChange);
-        }
-
         [Header("Move Settings")]
         public float walkingSpeed = 5f;
+        public float interpolationRate;
+        private bool interpolationRunning = false;
         private Vector2 moveInput;
-        private Vector3 newPosition;
         private float currentSpeed;
         void OnMove(InputValue value)
         {
@@ -203,6 +185,51 @@ namespace LightPat.Core
             }
 
             moveInput = value.Get<Vector2>();
+        }
+
+        void OnTest()
+        {
+            Vector3 endPosition = new Vector3(5,0,5);
+            StartCoroutine(interpolateMovement(endPosition));
+        }
+
+        [ServerRpc]
+        void MoveServerRpc(Vector3 newPosition)
+        {
+            if (!IsHost)
+            {
+                //transform.position = Vector3.Lerp(transform.position, newPosition, interpolationRate);
+                StartCoroutine(interpolateMovement(newPosition));
+            }
+            MoveClientRpc(newPosition);
+        }
+
+        [ClientRpc]
+        void MoveClientRpc(Vector3 newPosition)
+        {
+            if (IsLocalPlayer) { return; }
+
+            StartCoroutine(interpolateMovement(newPosition));
+            //transform.position = Vector3.Lerp(transform.position, newPosition, interpolationRate);
+        }
+
+        private IEnumerator interpolateMovement(Vector3 endPosition)
+        {
+            interpolationRunning = true;
+            Vector3 startingPosition = transform.position;
+            Vector3 interpolationFactor = (endPosition - transform.position) * interpolationRate;
+            interpolationFactor.y = transform.position.y;
+
+            Debug.Log(startingPosition + " " + interpolationFactor + " " + endPosition);
+
+            for (float i = 0; i < 1; i += interpolationRate)
+            {
+                transform.position += interpolationFactor;
+                yield return new WaitForEndOfFrame();
+            }
+
+            yield return new WaitForEndOfFrame();
+            interpolationRunning = false;
         }
 
         [Header("Look Settings")]
