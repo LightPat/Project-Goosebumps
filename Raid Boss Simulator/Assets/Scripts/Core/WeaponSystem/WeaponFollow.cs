@@ -12,9 +12,8 @@ namespace LightPat.Core.WeaponSystem
         private void Update()
         {
             if (followTarget == null) { return; }
-
-            transform.position = Vector3.MoveTowards(transform.position, followTarget.position, 0.5f);
-            //reg.transform.localPosition = reg.transform.Find("Weapon Handle").localPosition * -1;
+            transform.position = followTarget.position;
+            transform.localPosition = transform.localPosition + transform.Find("PrimaryHandSpot").localPosition * -1 * transform.localScale.x;
         }
     }
 }
