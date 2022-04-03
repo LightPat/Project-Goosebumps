@@ -182,6 +182,7 @@ namespace LightPat.Core.WeaponSystem
                 int equipIndex = getEquippedWeaponIndex();
                 // Set the currently active equipped weapon to inactive, and return if that was the index we were trying to query
                 animator.SetBool("Holding Rifle", false);
+                UpdateAnimationStateServerRpc("Holding Rifle", false);
                 getEquippedWeapon().SetActive(false);
 
                 if (equipIndex == index)
@@ -192,6 +193,7 @@ namespace LightPat.Core.WeaponSystem
             }
 
             animator.SetBool("Holding Rifle", true);
+            UpdateAnimationStateServerRpc("Holding Rifle", true);
 
             loadout[index].SetActive(true);
             QueryLoadoutServerRpc(index);
