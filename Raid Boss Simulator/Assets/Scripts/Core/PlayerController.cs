@@ -143,7 +143,10 @@ namespace LightPat.Core
                 }
             }
 
-            MoveServerRpc(transform.position);
+            if (moveInput != Vector2.zero)
+            {
+                MoveServerRpc(transform.position);
+            }
 
             bool grounded = isGrounded();
 
@@ -187,19 +190,16 @@ namespace LightPat.Core
             moveInput = value.Get<Vector2>();
         }
 
-        void OnTest()
-        {
-            Vector3 endPosition = new Vector3(5,0,5);
-            StartCoroutine(interpolateMovement(endPosition));
-        }
-
         [ServerRpc]
         void MoveServerRpc(Vector3 newPosition)
         {
             if (!IsHost)
             {
                 //transform.position = Vector3.Lerp(transform.position, newPosition, interpolationRate);
-                StartCoroutine(interpolateMovement(newPosition));
+                if (!interpolationRunning)
+                {
+                    StartCoroutine(interpolateMovement(newPosition));
+                }
             }
             MoveClientRpc(newPosition);
         }
@@ -209,8 +209,10 @@ namespace LightPat.Core
         {
             if (IsLocalPlayer) { return; }
 
-            StartCoroutine(interpolateMovement(newPosition));
-            //transform.position = Vector3.Lerp(transform.position, newPosition, interpolationRate);
+            if (!interpolationRunning)
+            {
+                StartCoroutine(interpolateMovement(newPosition));
+            }
         }
 
         private IEnumerator interpolateMovement(Vector3 endPosition)
@@ -218,7 +220,6 @@ namespace LightPat.Core
             interpolationRunning = true;
             Vector3 startingPosition = transform.position;
             Vector3 interpolationFactor = (endPosition - transform.position) * interpolationRate;
-            interpolationFactor.y = transform.position.y;
 
             Debug.Log(startingPosition + " " + interpolationFactor + " " + endPosition);
 
