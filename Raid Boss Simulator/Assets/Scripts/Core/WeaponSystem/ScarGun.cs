@@ -88,8 +88,6 @@ namespace LightPat.Core.WeaponSystem
 
             reloading = true;
 
-            // Check if mag is full here
-
             Transform magazine = transform.Find("Magazine");
 
             GameObject newMag = Instantiate(magazine.gameObject, transform);
@@ -98,7 +96,6 @@ namespace LightPat.Core.WeaponSystem
 
             magazine.parent = null;
             magazine.GetComponent<Rigidbody>().isKinematic = false;
-            magazine.GetComponent<Collider>().enabled = true;
             GetComponent<Animator>().Play("Reload");
 
             StartCoroutine(ReloadCoroutine(magazine.gameObject, newMag));

@@ -55,11 +55,9 @@ namespace LightPat.Core.WeaponSystem
 
             if (!openSlot) { DisplayLogger.Instance.LogInfo("Loadout Full!"); return; }
 
-            GameObject reg = Instantiate(g.GetComponent<Weapon>().regularPrefab, Vector3.zero, transform.rotation);
-            reg.transform.SetParent(primaryHand, true);
-            // Set to point where hand and weapon handle intersect
-            reg.transform.localPosition = reg.transform.Find("Weapon Handle").localPosition * -1;
+            GameObject reg = Instantiate(g.GetComponent<Weapon>().regularPrefab, primaryHand.position, transform.rotation);
             reg.transform.SetParent(transform, true);
+            reg.GetComponent<WeaponFollow>().followTarget = primaryHand;
             reg.name = g.GetComponent<Weapon>().regularPrefab.name;
 
             // Append gameobject to end of loadout if loadout slot is empty
@@ -169,18 +167,6 @@ namespace LightPat.Core.WeaponSystem
             QueryLoadout(2);
         }
 
-        private void Update()
-        {
-            //if (getEquippedWeapon() != null)
-            //{
-            //    rightShoulder.rotation = Quaternion.LookRotation(getEquippedWeapon().transform.Find("Weapon Handle").position);
-            //}
-            //else
-            //{
-            //    rightShoulder.rotation = Quaternion.identity;
-            //}
-        }
-
         private void QueryLoadout(int index)
         {
             // If there is no weapon in the loadout slot, return
@@ -191,19 +177,17 @@ namespace LightPat.Core.WeaponSystem
             {
                 int equipIndex = getEquippedWeaponIndex();
                 // Set the currently active equipped weapon to inactive, and return if that was the index we were trying to query
+                animator.SetBool("Holding Weapon", false);
                 getEquippedWeapon().SetActive(false);
 
                 if (equipIndex == index)
                 {
-                    
                     QueryLoadoutServerRpc(index); 
                     return;
                 }
             }
 
-            //FakeChild fc = loadout[index].gameObject.AddComponent(typeof(FakeChild)) as FakeChild;
-            //fc.SetFakeParent(primaryHand);
-            //rightShoulder.Find("Upper Arm").Find("Elbow").rotation = Quaternion.Euler(-45, 0, 0);
+            animator.SetBool("Holding Weapon", true);
 
             loadout[index].SetActive(true);
             QueryLoadoutServerRpc(index);
@@ -502,6 +486,7 @@ namespace LightPat.Core.WeaponSystem
         {
             if (getEquippedWeapon() == null) { return; }
 
+            animator.SetBool("Holding Weapon", false);
             dropWeaponServerRpc(getEquippedWeaponIndex());
         }
 

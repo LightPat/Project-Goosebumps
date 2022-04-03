@@ -24,7 +24,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5015740864280155672}
   m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -0, y: -0.622, z: -1.145}
+  m_LocalPosition: {x: -0, y: -0.647, z: -1.078}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 6901378238141329974}
@@ -5675,7 +5675,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6901378238141330333}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0.27, z: 2.868}
+  m_LocalPosition: {x: 0, y: 0.27, z: 2.88}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 6901378238141329974}
@@ -5775,6 +5775,7 @@ GameObject:
   - component: {fileID: 6901378238141329731}
   - component: {fileID: 6901378238141329788}
   - component: {fileID: 6901378238141330403}
+  - component: {fileID: 431588804696944092}
   - component: {fileID: 4218768641062493319}
   m_Layer: 0
   m_Name: Scar
@@ -6101,6 +6102,19 @@ MonoBehaviour:
   rateOfFire: 500
   magazineSize: 30
   bulletsRemaining: 1
+--- !u!114 &431588804696944092
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6901378238141330335}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6948af7c2aa8b2341b5bcb0e8e973b15, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  followTarget: {fileID: 0}
 --- !u!95 &4218768641062493319
 Animator:
   serializedVersion: 3
