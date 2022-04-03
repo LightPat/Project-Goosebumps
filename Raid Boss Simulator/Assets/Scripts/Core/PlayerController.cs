@@ -212,12 +212,11 @@ namespace LightPat.Core
         [ClientRpc]
         void RotateClientRpc(Vector3 newRotationEulers)
         {
-            if (pingWatch.ElapsedMilliseconds > 0)
-            {
+            if (IsLocalPlayer) {
                 pingDisplay.SetText(pingWatch.ElapsedMilliseconds.ToString() + " ms");
+                pingWatch.Reset();
+                return;
             }
-            pingWatch.Reset();
-            if (IsLocalPlayer) { return; }
 
             rb.MoveRotation(Quaternion.Euler(0, newRotationEulers.x, 0));
             verticalRotate.rotation = Quaternion.Euler(-newRotationEulers.y, newRotationEulers.x, 0);
