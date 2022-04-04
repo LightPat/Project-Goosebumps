@@ -248,7 +248,7 @@ namespace LightPat.Core
                 if (grounded & !idleJumpRunning)
                 {
                     float jumpForce = Mathf.Sqrt(jumpHeight * -2 * Physics.gravity.y);
-                    if (animator.GetCurrentAnimatorStateInfo(0).IsName("Idle"))
+                    if (animator.GetCurrentAnimatorStateInfo(3).IsName("Idle L Leg"))
                     {
                         StartCoroutine(IdleJump(jumpForce));
                     }

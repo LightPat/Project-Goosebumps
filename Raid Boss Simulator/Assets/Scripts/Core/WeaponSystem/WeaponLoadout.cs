@@ -196,7 +196,6 @@ namespace LightPat.Core.WeaponSystem
 
             animator.SetBool("Holding " + loadout[index].GetComponent<Weapon>().animationClass, true);
             UpdateAnimationStateServerRpc("Holding " + loadout[index].GetComponent<Weapon>().animationClass, true);
-            Debug.Log(loadout[index]);
             loadout[index].SetActive(true);
             QueryLoadoutServerRpc(index);
         }
