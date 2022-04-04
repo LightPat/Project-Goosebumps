@@ -240,6 +240,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   networkedPrefab: {fileID: 3694578424528917851, guid: 68be300dd8325d14a9ae894dd9f5903d, type: 3}
   regularPrefab: {fileID: 3409302727197833004}
+  animationClass: Two-Handed Sword
   baseDamage: 20
   criticalMultiplier: 2
   fullAuto: 0

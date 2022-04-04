@@ -176,25 +176,27 @@ namespace LightPat.Core.WeaponSystem
             // If there is no weapon in the loadout slot, return
             if (loadout[index] == null) { return; }
 
+            GameObject w = getEquippedWeapon();
+
             // If there is already an equipped weapon
-            if (getEquippedWeapon() != null)
+            if (w != null)
             {
                 int equipIndex = getEquippedWeaponIndex();
                 // Set the currently active equipped weapon to inactive, and return if that was the index we were trying to query
-                animator.SetBool("Holding Rifle", false);
-                UpdateAnimationStateServerRpc("Holding Rifle", false);
-                getEquippedWeapon().SetActive(false);
+                animator.SetBool("Holding " + w.GetComponent<Weapon>().animationClass, false);
+                UpdateAnimationStateServerRpc("Holding " + w.GetComponent<Weapon>().animationClass, false);
+                w.SetActive(false);
 
                 if (equipIndex == index)
                 {
-                    QueryLoadoutServerRpc(index); 
+                    QueryLoadoutServerRpc(index);
                     return;
                 }
             }
 
-            animator.SetBool("Holding Rifle", true);
-            UpdateAnimationStateServerRpc("Holding Rifle", true);
-
+            animator.SetBool("Holding " + loadout[index].GetComponent<Weapon>().animationClass, true);
+            UpdateAnimationStateServerRpc("Holding " + loadout[index].GetComponent<Weapon>().animationClass, true);
+            Debug.Log(loadout[index]);
             loadout[index].SetActive(true);
             QueryLoadoutServerRpc(index);
         }
@@ -490,10 +492,11 @@ namespace LightPat.Core.WeaponSystem
 
         void OnDrop()
         {
-            if (getEquippedWeapon() == null) { return; }
+            GameObject w = getEquippedWeapon();
+            if (w == null) { return; }
 
-            animator.SetBool("Holding Rifle", false);
-            UpdateAnimationStateServerRpc("Holding Rifle", false);
+            animator.SetBool("Holding " + w.GetComponent<Weapon>().animationClass, false);
+            UpdateAnimationStateServerRpc("Holding " + w.GetComponent<Weapon>().animationClass, false);
             dropWeaponServerRpc(getEquippedWeaponIndex());
         }
 

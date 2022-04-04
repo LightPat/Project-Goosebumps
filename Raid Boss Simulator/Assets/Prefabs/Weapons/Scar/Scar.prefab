@@ -6095,6 +6095,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   networkedPrefab: {fileID: 4111316805484961874, guid: b5a826f5878461142b00823c06dc4eaf, type: 3}
   regularPrefab: {fileID: 6901378238141330335}
+  animationClass: Rifle
   baseDamage: 5
   criticalMultiplier: 2
   fullAuto: 1

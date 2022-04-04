@@ -12,6 +12,7 @@ namespace LightPat.Core
         public GameObject regularPrefab;
 
         [Header("General Weapon Properties")]
+        public string animationClass;
         public float baseDamage;
         public float criticalMultiplier = 2f;
         public bool fullAuto = true;
