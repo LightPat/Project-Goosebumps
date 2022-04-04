@@ -145,7 +145,7 @@ namespace LightPat.Core
                 }
             }
 
-            bool grounded = isGrounded();
+            grounded = isGrounded();
 
             animator.SetBool("Airborne", !grounded);
             UpdateAnimationStateServerRpc("Airborne", !grounded);
@@ -223,17 +223,13 @@ namespace LightPat.Core
             verticalRotate.rotation = Quaternion.Euler(-newRotationEulers.y, newRotationEulers.x, 0);
         }
 
-        [Header("Is Grounded")]
-        public float checkDistance = 2f;
+        [Header("IsGrounded Settings")]
+        public float checkDistance = 1;
+        private bool grounded = false;
         bool isGrounded()
         {
             RaycastHit hit;
-            // Raycast any gameObject that is beneath the collider
-            Vector3 checkPosition = transform.position;
-            checkPosition.y += 1;
-
-            bool bHit = Physics.Raycast(checkPosition, transform.up * -1, out hit, checkDistance);
-
+            bool bHit = Physics.Raycast(new Vector3(transform.position.x, transform.position.y+1, transform.position.z), new Vector3(0,-1,0), out hit, checkDistance, LayerMask.GetMask("Ground"));
             return bHit;
         }
 
@@ -249,19 +245,16 @@ namespace LightPat.Core
 
             if (value.isPressed)
             {
-                if (isGrounded() & !idleJumpRunning)
+                if (grounded & !idleJumpRunning)
                 {
                     float jumpForce = Mathf.Sqrt(jumpHeight * -2 * Physics.gravity.y);
-
                     if (animator.GetCurrentAnimatorStateInfo(0).IsName("Idle"))
                     {
                         StartCoroutine(IdleJump(jumpForce));
-                        JumpServerRpc(jumpForce, true);
                     }
                     else
                     {
                         rb.AddForce(new Vector3(0, jumpForce, 0), ForceMode.VelocityChange);
-                        JumpServerRpc(jumpForce, false);
                     }
                 }
             }
@@ -272,42 +265,12 @@ namespace LightPat.Core
         {
             idleJumpRunning = true;
             animator.SetBool("Jump", true);
+            UpdateAnimationStateServerRpc("Jump", true);
             yield return new WaitForSeconds(0.5f);
             rb.AddForce(new Vector3(0, jumpForce, 0), ForceMode.VelocityChange);
             animator.SetBool("Jump", false);
+            UpdateAnimationStateServerRpc("Jump", false);
             idleJumpRunning = false;
-        }
-
-        [ServerRpc]
-        void JumpServerRpc(float jumpForce, bool idleJump)
-        {
-            if (!IsHost)
-            {
-                if (idleJump)
-                {
-                    StartCoroutine(IdleJump(jumpForce));
-                }
-                else
-                {
-                    rb.AddForce(new Vector3(0, jumpForce, 0), ForceMode.VelocityChange);
-                }
-            }
-            JumpClientRpc(jumpForce, idleJump);
-        }
-
-        [ClientRpc]
-        void JumpClientRpc(float jumpForce, bool idleJump)
-        {
-            if (IsLocalPlayer) { return; }
-
-            if (idleJump)
-            {
-                StartCoroutine(IdleJump(jumpForce));
-            }
-            else
-            {
-                rb.AddForce(new Vector3(0, jumpForce, 0), ForceMode.VelocityChange);
-            }
         }
 
         [Header("Crouch Settings")]
