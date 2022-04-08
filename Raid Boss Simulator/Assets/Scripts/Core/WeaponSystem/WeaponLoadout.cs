@@ -39,6 +39,71 @@ namespace LightPat.Core.WeaponSystem
             }
         }
 
+        private void Update()
+        {
+            // Full auto firing
+            GameObject w = getEquippedWeapon();
+            if (w != null)
+            {
+                if (attackHeld)
+                {
+                    if (w.GetComponent<Weapon>().fullAuto)
+                    {
+                        w.GetComponent<Weapon>().attack();
+                        AttackServerRpc();
+                    }
+                }
+            }
+        }
+
+        private bool attackHeld;
+        void OnAttack(InputValue value)
+        {
+            GameObject equippedWeapon = getEquippedWeapon();
+
+            // Fire if the weapon isn't full auto
+            // Full auto firing is handled in update()
+            if (value.isPressed)
+            {
+                if (equippedWeapon != null)
+                {
+                    if (!equippedWeapon.GetComponent<Weapon>().fullAuto)
+                    {
+                        equippedWeapon.GetComponent<Weapon>().attack();
+                        AttackServerRpc();
+                    }
+                }
+            }
+
+            if (value.isPressed)
+            {
+                attackHeld = true;
+            }
+            else
+            {
+                attackHeld = false;
+            }
+        }
+
+        [ServerRpc]
+        void AttackServerRpc()
+        {
+            if (!IsHost)
+            {
+                getEquippedWeapon().GetComponent<Weapon>().attack();
+            }
+
+            AttackClientRpc();
+        }
+
+        [ClientRpc]
+        void AttackClientRpc()
+        {
+            if (IsLocalPlayer) { return; }
+
+            getEquippedWeapon().GetComponent<Weapon>().attack();
+        }
+
         public void addWeapon(GameObject g)
         {
             if (g.transform.parent != null) { return; }
@@ -537,6 +602,26 @@ namespace LightPat.Core.WeaponSystem
             if (g == null) { return; }
 
             g.GetComponent<Weapon>().reload();
+            ReloadServerRpc();
+        }
+
+        [ServerRpc]
+        void ReloadServerRpc()
+        {
+            if (!IsHost)
+            {
+                getEquippedWeapon().GetComponent<Weapon>().reload();
+            }
+
+            ReloadClientRpc();
+        }
+
+        [ClientRpc]
+        void ReloadClientRpc()
+        {
+            if (IsLocalPlayer) { return; }
+
+            getEquippedWeapon().GetComponent<Weapon>().reload();
         }
 
         //------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------

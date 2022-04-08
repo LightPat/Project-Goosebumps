@@ -131,20 +131,6 @@ namespace LightPat.Core
 
             verticalRotate.rotation = Quaternion.Euler(-lookEulers.y, lookEulers.x, 0);
 
-            // Full auto firing
-            GameObject w = weaponLoadout.getEquippedWeapon();
-            if (w != null)
-            {
-                if (attackHeld)
-                {
-                    if (w.GetComponent<Weapon>().fullAuto)
-                    {
-                        w.GetComponent<Weapon>().attack();
-                        AttackServerRpc();
-                    }
-                }
-            }
-
             grounded = isGrounded();
 
             animator.SetBool("Airborne", !grounded);
@@ -327,54 +313,6 @@ namespace LightPat.Core
                     break;
                 }
             }
-        }
-
-        private bool attackHeld;
-        void OnAttack(InputValue value)
-        {
-            GameObject equippedWeapon = weaponLoadout.getEquippedWeapon();
-
-            // Fire if the weapon isn't full auto
-            // Full auto firing is handled in update()
-            if (value.isPressed)
-            {
-                if (equippedWeapon != null)
-                {
-                    if (!equippedWeapon.GetComponent<Weapon>().fullAuto)
-                    {
-                        equippedWeapon.GetComponent<Weapon>().attack();
-                        AttackServerRpc();
-                    }
-                }
-            }
-
-            if (value.isPressed)
-            {
-                attackHeld = true;
-            }
-            else
-            {
-                attackHeld = false;
-            }
-        }
-
-        [ServerRpc]
-        void AttackServerRpc()
-        {
-            if (!IsHost)
-            {
-                weaponLoadout.getEquippedWeapon().GetComponent<Weapon>().attack();
-            }
-
-            AttackClientRpc();
-        }
-
-        [ClientRpc]
-        void AttackClientRpc()
-        {
-            if (IsLocalPlayer) { return; }
-
-            weaponLoadout.getEquippedWeapon().GetComponent<Weapon>().attack();
         }
 
         private GameObject canvas;
