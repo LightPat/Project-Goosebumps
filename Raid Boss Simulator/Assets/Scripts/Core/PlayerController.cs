@@ -120,8 +120,7 @@ namespace LightPat.Core
             }
 
             Quaternion newRotation = Quaternion.Euler(0, lookEulers.x, 0);
-            //rb.MoveRotation(newRotation);
-            transform.rotation = newRotation;
+            rb.MoveRotation(newRotation);
 
             if (oldRotation != newRotation)
             {
