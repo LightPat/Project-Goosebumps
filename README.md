@@ -8,7 +8,7 @@ Fully implementing multiplayer sandbox
 
 ## In-Use Assets
 [Scar L](https://www.cgtrader.com/free-3d-models/military/gun/scar-l-01574b59-91cf-4a67-902c-fe52300fff9d)<br/>
-[Excalibur] (https://sketchfab.com/3d-models/fatestay-night-excalibur-updated-dc4e601857e94a2b9c3acbd856943581)
+[Excalibur](https://sketchfab.com/3d-models/fatestay-night-excalibur-updated-dc4e601857e94a2b9c3acbd856943581)
 
 ## Classes (abilities basically)
 ### Electromaster/Railgun
